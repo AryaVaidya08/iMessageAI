@@ -3,26 +3,21 @@ import bs4
 import os
 from tqdm import tqdm
 from datetime import datetime
-from backend.modules import Tapback, Message
+from backend.modules import Tapback, Message, Announcement
+
+PERSONAL_NUMBER = "YOUR_NUMBER"
 
 os.system("clear")
 
 files = os.listdir("./backend/parser/raw_export")
-files.sort()
-
-#files = [fileName4]
 
 messageCount = 0
 badMessages = 0
 
-def runProgram(fileName):
+def extractMessages(soup):
     global messageCount, badMessages
 
-    #Work with Command Line Arguments Later / Loop over all messages
-    soup = BeautifulSoup(open(fileName, "r"), features="html.parser")
-
     messages = soup.body.find_all('div', "message", recursive=False)
-    announcements = soup.body.find_all('div', "announcement", recursive=False)
 
     #SAVE WORKING FILE FOR EASE OF CHECKING
     #f = open("./output.html", "w")
@@ -70,16 +65,11 @@ def runProgram(fileName):
         timestampStr : str = anchorTag.getText()
         timestamp = datetime.strptime(timestampStr, "%b %d, %Y %I:%M:%S %p")
         
-
         sender : bs4.element.Tag = metadata_tag("span", attrs='sender', recursive=False)[0].getText()
-
 
         return messageID, timestamp, sender
 
     def extract_text_or_attachment(message_tags : list[bs4.element.Tag]):
-        #attachment, bubble, edited
-        #print(message_tags)
-
         message_text = ""
         attachment = False
         sticker = False
@@ -113,7 +103,7 @@ def runProgram(fileName):
 
         return message_text, attachment, sticker            
 
-    #NEED TO PUT INTO TAPBACK OBJECTS        
+    #TODO: NEED TO PUT INTO TAPBACK OBJECTS        
     def extract_tapbacks(tapback_tags : list[bs4.element.Tag]):
         tapbacks : list[Tapback] = []
         for tag in tapback_tags:
@@ -137,17 +127,16 @@ def runProgram(fileName):
 
     def extractReplyIDs(originalReplyDict : dict, originalID : str, reply_tags : list[bs4.element.Tag]):
         replies : list[bs4.element.Tag] = reply_tags[0]("div", attrs="reply", recursive=False)
-        #print("*" * 100)
+
         for reply in replies:
-            #print(reply)
-            #print()
             originalReplyDict[reply["id"]] = originalID
-        #print("*" * 100)
+
         return originalReplyDict
 
     replyDict = {}
 
     messageCount += len(messages)
+    allMessages : list[Message] = []
     for message in messages[:]:
 
         #print(message.prettify())
@@ -196,18 +185,89 @@ def runProgram(fileName):
 
 
         messageObj = Message(id=messageID, sender_id=sender, timestamp=timestamp, 
-                             text=text, has_attachment=has_attachment, has_sticker=has_sticker, 
-                             tapbacks=tapbacks, reply_to=reply_message_id)
+                                text=text, has_attachment=has_attachment, has_sticker=has_sticker, 
+                                tapbacks=tapbacks, reply_to=reply_message_id)
 
+        allMessages.append(messageObj)
         #print(f"""Message(id={messageID}, sender_id={sender}, timestamp={timestamp}, 
         #text=\"{text}\", has_attachment={has_attachment}, has_sticker={has_sticker}, 
-        #tapbacks={tapbacks}, reply_to={reply_message_id})
-        #""")
+        #tapbacks={tapbacks}, reply_to={reply_message_id})\n""")
 
         #print("=" * 20)
+
+    return allMessages
+
+def extractAnnouncements(soup):
+    announcements : list[bs4.element.Tag] = soup.body.find_all('div', "announcement", recursive=False)
+    for announcement in announcements:
+        announcement_tag = announcement("p", recursive=False)[0]
+        datetimeStr = announcement_tag("span", attrs="timestamp", recursive=False)[0].getText()
+
+        timestamp : datetime = datetime.strptime(datetimeStr, "%b %d, %Y %I:%M:%S %p")
+
+        actionStrs = announcement_tag.getText()[len(datetimeStr):].strip().split(" ")
+
+        sender = actionStrs[0]
+        if sender == "You":
+            sender = PERSONAL_NUMBER
+
+        actionWord = actionStrs[1]
+
+        action = ""
+        affected_id = None
+
+        if actionWord == "unsent":      #unsent message
+            action = "unsent message"           
+        elif actionWord == "added":
+            action = "added person"
+            affected_id = actionStrs[2]
+            if affected_id == "You":
+                affected_id = PERSONAL_NUMBER
+        elif actionWord == "kept":
+            action = "kept audio"
+        elif actionWord == "removed":
+            if actionStrs[2] == "the":
+                if actionStrs[-1] == "background.":
+                    action = "removed background"
+                elif actionStrs[-1] == "photo.":
+                    action = "removed photo"
+                else:
+                    print("UHOH", ' '.join(actionStrs))
+            else:
+                action = "removed person"
+                affected_id = actionStrs[2]
+        elif actionWord == "left":
+            action = "left convo"
+        elif actionWord == "named":
+            action = "renamed convo"
+        elif actionWord == "changed":
+            if actionStrs[-1] == "background.":
+                action = "changed background"
+            elif actionStrs[-1] == "photo.":
+                action = "changed photo"
+            elif actionStrs[-1] == "number.":
+                action = "changed number"
+            else:
+                print("UHOH", ' '.join(actionStrs))
+        else:
+            print("We fading ts")
+
+        Announcement(datetime=timestamp, announcer_id=sender, 
+                     action=action, affected_id=affected_id)
+
+        print(f"""Announcement(datetime={timestamp}, announcer_id={sender},
+             action=\"{action}\", affected_id={affected_id})\n""")
+
+def runProgram(fileName):
+    #Work with Command Line Arguments Later / Loop over all messages
+    soup = BeautifulSoup(open(fileName, "r"), features="html.parser")
+
+    #messages = extractMessages(soup)
+    announcements = extractAnnouncements(soup)
+
 
 for i in range(len(files)):
     print(f"---- {files[i]} ({i}/{len(files)}) ----")
     runProgram("./backend/parser/raw_export/"+files[i])
 
-print(f"Messages Collected: {messageCount - badMessages}/{messageCount} {(((messageCount - badMessages)/messageCount)*100):.3f}%")
+#print(f"Messages Collected: {messageCount - badMessages}/{messageCount} {(((messageCount - badMessages)/messageCount)*100):.3f}%")

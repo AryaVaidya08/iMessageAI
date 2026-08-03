@@ -1,9 +1,12 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 @dataclass
 class Announcement:
-    announcement_id: str
+
+    datetime: datetime
     announcer_id: str
     action: str
+
     affected_id: str | None = None
     
