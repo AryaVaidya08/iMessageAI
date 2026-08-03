@@ -15,3 +15,4 @@
 
 ## Notes
 - all .gitkeep files are temporary placeholders to retain the structure of the codebase
+- Remove sharing locations thing due to a lot of breaking in my phone

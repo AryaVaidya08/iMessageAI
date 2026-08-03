@@ -10,7 +10,8 @@ class Message:
 
     text: str
     has_attachment: bool = False
-
-    reply_to: str | None = None
+    has_sticker: bool = False
 
     tapbacks: list[Tapback] = field(default_factory=list)
+
+    reply_to: str | None = None
