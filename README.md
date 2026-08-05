@@ -12,6 +12,8 @@
 
 ## Project History
 - 8/2/26 - Setup project goals and structure repository
+- 8/3/26 - Started message & annoucement parsing
+- 8/5/26 - Completed participant logic for parsing
 
 ## Notes
 - all .gitkeep files are temporary placeholders to retain the structure of the codebase
