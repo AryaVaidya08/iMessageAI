@@ -3,21 +3,28 @@ import bs4
 import os
 from tqdm import tqdm
 from datetime import datetime
-from backend.modules import Tapback, Message, Announcement, Participant
+from backend.modules import Tapback, Message, Announcement, Participant, Conversation, RelationshipType
 import uuid
+import nanoid
 
-PERSONAL_NUMBER = "ENTER NUMBER HERE"
+PERSONAL_NUMBER = "+19088424785"
 
 os.system("clear")
 
 files = os.listdir("./backend/parser/raw_export")
 files.remove(".gitkeep")
+files.remove("+18482295363.html")
+files.remove("+17328536966.html")
 files.sort()
+#files = ["+19082104570.html", "+19083324481, +19082104570, +19088641540.html"]
 
 participants: dict[str, Participant] = {}
+currentParticipants: dict[str, Participant] = {}
 
 def get_or_create_participant(sender: str) -> Participant:
     if sender in participants:
+        if sender not in currentParticipants:
+            currentParticipants[sender] = participants[sender]
         return participants[sender]
 
     participant = Participant(id=uuid.uuid4())
@@ -31,10 +38,12 @@ def get_or_create_participant(sender: str) -> Participant:
         participant.phone_num = sender
 
     participants[sender] = participant
+    currentParticipants[sender] = participant
     return participant
 
 def extractMessages(soup):
     messages = soup.body.find_all('div', "message", recursive=False)
+     
 
     def extract_metadata(p_tags : list[bs4.element.Tag]):
         metadata_tag = p_tags[0]
@@ -244,35 +253,28 @@ def extractAnnouncements(soup):
         #     action=\"{action}\", affected_id={affected_id})\n""")
     return allAnnouncements
 
-
-messageCount = 0
-annouceCount = 0
-
-def runProgram(fileName):
-    global messageCount, annouceCount
+def runProgram(fileName : str):
+    global currentParticipants
     #Work with Command Line Arguments Later / Loop over all messages
+    currentParticipants = {}
     soup = BeautifulSoup(open(fileName, "r"), features="html.parser")
 
     messages = extractMessages(soup)
     announcements = extractAnnouncements(soup)
 
-    messageCount += len(messages)
-    annouceCount += len(announcements)
+    convoID = nanoid.generate(size=16)
 
-    try:
-        print(len(messages))
-    except:
-        pass
+    #RelationshipType temp set to other
+    newConversation = Conversation(id=convoID, is_group_chat=len(currentParticipants) > 2 or fileName.count(",") > 0, 
+                                   participants=currentParticipants, relationship_type=RelationshipType.OTHER,
+                                   messages=messages, announcements=announcements)
 
-    try:
-        print(len(announcements))
-    except:
-        pass
+    #print(f"""Conversation(id={convoID}, is_group_chat={len(currentParticipants) > 2 or fileName.count(",") > 0}, 
+    #         participants={len(currentParticipants)}, relationship_type={RelationshipType.OTHER},
+    #         messages={len(messages)}, announcements={len(announcements)})\n""")
 
 
 for i in range(len(files)):
     print(f"---- {files[i]} ({i}/{len(files)}) ----")
     runProgram("./backend/parser/raw_export/"+files[i])
 
-print(f"{messageCount} Messages Extracted | {annouceCount} Announcements Extracted")
-#383298 Messages Extracted | 6787 Announcements Extracted
