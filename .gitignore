@@ -3,6 +3,7 @@ backend/parser/storage/*
 .DS_Store
 .vscode/*
 backend/parser/scripts/extract_specific_convo.sh
+__pycache__/
 
 !backend/parser/raw_export/.gitkeep
 !backend/parser/storage/.gitkeep

@@ -3,56 +3,38 @@ import bs4
 import os
 from tqdm import tqdm
 from datetime import datetime
-from backend.modules import Tapback, Message, Announcement
+from backend.modules import Tapback, Message, Announcement, Participant
+import uuid
 
-PERSONAL_NUMBER = "YOUR_NUMBER"
+PERSONAL_NUMBER = "ENTER NUMBER HERE"
 
 os.system("clear")
 
 files = os.listdir("./backend/parser/raw_export")
+files.remove(".gitkeep")
+files.sort()
 
-messageCount = 0
-badMessages = 0
+participants: dict[str, Participant] = {}
+
+def get_or_create_participant(sender: str) -> Participant:
+    if sender in participants:
+        return participants[sender]
+
+    participant = Participant(id=uuid.uuid4())
+
+    if sender == PERSONAL_NUMBER:
+        participant.phone_num = PERSONAL_NUMBER
+        participant.is_me = True
+    elif "@" in sender:
+        participant.email = sender
+    else:
+        participant.phone_num = sender
+
+    participants[sender] = participant
+    return participant
 
 def extractMessages(soup):
-    global messageCount, badMessages
-
     messages = soup.body.find_all('div', "message", recursive=False)
-
-    #SAVE WORKING FILE FOR EASE OF CHECKING
-    #f = open("./output.html", "w")
-    #f.write(str(soup.prettify()))
-
-    # Preprocessing: Get rid of the messages with reply-context
-    """
-    cleanedMessages : list[bs4.element.Tag] = []
-
-    for i in range(len(messages)):
-        if len(messages[i].find_all("span", attrs="reply_context")) != 1:
-            cleanedMessages.append(messages[i])
-
-    #print(len(messages), "->", len(cleanedMessages))
-
-    """
-
-    # STICKERS CAN BE SENT INDEPENDENTLY
-    # IF STICKERS ARE ATTACHED TO A MESSAGE THEY ARE CLASSIFIED AS TAPBACKS (HANDLE THIS PROPERLY)
-
-    """
-    <div class="message" id="r-4EB2B2BF-FC0A-407F-ABEF-62057B0EED18">
-    <div class="sent iMessage">
-    <p> ##_#_#_#_#_#_#_#_#__#_#_#_#_##_#__##_#_ THIS HAS THE METADATA TIMEDATE SENDER
-    <hr/> #_#_#_#__#_#_#_#_##_#_#_#_#_#_#_ THIS IS JUST A HORIZONTAL LINE
-    <div class="message_part"> ##_#__#_##_#_#_#_#_#_ THIS IS THE ACTUAL TEXT IN THE MESSAGE OR ATTACHMENT
-    <div class="tapbacks"> #_#_##_#_# THIS CONTAINS THE POTENTIAL FOR TAPBACKS
-    <div class="replies"> #_#_##_#_#_#_THIS LETS US KNOW IF THERE ARE REPLIES TO THE MESSAGE
-    <span class="reply_context"> #_#_#_#_ LETS US KNOW IF IT REPLIED TO A PREVIOUS MESSAGE
-    </span>
-    </div>
-    </div>
-    """
-
-    #NEED TO ADD HEALTH CHECKS AND ERROR HANDLING FOR ALL FUNCTIONS
 
     def extract_metadata(p_tags : list[bs4.element.Tag]):
         metadata_tag = p_tags[0]
@@ -102,8 +84,7 @@ def extractMessages(soup):
             return None
 
         return message_text, attachment, sticker            
-
-    #TODO: NEED TO PUT INTO TAPBACK OBJECTS        
+     
     def extract_tapbacks(tapback_tags : list[bs4.element.Tag]):
         tapbacks : list[Tapback] = []
         for tag in tapback_tags:
@@ -111,17 +92,20 @@ def extractMessages(soup):
             sticker_tag : bs4.element.Tag = tag("div", attrs="sticker_tapback")
 
             if len(tapback_tag):
-                emoji_action = tapback_tag[0]("b")[0].getText()
+                action = tapback_tag[0]("b")[0].getText()
 
                 tapback_text = tapback_tag[0].getText()
                 sender = tapback_text[tapback_text.index("by")+2:].strip()
-                
-                #print(emoji_action, sender)
             elif len(sticker_tag):
                 sticker_text = sticker_tag[0].getText()
                 sender = sticker_text[sticker_text.index("by")+2:].strip()
+                action = "Sticker"
+            else:
+                continue
 
-                #print("Sticker", sender)
+            participant = get_or_create_participant(sender)
+            newTapback = Tapback(reactor_id=participant.id, action=action)
+            tapbacks.append(newTapback)
 
         return tapbacks
 
@@ -135,7 +119,6 @@ def extractMessages(soup):
 
     replyDict = {}
 
-    messageCount += len(messages)
     allMessages : list[Message] = []
     for message in messages[:]:
 
@@ -150,17 +133,16 @@ def extractMessages(soup):
 
         if not (len(p_tags) <= 2 and len(text_tags) != 0):
             #Health Check
-            badMessages += 1
             continue
 
         #Get Stuff
         messageID, timestamp, sender = extract_metadata(p_tags)
+        participant = get_or_create_participant(sender)
         status = extract_text_or_attachment(text_tags)
 
         if status != None:
             text, has_attachment, has_sticker = status
         else:
-            badMessages += 1
             continue
 
         tapbacks = None
@@ -178,28 +160,27 @@ def extractMessages(soup):
             try:
                 reply_message_id = replyDict[messageID]
             except:
-                badMessages += 1
                 #Just throw away --> could be a reply to either a link, app, blank, or media error
                 print("KEY ERROR WITH REPLY")
                 continue
 
 
-        messageObj = Message(id=messageID, sender_id=sender, timestamp=timestamp, 
+        messageObj = Message(id=messageID, sender_id=participant.id, timestamp=timestamp, 
                                 text=text, has_attachment=has_attachment, has_sticker=has_sticker, 
                                 tapbacks=tapbacks, reply_to=reply_message_id)
 
         allMessages.append(messageObj)
-        #print(f"""Message(id={messageID}, sender_id={sender}, timestamp={timestamp}, 
+        #print(f"""Message(id={messageID}, sender_id={participant.id}, timestamp={timestamp}, 
         #text=\"{text}\", has_attachment={has_attachment}, has_sticker={has_sticker}, 
         #tapbacks={tapbacks}, reply_to={reply_message_id})\n""")
-
         #print("=" * 20)
 
     return allMessages
 
 def extractAnnouncements(soup):
+    allAnnouncements : list[Announcement] = []
     announcements : list[bs4.element.Tag] = soup.body.find_all('div', "announcement", recursive=False)
-    for announcement in announcements:
+    for announcement in announcements[:]:
         announcement_tag = announcement("p", recursive=False)[0]
         datetimeStr = announcement_tag("span", attrs="timestamp", recursive=False)[0].getText()
 
@@ -252,22 +233,46 @@ def extractAnnouncements(soup):
         else:
             print("We fading ts")
 
-        Announcement(datetime=timestamp, announcer_id=sender, 
+        participant = get_or_create_participant(sender)
+
+        newAnnouncement = Announcement(datetime=timestamp, announcer_id=participant.id, 
                      action=action, affected_id=affected_id)
 
-        print(f"""Announcement(datetime={timestamp}, announcer_id={sender},
-             action=\"{action}\", affected_id={affected_id})\n""")
+        allAnnouncements.append(newAnnouncement)
+
+        #print(f"""Announcement(datetime={timestamp}, announcer_id={participant.id},
+        #     action=\"{action}\", affected_id={affected_id})\n""")
+    return allAnnouncements
+
+
+messageCount = 0
+annouceCount = 0
 
 def runProgram(fileName):
+    global messageCount, annouceCount
     #Work with Command Line Arguments Later / Loop over all messages
     soup = BeautifulSoup(open(fileName, "r"), features="html.parser")
 
-    #messages = extractMessages(soup)
+    messages = extractMessages(soup)
     announcements = extractAnnouncements(soup)
+
+    messageCount += len(messages)
+    annouceCount += len(announcements)
+
+    try:
+        print(len(messages))
+    except:
+        pass
+
+    try:
+        print(len(announcements))
+    except:
+        pass
 
 
 for i in range(len(files)):
     print(f"---- {files[i]} ({i}/{len(files)}) ----")
     runProgram("./backend/parser/raw_export/"+files[i])
 
-#print(f"Messages Collected: {messageCount - badMessages}/{messageCount} {(((messageCount - badMessages)/messageCount)*100):.3f}%")
+print(f"{messageCount} Messages Extracted | {annouceCount} Announcements Extracted")
+#383298 Messages Extracted | 6787 Announcements Extracted
