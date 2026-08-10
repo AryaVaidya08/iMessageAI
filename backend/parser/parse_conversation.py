@@ -1,4 +1,7 @@
 import os
+import json
+import dataclasses
+from pathlib import Path
 from dotenv import load_dotenv
 
 from backend.modules import Tapback, Message, Announcement, Participant, Conversation, RelationshipType
@@ -17,8 +20,33 @@ PERSONAL_NUMBER = os.getenv("PERSONAL_NUMBER")
 participants: dict[str, Participant] = {}
 currentParticipants: dict[str, Participant] = {}
 
+# -- Local Helper Functions --
+
 def _stable_conversation_id(file_name: str) -> str:
     return hashlib.sha256(file_name.encode("utf-8")).hexdigest()[:16]
+
+def _serialize_participant(p: Participant) -> dict:
+    d = dataclasses.asdict(p)
+    d["id"] = str(d["id"])  # uuid.UUID -> str
+    return d
+
+def _deserialize_participant(d: dict) -> Participant:
+    d = dict(d)
+    d["id"] = uuid.UUID(d["id"])  # str -> uuid.UUID
+    return Participant(**d)
+
+def load_participant_registry(path: str | Path) -> None:
+    participants.clear()
+    p = Path(path)
+    if not p.exists():
+        return
+    data = json.loads(p.read_text())
+    for sender, participant_dict in data.items():
+        participants[sender] = _deserialize_participant(participant_dict)
+
+def save_participant_registry(path: str | Path) -> None:
+    data = {sender: _serialize_participant(p) for sender, p in participants.items()}
+    Path(path).write_text(json.dumps(data, indent=2))
 
 def get_or_create_participant(sender: str) -> Participant:
     if sender in participants:
@@ -39,6 +67,8 @@ def get_or_create_participant(sender: str) -> Participant:
     participants[sender] = participant
     currentParticipants[sender] = participant
     return participant
+
+# -- Main Helper Functions --
 
 def extract_messages(soup):
     messages = soup.body.find_all('div', "message", recursive=False)
@@ -228,7 +258,7 @@ def extract_announcements(soup):
         if affected != None:
             affected_person = get_or_create_participant(affected)
 
-        annoucementID = nanoid.generate(size=16)
+        annoucementID = hashlib.sha256(f"{timestamp.isoformat()}|{participant.id}|{action}|{affected_person.id if affected_person else ''}".encode()).hexdigest()[:16]
 
         newAnnouncement = Announcement(annoucement_id=annoucementID, datetime=timestamp, announcer_id=participant.id, 
                                        action=action, affected_id=affected_person.id if affected_person else None)
@@ -237,11 +267,18 @@ def extract_announcements(soup):
 
     return allAnnouncements
 
+# -- Main Function --
+
 def parse_conversation(fileName : str):
+    print(fileName)
     global currentParticipants
 
     currentParticipants = {}
     soup = BeautifulSoup(open(fileName, "r"), features="html.parser")
+
+    #+16098744084.html
+    #+17328536966.html
+    #+18482295363.html
 
     messages = extract_messages(soup)
     announcements = extract_announcements(soup)
@@ -253,15 +290,7 @@ def parse_conversation(fileName : str):
                                    participants=list(currentParticipants.values()), relationship_type=RelationshipType.OTHER,
                                    messages=messages, announcements=announcements)
 
-    print(fileName, len(list(participants.keys())), len(list(currentParticipants.keys())))
+    print(len(list(participants.keys())), len(list(currentParticipants.keys())), len(messages), len(announcements))
     print("=" * 50)
 
     return conversation
-
-if __name__ == "__main__":
-    files = os.listdir("backend/parser/raw_export")
-    files.remove(".gitkeep")
-    print(len(files))
-
-    for file in files:
-        parse_conversation("backend/parser/raw_export/"+file)
