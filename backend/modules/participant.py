@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-
+from uuid import UUID
 @dataclass
 class Participant:
-    id: str
+    id: UUID
     
     phone_num: str | None = None
     email: str | None = None

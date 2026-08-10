@@ -1,25 +1,24 @@
+import os
+from dotenv import load_dotenv
+
+from backend.modules import Tapback, Message, Announcement, Participant, Conversation, RelationshipType
+from datetime import datetime
+
 from bs4 import BeautifulSoup
 import bs4
-import os
-from tqdm import tqdm
-from datetime import datetime
-from backend.modules import Tapback, Message, Announcement, Participant, Conversation, RelationshipType
+
 import uuid
 import nanoid
+import hashlib
 
-PERSONAL_NUMBER = "+19088424785"
-
-os.system("clear")
-
-files = os.listdir("./backend/parser/raw_export")
-files.remove(".gitkeep")
-files.remove("+18482295363.html")
-files.remove("+17328536966.html")
-files.sort()
-#files = ["+19082104570.html", "+19083324481, +19082104570, +19088641540.html"]
+load_dotenv(".env.local")
+PERSONAL_NUMBER = os.getenv("PERSONAL_NUMBER")
 
 participants: dict[str, Participant] = {}
 currentParticipants: dict[str, Participant] = {}
+
+def _stable_conversation_id(file_name: str) -> str:
+    return hashlib.sha256(file_name.encode("utf-8")).hexdigest()[:16]
 
 def get_or_create_participant(sender: str) -> Participant:
     if sender in participants:
@@ -41,10 +40,9 @@ def get_or_create_participant(sender: str) -> Participant:
     currentParticipants[sender] = participant
     return participant
 
-def extractMessages(soup):
+def extract_messages(soup):
     messages = soup.body.find_all('div', "message", recursive=False)
      
-
     def extract_metadata(p_tags : list[bs4.element.Tag]):
         metadata_tag = p_tags[0]
 
@@ -71,12 +69,6 @@ def extractMessages(soup):
             sticker_tags : list[bs4.element.Tag] = tag("div", attrs="sticker", recursive=False)                 #Keep
             edited_tags : list[bs4.element.Tag]= tag("div", attrs="edited", recursive=False)                   #Get Last One
 
-            error_tags = tag("span", attrs="attachment_error", recursive=False)         #Remove
-            unsent_tags = tag("span", attrs="unsent", recursive=False)                  #Remove
-            app_tags = tag("div", attrs="app", recursive=False)                         #Remove
-            app_error_tags = tag("div", attrs="app_error", recursive=False)             #Remove
-
-
             if len(bubble_tags):
                 message_text = bubble_tags[0].getText()
             elif len(attachment_tags):
@@ -85,9 +77,6 @@ def extractMessages(soup):
                 sticker = True
             elif len(edited_tags):
                 message_text = edited_tags[0]("tfoot")[0]("td")[-1].getText()
-            else:
-                #Useless Message
-                continue
 
         if len(message_text) == 0 and not attachment and not sticker:
             return None
@@ -118,7 +107,7 @@ def extractMessages(soup):
 
         return tapbacks
 
-    def extractReplyIDs(originalReplyDict : dict, originalID : str, reply_tags : list[bs4.element.Tag]):
+    def extract_reply_ids(originalReplyDict : dict, originalID : str, reply_tags : list[bs4.element.Tag]):
         replies : list[bs4.element.Tag] = reply_tags[0]("div", attrs="reply", recursive=False)
 
         for reply in replies:
@@ -130,13 +119,9 @@ def extractMessages(soup):
 
     allMessages : list[Message] = []
     for message in messages[:]:
-
-        #print(message.prettify())
-        
-        #print("-" * 50)
         subClass = "received" if len(message("div", attrs="received", recursive=False)) == 1 else "sent"
         actualMesssage : bs4.element.Tag = message("div", subClass, recursive=False)[0]
-        #Health Checks
+
         p_tags = actualMesssage("p", recursive=False)
         text_tags = actualMesssage("div", attrs="message_part", recursive=False)
 
@@ -154,7 +139,7 @@ def extractMessages(soup):
         else:
             continue
 
-        tapbacks = None
+        tapbacks = []
         tapback_tags = actualMesssage("div", attrs="tapbacks", recursive=False)
         if len(tapback_tags) == 1:
             tapbacks : list[Tapback] = extract_tapbacks(tapback_tags[0]("div", attrs="tapback"))
@@ -163,14 +148,12 @@ def extractMessages(soup):
         reply_message_id = None
         reply_tags = actualMesssage("div", attrs="replies", recursive=False)
         if len(reply_tags) == 1:                                                #THIS IS A BASE MESSAGE WITH REPLIES
-            
-            replyDict = extractReplyIDs(replyDict, messageID, reply_tags)
+            replyDict = extract_reply_ids(replyDict, messageID, reply_tags)
         elif len(actualMesssage.find_all("span", attrs="reply_context")) == 1:  #THIS IS A REPLY TO A PREVIOUS MESSAGE
             try:
                 reply_message_id = replyDict[messageID]
             except:
                 #Just throw away --> could be a reply to either a link, app, blank, or media error
-                print("KEY ERROR WITH REPLY")
                 continue
 
 
@@ -179,16 +162,13 @@ def extractMessages(soup):
                                 tapbacks=tapbacks, reply_to=reply_message_id)
 
         allMessages.append(messageObj)
-        #print(f"""Message(id={messageID}, sender_id={participant.id}, timestamp={timestamp}, 
-        #text=\"{text}\", has_attachment={has_attachment}, has_sticker={has_sticker}, 
-        #tapbacks={tapbacks}, reply_to={reply_message_id})\n""")
-        #print("=" * 20)
 
     return allMessages
 
-def extractAnnouncements(soup):
+def extract_announcements(soup):
     allAnnouncements : list[Announcement] = []
     announcements : list[bs4.element.Tag] = soup.body.find_all('div', "announcement", recursive=False)
+
     for announcement in announcements[:]:
         announcement_tag = announcement("p", recursive=False)[0]
         datetimeStr = announcement_tag("span", attrs="timestamp", recursive=False)[0].getText()
@@ -204,15 +184,15 @@ def extractAnnouncements(soup):
         actionWord = actionStrs[1]
 
         action = ""
-        affected_id = None
+        affected = None
 
         if actionWord == "unsent":      #unsent message
             action = "unsent message"           
         elif actionWord == "added":
             action = "added person"
-            affected_id = actionStrs[2]
-            if affected_id == "You":
-                affected_id = PERSONAL_NUMBER
+            affected = actionStrs[2]
+            if affected == "You":
+                affected = PERSONAL_NUMBER
         elif actionWord == "kept":
             action = "kept audio"
         elif actionWord == "removed":
@@ -225,7 +205,7 @@ def extractAnnouncements(soup):
                     print("UHOH", ' '.join(actionStrs))
             else:
                 action = "removed person"
-                affected_id = actionStrs[2]
+                affected = actionStrs[2]
         elif actionWord == "left":
             action = "left convo"
         elif actionWord == "named":
@@ -243,38 +223,45 @@ def extractAnnouncements(soup):
             print("We fading ts")
 
         participant = get_or_create_participant(sender)
+        affected_person = None
 
-        newAnnouncement = Announcement(datetime=timestamp, announcer_id=participant.id, 
-                     action=action, affected_id=affected_id)
+        if affected != None:
+            affected_person = get_or_create_participant(affected)
+
+        annoucementID = nanoid.generate(size=16)
+
+        newAnnouncement = Announcement(annoucement_id=annoucementID, datetime=timestamp, announcer_id=participant.id, 
+                                       action=action, affected_id=affected_person.id if affected_person else None)
 
         allAnnouncements.append(newAnnouncement)
 
-        #print(f"""Announcement(datetime={timestamp}, announcer_id={participant.id},
-        #     action=\"{action}\", affected_id={affected_id})\n""")
     return allAnnouncements
 
-def runProgram(fileName : str):
+def parse_conversation(fileName : str):
     global currentParticipants
-    #Work with Command Line Arguments Later / Loop over all messages
+
     currentParticipants = {}
     soup = BeautifulSoup(open(fileName, "r"), features="html.parser")
 
-    messages = extractMessages(soup)
-    announcements = extractAnnouncements(soup)
+    messages = extract_messages(soup)
+    announcements = extract_announcements(soup)
 
-    convoID = nanoid.generate(size=16)
+    convoID = _stable_conversation_id(fileName)
 
     #RelationshipType temp set to other
-    newConversation = Conversation(id=convoID, is_group_chat=len(currentParticipants) > 2 or fileName.count(",") > 0, 
-                                   participants=currentParticipants, relationship_type=RelationshipType.OTHER,
+    conversation = Conversation(id=convoID, is_group_chat=len(currentParticipants) > 2 or fileName.count(",") > 0, 
+                                   participants=list(currentParticipants.values()), relationship_type=RelationshipType.OTHER,
                                    messages=messages, announcements=announcements)
 
-    #print(f"""Conversation(id={convoID}, is_group_chat={len(currentParticipants) > 2 or fileName.count(",") > 0}, 
-    #         participants={len(currentParticipants)}, relationship_type={RelationshipType.OTHER},
-    #         messages={len(messages)}, announcements={len(announcements)})\n""")
+    print(fileName, len(list(participants.keys())), len(list(currentParticipants.keys())))
+    print("=" * 50)
 
+    return conversation
 
-for i in range(len(files)):
-    print(f"---- {files[i]} ({i}/{len(files)}) ----")
-    runProgram("./backend/parser/raw_export/"+files[i])
+if __name__ == "__main__":
+    files = os.listdir("backend/parser/raw_export")
+    files.remove(".gitkeep")
+    print(len(files))
 
+    for file in files:
+        parse_conversation("backend/parser/raw_export/"+file)

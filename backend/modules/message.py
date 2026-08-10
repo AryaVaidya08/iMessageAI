@@ -1,11 +1,12 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from .tapback import Tapback
+from uuid import UUID
 
 @dataclass
 class Message:
     id: str
-    sender_id: str
+    sender_id: UUID
     timestamp: datetime
 
     text: str
