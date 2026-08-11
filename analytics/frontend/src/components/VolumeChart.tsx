@@ -1,36 +1,57 @@
-import { useEffect, useState } from "react";
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import type { Granularity, VolumePoint } from "../api/client";
+import type { Granularity, JoinLeaveEvent, VolumePoint } from "../api/client";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import styles from "./VolumeChart.module.css";
 
 const GRANULARITIES: Granularity[] = ["day", "week", "month"];
 
-function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(
-    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+// Mirrors the backend's bucket_volume() bucketing rule so a join/leave
+// event's exact timestamp maps onto the same x-axis category the volume
+// bars use, regardless of granularity.
+function bucketFor(dateIso: string, granularity: Granularity): string {
+  const day = dateIso.slice(0, 10);
+  if (granularity === "day") return day;
+  if (granularity === "month") return day.slice(0, 7);
+  const d = new Date(`${day}T00:00:00`);
+  const dow = d.getDay(); // 0=Sunday
+  const daysSinceMonday = dow === 0 ? 6 : dow - 1;
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - daysSinceMonday);
+  return monday.toISOString().slice(0, 10);
+}
 
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const listener = () => setReduced(mq.matches);
-    mq.addEventListener("change", listener);
-    return () => mq.removeEventListener("change", listener);
-  }, []);
+interface AnnotationSummary {
+  bucket: string;
+  joined: number;
+  left: number;
+}
 
-  return reduced;
+function summarizeAnnotations(events: JoinLeaveEvent[], granularity: Granularity): AnnotationSummary[] {
+  const byBucket = new Map<string, AnnotationSummary>();
+  for (const e of events) {
+    const bucket = bucketFor(e.datetime, granularity);
+    const entry = byBucket.get(bucket) ?? { bucket, joined: 0, left: 0 };
+    if (e.kind === "joined") entry.joined += 1;
+    else entry.left += 1;
+    byBucket.set(bucket, entry);
+  }
+  return [...byBucket.values()];
 }
 
 export function VolumeChart({
   points,
   granularity,
   onGranularityChange,
+  joinLeaveEvents,
 }: {
   points: VolumePoint[];
   granularity: Granularity;
   onGranularityChange: (g: Granularity) => void;
+  joinLeaveEvents?: JoinLeaveEvent[];
 }) {
   const reducedMotion = usePrefersReducedMotion();
+  const annotations = joinLeaveEvents ? summarizeAnnotations(joinLeaveEvents, granularity) : [];
 
   return (
     <div className={styles.card}>
@@ -66,6 +87,20 @@ export function VolumeChart({
             radius={[6, 6, 0, 0]}
             isAnimationActive={!reducedMotion}
           />
+          {annotations.map((a) => (
+            <ReferenceLine
+              key={a.bucket}
+              x={a.bucket}
+              stroke="var(--color-text-secondary)"
+              strokeDasharray="3 3"
+              label={{
+                value: [a.joined ? `+${a.joined}` : "", a.left ? `−${a.left}` : ""].filter(Boolean).join(" "),
+                position: "top",
+                fontSize: 10,
+                fill: "var(--color-text-secondary)",
+              }}
+            />
+          ))}
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -74,11 +74,19 @@ class TapbackCount(BaseModel):
     count: int
 
 
+class HistogramBucket(BaseModel):
+    label: str
+    count: int
+
+
 class ParticipantStats(BaseModel):
     participant_id: str
     display_name: str
     message_count: int
     median_reply_seconds: float | None
+    reply_histogram: list[HistogramBucket]
+    gap_initiator_count: int
+    late_night_ratio: float
     top_words: list[WordCount]
     top_emojis: list[EmojiCount]
     tapbacks_given: list[TapbackCount]
@@ -110,3 +118,106 @@ class MessageOut(BaseModel):
 class MessagesPage(BaseModel):
     items: list[MessageOut]
     next_cursor: str | None
+
+
+# --- Leaderboards ----------------------------------------------------------
+
+
+class AttachmentLeaderboardEntry(BaseModel):
+    participant_id: str
+    display_name: str
+    count: int
+
+
+class AttachmentLeaderboardResponse(BaseModel):
+    items: list[AttachmentLeaderboardEntry]
+
+
+class MessageLeaderboardEntryBase(BaseModel):
+    message_id: str
+    text: str
+    sender_id: str
+    sender_display_name: str
+    conversation_id: str
+    conversation_display_name: str
+    timestamp: str
+
+
+class LovedMessageEntry(MessageLeaderboardEntryBase):
+    tapback_count: int
+
+
+class LovedMessagesResponse(BaseModel):
+    items: list[LovedMessageEntry]
+
+
+class ArguedMessageEntry(MessageLeaderboardEntryBase):
+    reply_count: int
+
+
+class ArguedMessagesResponse(BaseModel):
+    items: list[ArguedMessageEntry]
+
+
+class StreakLeaderboard(BaseModel):
+    conversation_id: str
+    conversation_display_name: str
+    streak_days: int
+
+
+class SilenceLeaderboard(BaseModel):
+    conversation_id: str
+    conversation_display_name: str
+    gap_seconds: float
+    before: str
+    after: str
+
+
+class FastestReplyRelationship(BaseModel):
+    relationship_type: str
+    median_reply_seconds: float
+
+
+# --- Conversation detail additions -----------------------------------------
+
+
+class HeatmapResponse(BaseModel):
+    grid: list[list[int]]
+
+
+class ConversationStreakSilence(BaseModel):
+    streak_days: int
+    silence_gap_seconds: float | None
+    silence_before: str | None
+    silence_after: str | None
+
+
+class GroupSizePoint(BaseModel):
+    datetime: str
+    size: int
+
+
+class GroupSizeResponse(BaseModel):
+    points: list[GroupSizePoint]
+
+
+class JoinLeaveEvent(BaseModel):
+    datetime: str
+    kind: str  # "joined" | "left"
+    display_name: str
+
+
+class JoinLeaveResponse(BaseModel):
+    items: list[JoinLeaveEvent]
+
+
+class ReplyGraphEdge(BaseModel):
+    replier_id: str
+    replier_display_name: str
+    original_id: str
+    original_display_name: str
+    count: int
+
+
+class ReplyGraphResponse(BaseModel):
+    edges: list[ReplyGraphEdge]

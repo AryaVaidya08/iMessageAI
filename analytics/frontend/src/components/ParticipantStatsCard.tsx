@@ -1,4 +1,5 @@
 import type { ParticipantStats } from "../api/client";
+import { ReplyTimeHistogram } from "./ReplyTimeHistogram";
 import { TapbackBreakdown } from "./TapbackBreakdown";
 import { TopEmojisList } from "./TopEmojisList";
 import { TopWordsList } from "./TopWordsList";
@@ -25,7 +26,16 @@ export function ParticipantStatsCard({ stats }: { stats: ParticipantStats }) {
           <div className={styles.metricLabel}>Median reply time</div>
           <div className="mono">{formatReplySeconds(stats.median_reply_seconds)}</div>
         </div>
+        <div>
+          <div className={styles.metricLabel}>Breaks silences</div>
+          <div className="mono">{stats.gap_initiator_count.toLocaleString()}</div>
+        </div>
+        <div>
+          <div className={styles.metricLabel}>Late-night texts</div>
+          <div className="mono">{Math.round(stats.late_night_ratio * 100)}%</div>
+        </div>
       </div>
+      <ReplyTimeHistogram buckets={stats.reply_histogram} />
       <TopWordsList words={stats.top_words} />
       <TopEmojisList emojis={stats.top_emojis} />
       <TapbackBreakdown given={stats.tapbacks_given} received={stats.tapbacks_received} />

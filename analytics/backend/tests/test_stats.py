@@ -1,10 +1,24 @@
 import pytest
 
 from services.stats import (
+    DayActivity,
+    HISTOGRAM_BUCKETS,
     MessageEvent,
     TapbackEvent,
+    best_silence_conversation,
+    best_streak_conversation,
+    build_heatmap_grid,
+    build_reply_graph,
     bucket_volume,
+    fastest_reply_relationship_types,
+    gap_initiators,
+    group_size_over_time,
+    late_night_ratio,
+    longest_silence,
+    longest_streak_days,
     median_reply_seconds,
+    reply_deltas_seconds,
+    reply_time_histogram,
     tapbacks_given,
     tapbacks_received,
     top_emojis,
@@ -274,3 +288,245 @@ def test_tapbacks_given_respects_limit():
         TapbackEvent("p1", "p2", "Laughed"),
     ]
     assert len(tapbacks_given(events, "p1", limit=2)) == 2
+
+
+def test_reply_deltas_seconds_pools_across_senders():
+    events = [
+        MessageEvent("a", "2024-01-01T09:00:00"),
+        MessageEvent("b", "2024-01-01T09:01:00"),  # 60s
+        MessageEvent("a", "2024-01-01T09:03:00"),  # 120s
+    ]
+    assert sorted(reply_deltas_seconds(events)) == [60.0, 120.0]
+
+
+def test_reply_deltas_seconds_raises_on_unsorted_input():
+    events = [
+        MessageEvent("a", "2024-01-01T09:05:00"),
+        MessageEvent("b", "2024-01-01T09:00:00"),
+    ]
+    with pytest.raises(ValueError):
+        reply_deltas_seconds(events)
+
+
+def test_reply_time_histogram_buckets_by_delay():
+    events = [
+        MessageEvent("a", "2024-01-01T09:00:00"),
+        MessageEvent("b", "2024-01-01T09:00:30"),  # 30s -> <1m
+        MessageEvent("a", "2024-01-01T09:03:30"),  # 180s -> 1-5m
+        MessageEvent("b", "2024-01-02T09:03:30"),  # 24h -> >24h
+    ]
+    result = reply_time_histogram(events)
+    bucket_labels = [label for label, _ in HISTOGRAM_BUCKETS]
+    assert [label for label, _ in result["b"]] == bucket_labels
+    counts_b = dict(result["b"])
+    assert counts_b["<1m"] == 1
+    assert counts_b[">24h"] == 1  # exactly 86400s falls just past the 12-24h upper bound
+    counts_a = dict(result["a"])
+    assert counts_a["1-5m"] == 1
+
+
+def test_reply_time_histogram_zero_count_buckets_present():
+    events = [
+        MessageEvent("a", "2024-01-01T09:00:00"),
+        MessageEvent("b", "2024-01-01T09:00:30"),
+    ]
+    result = reply_time_histogram(events)
+    assert dict(result["b"])["5-30m"] == 0
+
+
+def test_reply_time_histogram_raises_on_unsorted_input():
+    events = [
+        MessageEvent("a", "2024-01-01T09:05:00"),
+        MessageEvent("b", "2024-01-01T09:00:00"),
+    ]
+    with pytest.raises(ValueError):
+        reply_time_histogram(events)
+
+
+def test_fastest_reply_relationship_types_sorts_ascending():
+    deltas = {"friend": [600.0, 200.0], "family": [30.0], "work": []}
+    result = fastest_reply_relationship_types(deltas)
+    assert result == [("family", 30.0), ("friend", 400.0)]
+
+
+def test_fastest_reply_relationship_types_omits_empty():
+    result = fastest_reply_relationship_types({"work": []})
+    assert result == []
+
+
+def test_gap_initiators_credits_sender_after_threshold():
+    events = [
+        MessageEvent("a", "2024-01-01T09:00:00"),
+        MessageEvent("b", "2024-01-01T09:00:30"),  # 30s gap, below threshold
+        MessageEvent("a", "2024-01-02T09:00:30"),  # ~24h gap, above threshold
+    ]
+    result = gap_initiators(events, gap_threshold_seconds=3600)
+    assert result == {"a": 1, "b": 0}
+
+
+def test_gap_initiators_first_message_never_counts():
+    events = [MessageEvent("a", "2024-01-01T09:00:00")]
+    assert gap_initiators(events, gap_threshold_seconds=1) == {"a": 0}
+
+
+def test_gap_initiators_raises_on_unsorted_input():
+    events = [
+        MessageEvent("a", "2024-01-01T09:05:00"),
+        MessageEvent("b", "2024-01-01T09:00:00"),
+    ]
+    with pytest.raises(ValueError):
+        gap_initiators(events, gap_threshold_seconds=1)
+
+
+def test_late_night_ratio_computes_fraction():
+    hours = [("a", 23), ("a", 12), ("a", 2), ("b", 9)]
+    result = late_night_ratio(hours)
+    assert result["a"] == pytest.approx(2 / 3)
+    assert result["b"] == 0.0
+
+
+def test_late_night_ratio_boundary_hours():
+    # 5am is NOT late-night; 4am and 23 (11pm) are.
+    hours = [("a", 5), ("a", 4), ("a", 23)]
+    result = late_night_ratio(hours)
+    assert result["a"] == pytest.approx(2 / 3)
+
+
+def test_build_heatmap_grid_fills_sparse_cells():
+    grid = build_heatmap_grid([(0, 9, 5), (6, 23, 2)])
+    assert len(grid) == 7
+    assert all(len(row) == 24 for row in grid)
+    assert grid[0][9] == 5
+    assert grid[6][23] == 2
+    assert grid[1][9] == 0
+
+
+def test_build_heatmap_grid_empty_cells_all_zero():
+    grid = build_heatmap_grid([])
+    assert grid == [[0] * 24 for _ in range(7)]
+
+
+def test_longest_streak_days_consecutive_run():
+    days = [
+        DayActivity("2024-01-01", "2024-01-01T09:00:00", "2024-01-01T10:00:00"),
+        DayActivity("2024-01-02", "2024-01-02T09:00:00", "2024-01-02T10:00:00"),
+        DayActivity("2024-01-03", "2024-01-03T09:00:00", "2024-01-03T10:00:00"),
+        DayActivity("2024-01-10", "2024-01-10T09:00:00", "2024-01-10T10:00:00"),
+    ]
+    assert longest_streak_days(days) == 3
+
+
+def test_longest_streak_days_empty_returns_zero():
+    assert longest_streak_days([]) == 0
+
+
+def test_longest_streak_days_single_day_returns_one():
+    days = [DayActivity("2024-01-01", "2024-01-01T09:00:00", "2024-01-01T10:00:00")]
+    assert longest_streak_days(days) == 1
+
+
+def test_longest_streak_days_two_separate_runs_picks_longer():
+    days = [
+        DayActivity("2024-01-01", "x", "x"),
+        DayActivity("2024-01-02", "x", "x"),
+        DayActivity("2024-02-01", "x", "x"),
+        DayActivity("2024-02-02", "x", "x"),
+        DayActivity("2024-02-03", "x", "x"),
+    ]
+    assert longest_streak_days(days) == 3
+
+
+def test_longest_silence_finds_largest_gap():
+    days = [
+        DayActivity("2024-01-01", "2024-01-01T09:00:00", "2024-01-01T23:00:00"),
+        DayActivity("2024-01-02", "2024-01-02T00:05:00", "2024-01-02T10:00:00"),  # small gap after day1
+        DayActivity("2024-02-01", "2024-02-01T08:00:00", "2024-02-01T09:00:00"),  # huge gap after day2
+    ]
+    result = longest_silence(days)
+    assert result["before"] == "2024-01-02T10:00:00"
+    assert result["after"] == "2024-02-01T08:00:00"
+    # Jan 2 10:00 -> Feb 1 10:00 is exactly 30 days; Feb 1 08:00 is 2h earlier.
+    assert result["gap_seconds"] == pytest.approx(30 * 24 * 3600 - 2 * 3600, abs=1)
+
+
+def test_longest_silence_fewer_than_two_days_returns_none():
+    assert longest_silence([]) is None
+    assert longest_silence([DayActivity("2024-01-01", "x", "x")]) is None
+
+
+def test_best_streak_conversation_picks_the_longer_one():
+    activity = {
+        "conv1": [
+            DayActivity("2024-01-01", "x", "x"),
+            DayActivity("2024-01-02", "x", "x"),
+        ],
+        "conv2": [
+            DayActivity("2024-01-01", "x", "x"),
+            DayActivity("2024-01-02", "x", "x"),
+            DayActivity("2024-01-03", "x", "x"),
+        ],
+    }
+    assert best_streak_conversation(activity) == ("conv2", 3)
+
+
+def test_best_streak_conversation_empty_returns_none():
+    assert best_streak_conversation({}) is None
+
+
+def test_best_silence_conversation_picks_the_largest_gap():
+    activity = {
+        "conv1": [
+            DayActivity("2024-01-01", "2024-01-01T09:00:00", "2024-01-01T10:00:00"),
+            DayActivity("2024-01-02", "2024-01-02T09:00:00", "2024-01-02T10:00:00"),
+        ],
+        "conv2": [
+            DayActivity("2024-01-01", "2024-01-01T09:00:00", "2024-01-01T10:00:00"),
+            DayActivity("2024-03-01", "2024-03-01T09:00:00", "2024-03-01T10:00:00"),
+        ],
+        "conv3": [DayActivity("2024-01-01", "x", "x")],  # only 1 active day, no silence
+    }
+    conv_id, silence = best_silence_conversation(activity)
+    assert conv_id == "conv2"
+    assert silence["before"] == "2024-01-01T10:00:00"
+
+
+def test_best_silence_conversation_no_eligible_conversation_returns_none():
+    activity = {"conv1": [DayActivity("2024-01-01", "x", "x")]}
+    assert best_silence_conversation(activity) is None
+
+
+def test_group_size_over_time_ends_at_current_size():
+    events = [
+        ("2024-01-01T00:00:00", "added person"),
+        ("2024-01-02T00:00:00", "added person"),
+        ("2024-01-03T00:00:00", "removed person"),
+    ]
+    # net delta = +1 +1 -1 = +1, so size before the first event was 5 - 1 = 4.
+    points = group_size_over_time(current_size=5, events=events)
+    assert points[0] == ("2024-01-01T00:00:00", 5)  # 4 -> 5 after "added person"
+    assert points[1] == ("2024-01-02T00:00:00", 6)  # 5 -> 6 after "added person"
+    assert points[-1] == ("2024-01-03T00:00:00", 5)  # 6 -> 5 after "removed person"
+
+
+def test_group_size_over_time_ignores_unknown_actions():
+    events = [("2024-01-01T00:00:00", "renamed convo")]
+    points = group_size_over_time(current_size=3, events=events)
+    assert points == [("2024-01-01T00:00:00", 3)]
+
+
+def test_group_size_over_time_no_events_returns_empty():
+    assert group_size_over_time(current_size=3, events=[]) == []
+
+
+def test_build_reply_graph_counts_and_sorts_by_weight():
+    edges = [("a", "b"), ("a", "b"), ("c", "b"), ("b", "a")]
+    graph = build_reply_graph(edges)
+    assert graph[0] == ("a", "b", 2)
+    assert ("c", "b", 1) in graph
+    assert ("b", "a", 1) in graph
+
+
+def test_build_reply_graph_excludes_self_replies():
+    edges = [("a", "a"), ("a", "b")]
+    graph = build_reply_graph(edges)
+    assert graph == [("a", "b", 1)]

@@ -4,14 +4,28 @@ from dependencies import get_db, get_resolver
 from models import (
     ConversationDetail,
     ConversationListResponse,
+    ConversationStreakSilence,
+    GroupSizePoint,
+    GroupSizeResponse,
+    HeatmapResponse,
+    HistogramBucket,
+    JoinLeaveEvent,
+    JoinLeaveResponse,
     MessagesPage,
     ParticipantStatsResponse,
+    ReplyGraphEdge,
+    ReplyGraphResponse,
     VolumePoint,
     VolumeResponse,
 )
 from services import queries, stats
 
 router = APIRouter(prefix="/api/conversations", tags=["conversations"])
+
+# A reply counts as "breaking a silence" once at least this long has passed
+# since the previous message (from anyone) -- chosen as a round number well
+# above typical back-and-forth reply latency but well below a full day.
+GAP_INITIATOR_THRESHOLD_SECONDS = 6 * 3600
 
 
 @router.get("", response_model=ConversationListResponse)
@@ -58,9 +72,13 @@ def get_participant_stats(conversation_id: str, conn=Depends(get_db), resolver=D
 
     message_rows = queries.get_conversation_messages_for_stats(conn, conversation_id)
     tapback_rows = queries.get_conversation_tapback_events(conn, conversation_id)
+    hours_by_sender = queries.get_conversation_hours_by_sender(conn, conversation_id)
 
     events = [stats.MessageEvent(sender_id=r["sender_id"], timestamp=r["timestamp"]) for r in message_rows]
     reply_seconds = stats.median_reply_seconds(events)
+    histograms = stats.reply_time_histogram(events)
+    gap_initiators = stats.gap_initiators(events, GAP_INITIATOR_THRESHOLD_SECONDS)
+    late_night = stats.late_night_ratio(hours_by_sender)
 
     texts_by_sender: dict[str, list[str]] = {}
     counts_by_sender: dict[str, int] = {}
@@ -81,6 +99,11 @@ def get_participant_stats(conversation_id: str, conn=Depends(get_db), resolver=D
             "display_name": resolved.display_name,
             "message_count": counts_by_sender.get(pid, 0),
             "median_reply_seconds": reply_seconds.get(pid),
+            "reply_histogram": [
+                HistogramBucket(label=label, count=count) for label, count in histograms.get(pid, [])
+            ],
+            "gap_initiator_count": gap_initiators.get(pid, 0),
+            "late_night_ratio": late_night.get(pid, 0.0),
             "top_words": [{"word": w, "count": c} for w, c in stats.top_words(texts)],
             "top_emojis": [{"emoji": e, "count": c} for e, c in stats.top_emojis(texts)],
             "tapbacks_given": [{"action": a, "count": c} for a, c in stats.tapbacks_given(tapback_events, pid)],
@@ -122,3 +145,54 @@ def get_messages(
 
     next_cursor = rows[0]["id"] if len(rows) == limit else None
     return MessagesPage(items=items, next_cursor=next_cursor)
+
+
+@router.get("/{conversation_id}/heatmap", response_model=HeatmapResponse)
+def get_conversation_heatmap(conversation_id: str, conn=Depends(get_db), resolver=Depends(get_resolver)):
+    participants = queries.get_conversation_participants_resolved(conn, resolver, conversation_id)
+    if not participants:
+        raise HTTPException(status_code=404, detail="conversation not found")
+    cells = queries.get_conversation_dow_hour_counts(conn, conversation_id)
+    return HeatmapResponse(grid=stats.build_heatmap_grid(cells))
+
+
+@router.get("/{conversation_id}/streak-silence", response_model=ConversationStreakSilence)
+def get_conversation_streak_silence(conversation_id: str, conn=Depends(get_db), resolver=Depends(get_resolver)):
+    participants = queries.get_conversation_participants_resolved(conn, resolver, conversation_id)
+    if not participants:
+        raise HTTPException(status_code=404, detail="conversation not found")
+    days = queries.get_conversation_day_activity(conn, conversation_id)
+    silence = stats.longest_silence(days)
+    return ConversationStreakSilence(
+        streak_days=stats.longest_streak_days(days),
+        silence_gap_seconds=silence["gap_seconds"] if silence else None,
+        silence_before=silence["before"] if silence else None,
+        silence_after=silence["after"] if silence else None,
+    )
+
+
+@router.get("/{conversation_id}/group-size", response_model=GroupSizeResponse)
+def get_conversation_group_size(conversation_id: str, conn=Depends(get_db), resolver=Depends(get_resolver)):
+    participants = queries.get_conversation_participants_resolved(conn, resolver, conversation_id)
+    if not participants:
+        raise HTTPException(status_code=404, detail="conversation not found")
+    series = queries.get_conversation_group_size_series(conn, conversation_id)
+    return GroupSizeResponse(points=[GroupSizePoint(datetime=dt, size=size) for dt, size in series])
+
+
+@router.get("/{conversation_id}/join-leave", response_model=JoinLeaveResponse)
+def get_conversation_join_leave(conversation_id: str, conn=Depends(get_db), resolver=Depends(get_resolver)):
+    participants = queries.get_conversation_participants_resolved(conn, resolver, conversation_id)
+    if not participants:
+        raise HTTPException(status_code=404, detail="conversation not found")
+    items = queries.get_conversation_join_leave_events(conn, resolver, conversation_id)
+    return JoinLeaveResponse(items=[JoinLeaveEvent(**item) for item in items])
+
+
+@router.get("/{conversation_id}/reply-graph", response_model=ReplyGraphResponse)
+def get_conversation_reply_graph(conversation_id: str, conn=Depends(get_db), resolver=Depends(get_resolver)):
+    participants = queries.get_conversation_participants_resolved(conn, resolver, conversation_id)
+    if not participants:
+        raise HTTPException(status_code=404, detail="conversation not found")
+    edges = queries.get_conversation_reply_graph(conn, resolver, conversation_id)
+    return ReplyGraphResponse(edges=[ReplyGraphEdge(**edge) for edge in edges])

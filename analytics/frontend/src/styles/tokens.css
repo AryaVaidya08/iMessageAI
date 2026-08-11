@@ -16,6 +16,15 @@
   --bubble-other-2: #D6F0E8;
   --bubble-other-3: #FDEBD3;
   --bubble-other-4: #FCE3E8;
+
+  /* Sequential ramp (one hue, light->dark) for the day/hour heatmaps --
+     step 0 is "no activity" and reuses --color-border; steps 1-4 climb in
+     saturation/lightness toward --color-accent at the top of the scale. */
+  --heatmap-0: rgba(0, 0, 0, 0.06);
+  --heatmap-1: #CFE8FF;
+  --heatmap-2: #8FC7FF;
+  --heatmap-3: #4FA3FF;
+  --heatmap-4: #0A84FF;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,6 +35,11 @@
     --color-text-secondary: #98989D;
     --color-border: rgba(255, 255, 255, 0.08);
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --heatmap-0: rgba(255, 255, 255, 0.06);
+    --heatmap-1: #0D3A66;
+    --heatmap-2: #14538F;
+    --heatmap-3: #1C72C4;
+    --heatmap-4: #0A84FF;
   }
 }
 
@@ -36,4 +50,9 @@
   --color-text-secondary: #98989D;
   --color-border: rgba(255, 255, 255, 0.08);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --heatmap-0: rgba(255, 255, 255, 0.06);
+  --heatmap-1: #0D3A66;
+  --heatmap-2: #14538F;
+  --heatmap-3: #1C72C4;
+  --heatmap-4: #0A84FF;
 }

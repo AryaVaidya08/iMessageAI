@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { TopNav } from "./components/TopNav";
 import { ConversationDetailPage } from "./pages/ConversationDetailPage";
 import { ConversationsListPage } from "./pages/ConversationsListPage";
+import { LeaderboardsPage } from "./pages/LeaderboardsPage";
 import { OverviewPage } from "./pages/OverviewPage";
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
           <Route path="/" element={<OverviewPage />} />
           <Route path="/conversations" element={<ConversationsListPage />} />
           <Route path="/conversations/:id" element={<ConversationDetailPage />} />
+          <Route path="/leaderboards" element={<LeaderboardsPage />} />
         </Routes>
       </main>
     </>

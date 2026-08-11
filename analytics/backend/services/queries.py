@@ -1,6 +1,7 @@
+import itertools
 import sqlite3
 
-from services import names
+from services import names, stats
 
 
 def _resolve_participants(rows: list[sqlite3.Row], resolver) -> list["names.ResolvedParticipant"]:
@@ -226,3 +227,314 @@ def get_tapbacks_for_messages(
             {"reactor_id": r["reactor_id"], "display_name": display_name, "action": r["action"]}
         )
     return result
+
+
+def get_conversation_display_names(conn: sqlite3.Connection, resolver) -> dict[str, str]:
+    participants_by_conv = get_conversation_participants_raw(conn)
+    return {
+        conv_id: names.build_conversation_display_name(_resolve_participants(rows, resolver))
+        for conv_id, rows in participants_by_conv.items()
+    }
+
+
+def get_participants_by_ids(conn: sqlite3.Connection, ids: list[str]) -> dict[str, sqlite3.Row]:
+    if not ids:
+        return {}
+    placeholders = ",".join("?" for _ in ids)
+    rows = conn.execute(
+        f"SELECT id, phone_num, email, is_me FROM participants WHERE id IN ({placeholders})", ids
+    ).fetchall()
+    return {r["id"]: r for r in rows}
+
+
+def _resolved_display_name(row: sqlite3.Row | None, resolver) -> str:
+    if row is None:
+        return "Unknown"
+    resolved = names.resolve_participant(row["id"], row["phone_num"], row["email"], row["is_me"], resolver)
+    return resolved.display_name
+
+
+# --- Leaderboards ---------------------------------------------------------
+
+
+def get_attachment_leaderboard(conn: sqlite3.Connection, resolver, limit: int) -> list[dict]:
+    rows = conn.execute(
+        """
+        SELECT sender_id, COUNT(*) AS c
+        FROM messages
+        WHERE has_attachment = 1 OR has_sticker = 1
+        GROUP BY sender_id
+        ORDER BY c DESC
+        LIMIT ?
+        """,
+        (limit,),
+    ).fetchall()
+    participants = get_participants_by_ids(conn, [r["sender_id"] for r in rows])
+    return [
+        {
+            "participant_id": r["sender_id"],
+            "display_name": _resolved_display_name(participants.get(r["sender_id"]), resolver),
+            "count": r["c"],
+        }
+        for r in rows
+    ]
+
+
+def _hydrate_message_leaderboard(
+    conn: sqlite3.Connection, resolver, ranked: list[tuple[str, int]], count_key: str
+) -> list[dict]:
+    if not ranked:
+        return []
+    message_ids = [mid for mid, _ in ranked]
+    placeholders = ",".join("?" for _ in message_ids)
+    rows = conn.execute(
+        f"SELECT id, conversation_id, sender_id, timestamp, text FROM messages WHERE id IN ({placeholders})",
+        message_ids,
+    ).fetchall()
+    messages_by_id = {r["id"]: r for r in rows}
+    participants = get_participants_by_ids(conn, [r["sender_id"] for r in rows])
+    display_names = get_conversation_display_names(conn, resolver)
+
+    result = []
+    for message_id, count in ranked:
+        m = messages_by_id.get(message_id)
+        if m is None:
+            continue
+        result.append({
+            "message_id": message_id,
+            "text": m["text"],
+            "sender_id": m["sender_id"],
+            "sender_display_name": _resolved_display_name(participants.get(m["sender_id"]), resolver),
+            "conversation_id": m["conversation_id"],
+            "conversation_display_name": display_names.get(m["conversation_id"], "Unknown"),
+            "timestamp": m["timestamp"],
+            count_key: count,
+        })
+    return result
+
+
+def get_most_tapbacked_messages(conn: sqlite3.Connection, resolver, limit: int) -> list[dict]:
+    rows = conn.execute(
+        "SELECT message_id, COUNT(*) AS c FROM tapbacks GROUP BY message_id ORDER BY c DESC LIMIT ?",
+        (limit,),
+    ).fetchall()
+    ranked = [(r["message_id"], r["c"]) for r in rows]
+    return _hydrate_message_leaderboard(conn, resolver, ranked, "tapback_count")
+
+
+def get_most_replied_messages(conn: sqlite3.Connection, resolver, limit: int) -> list[dict]:
+    rows = conn.execute(
+        """
+        SELECT reply_to, COUNT(*) AS c
+        FROM messages
+        WHERE reply_to IS NOT NULL
+        GROUP BY reply_to
+        ORDER BY c DESC
+        LIMIT ?
+        """,
+        (limit,),
+    ).fetchall()
+    ranked = [(r["reply_to"], r["c"]) for r in rows]
+    return _hydrate_message_leaderboard(conn, resolver, ranked, "reply_count")
+
+
+def get_day_activity_by_conversation(conn: sqlite3.Connection) -> dict[str, list[stats.DayActivity]]:
+    # GROUP BY (conversation_id, day) has no covering index, so this does one
+    # full-table sort -- but the output is one row per active conversation-
+    # day (a small fraction of the 607K total messages), not one row per
+    # message, which is why this is used instead of pulling every message.
+    rows = conn.execute(
+        """
+        SELECT conversation_id, substr(timestamp, 1, 10) AS day,
+               MIN(timestamp) AS start_ts, MAX(timestamp) AS end_ts
+        FROM messages
+        GROUP BY conversation_id, day
+        ORDER BY conversation_id, day
+        """
+    ).fetchall()
+    by_conv: dict[str, list[stats.DayActivity]] = {}
+    for r in rows:
+        by_conv.setdefault(r["conversation_id"], []).append(
+            stats.DayActivity(day=r["day"], start_ts=r["start_ts"], end_ts=r["end_ts"])
+        )
+    return by_conv
+
+
+def get_conversation_day_activity(conn: sqlite3.Connection, conversation_id: str) -> list[stats.DayActivity]:
+    rows = conn.execute(
+        """
+        SELECT substr(timestamp, 1, 10) AS day, MIN(timestamp) AS start_ts, MAX(timestamp) AS end_ts
+        FROM messages
+        WHERE conversation_id = ?
+        GROUP BY day
+        ORDER BY day
+        """,
+        (conversation_id,),
+    ).fetchall()
+    return [stats.DayActivity(day=r["day"], start_ts=r["start_ts"], end_ts=r["end_ts"]) for r in rows]
+
+
+def get_streak_leaderboard(conn: sqlite3.Connection, resolver) -> dict | None:
+    best = stats.best_streak_conversation(get_day_activity_by_conversation(conn))
+    if best is None:
+        return None
+    conv_id, streak_days = best
+    display_names = get_conversation_display_names(conn, resolver)
+    return {
+        "conversation_id": conv_id,
+        "conversation_display_name": display_names.get(conv_id, "Unknown"),
+        "streak_days": streak_days,
+    }
+
+
+def get_silence_leaderboard(conn: sqlite3.Connection, resolver) -> dict | None:
+    best = stats.best_silence_conversation(get_day_activity_by_conversation(conn))
+    if best is None:
+        return None
+    conv_id, silence = best
+    display_names = get_conversation_display_names(conn, resolver)
+    return {
+        "conversation_id": conv_id,
+        "conversation_display_name": display_names.get(conv_id, "Unknown"),
+        "gap_seconds": silence["gap_seconds"],
+        "before": silence["before"],
+        "after": silence["after"],
+    }
+
+
+def get_fastest_reply_relationship_type(conn: sqlite3.Connection) -> dict | None:
+    # Full-table sort by (conversation_id, timestamp), same class of cost as
+    # get_day_activity_by_conversation above -- there is no composite index
+    # on messages(conversation_id, timestamp) yet (see perf note in project
+    # docs), so this is O(n log n) over all 607K messages on every call.
+    convs = {c["id"]: c["relationship_type"] for c in get_all_conversations(conn)}
+    rows = conn.execute(
+        "SELECT conversation_id, sender_id, timestamp FROM messages ORDER BY conversation_id, timestamp"
+    ).fetchall()
+    deltas_by_relationship: dict[str, list[float]] = {}
+    for conv_id, group in itertools.groupby(rows, key=lambda r: r["conversation_id"]):
+        rel = convs.get(conv_id)
+        if rel is None:
+            continue
+        events = [stats.MessageEvent(sender_id=r["sender_id"], timestamp=r["timestamp"]) for r in group]
+        deltas_by_relationship.setdefault(rel, []).extend(stats.reply_deltas_seconds(events))
+
+    ranked = stats.fastest_reply_relationship_types(deltas_by_relationship)
+    if not ranked:
+        return None
+    relationship_type, median_seconds = ranked[0]
+    return {"relationship_type": relationship_type, "median_reply_seconds": median_seconds}
+
+
+# --- Conversation detail additions ----------------------------------------
+
+
+def get_conversation_dow_hour_counts(conn: sqlite3.Connection, conversation_id: str) -> list[tuple[int, int, int]]:
+    rows = conn.execute(
+        """
+        SELECT CAST(strftime('%w', timestamp) AS INTEGER) AS dow,
+               CAST(strftime('%H', timestamp) AS INTEGER) AS hour,
+               COUNT(*) AS c
+        FROM messages
+        WHERE conversation_id = ?
+        GROUP BY dow, hour
+        """,
+        (conversation_id,),
+    ).fetchall()
+    return [(r["dow"], r["hour"], r["c"]) for r in rows]
+
+
+def get_global_dow_hour_counts(conn: sqlite3.Connection) -> list[tuple[int, int, int]]:
+    rows = conn.execute(
+        """
+        SELECT CAST(strftime('%w', timestamp) AS INTEGER) AS dow,
+               CAST(strftime('%H', timestamp) AS INTEGER) AS hour,
+               COUNT(*) AS c
+        FROM messages
+        GROUP BY dow, hour
+        """
+    ).fetchall()
+    return [(r["dow"], r["hour"], r["c"]) for r in rows]
+
+
+def get_conversation_hours_by_sender(conn: sqlite3.Connection, conversation_id: str) -> list[tuple[str, int]]:
+    rows = conn.execute(
+        """
+        SELECT sender_id, CAST(strftime('%H', timestamp) AS INTEGER) AS hour
+        FROM messages WHERE conversation_id = ?
+        """,
+        (conversation_id,),
+    ).fetchall()
+    return [(r["sender_id"], r["hour"]) for r in rows]
+
+
+MEMBERSHIP_ACTIONS = ("added person", "removed person", "left convo")
+
+
+def get_conversation_membership_events(conn: sqlite3.Connection, conversation_id: str) -> list[sqlite3.Row]:
+    placeholders = ",".join("?" for _ in MEMBERSHIP_ACTIONS)
+    return conn.execute(
+        f"""
+        SELECT datetime, action, announcer_id, affected_id
+        FROM announcements
+        WHERE conversation_id = ? AND action IN ({placeholders})
+        ORDER BY datetime
+        """,
+        (conversation_id, *MEMBERSHIP_ACTIONS),
+    ).fetchall()
+
+
+def get_conversation_group_size_series(conn: sqlite3.Connection, conversation_id: str) -> list[tuple[str, int]]:
+    current_size = conn.execute(
+        "SELECT COUNT(*) AS c FROM conversation_participants WHERE conversation_id = ?",
+        (conversation_id,),
+    ).fetchone()["c"]
+    pairs = [(r["datetime"], r["action"]) for r in get_conversation_membership_events(conn, conversation_id)]
+    return stats.group_size_over_time(current_size, pairs)
+
+
+def get_conversation_join_leave_events(conn: sqlite3.Connection, resolver, conversation_id: str) -> list[dict]:
+    events = get_conversation_membership_events(conn, conversation_id)
+    subject_ids = [r["affected_id"] or r["announcer_id"] for r in events]
+    participants = get_participants_by_ids(conn, [pid for pid in subject_ids if pid])
+    return [
+        {
+            "datetime": r["datetime"],
+            "kind": "joined" if r["action"] == "added person" else "left",
+            "display_name": _resolved_display_name(participants.get(r["affected_id"] or r["announcer_id"]), resolver),
+        }
+        for r in events
+    ]
+
+
+def get_conversation_reply_edges(conn: sqlite3.Connection, conversation_id: str) -> list[tuple[str, str]]:
+    rows = conn.execute(
+        """
+        SELECT m.sender_id AS replier, t.sender_id AS original
+        FROM messages m
+        JOIN messages t ON m.reply_to = t.id AND t.conversation_id = m.conversation_id
+        WHERE m.conversation_id = ?
+        """,
+        (conversation_id,),
+    ).fetchall()
+    return [(r["replier"], r["original"]) for r in rows]
+
+
+def get_conversation_reply_graph(conn: sqlite3.Connection, resolver, conversation_id: str) -> list[dict]:
+    graph = stats.build_reply_graph(get_conversation_reply_edges(conn, conversation_id))
+    participants = get_conversation_participants_resolved(conn, resolver, conversation_id)
+
+    def _name(pid: str) -> str:
+        p = participants.get(pid)
+        return p.display_name if p else "Unknown"
+
+    return [
+        {
+            "replier_id": replier,
+            "replier_display_name": _name(replier),
+            "original_id": original,
+            "original_display_name": _name(original),
+            "count": count,
+        }
+        for replier, original, count in graph
+    ]

@@ -1,0 +1,85 @@
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  animation: card-in 300ms var(--ease-spring) both;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.gridWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-x: auto;
+}
+
+.hourRow {
+  display: flex;
+  gap: 3px;
+  padding-left: 40px;
+}
+
+.hourLabel {
+  flex: 1;
+  min-width: 10px;
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.rowLabel {
+  width: 36px;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.cell {
+  flex: 1;
+  aspect-ratio: 1;
+  min-width: 10px;
+  border-radius: 3px;
+  background: var(--heatmap-0);
+}
+
+.cell[data-level="1"] { background: var(--heatmap-1); }
+.cell[data-level="2"] { background: var(--heatmap-2); }
+.cell[data-level="3"] { background: var(--heatmap-3); }
+.cell[data-level="4"] { background: var(--heatmap-4); }
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+
+.legendLabel {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.legendSwatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--heatmap-0);
+}
+
+.legendSwatch[data-level="1"] { background: var(--heatmap-1); }
+.legendSwatch[data-level="2"] { background: var(--heatmap-2); }
+.legendSwatch[data-level="3"] { background: var(--heatmap-3); }
+.legendSwatch[data-level="4"] { background: var(--heatmap-4); }
