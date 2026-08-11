@@ -66,6 +66,7 @@ export interface HistogramBucket { label: string; count: number; }
 export interface ParticipantStats {
   participant_id: string;
   display_name: string;
+  handle: string;
   message_count: number;
   median_reply_seconds: number | null;
   reply_histogram: HistogramBucket[];

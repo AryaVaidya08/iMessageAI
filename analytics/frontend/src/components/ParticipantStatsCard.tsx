@@ -16,7 +16,12 @@ function formatReplySeconds(seconds: number | null): string {
 export function ParticipantStatsCard({ stats }: { stats: ParticipantStats }) {
   return (
     <div className={styles.card}>
-      <h3 className={styles.name}>{stats.display_name}</h3>
+      <h3 className={styles.name}>
+        {stats.display_name}
+        {stats.handle && stats.handle !== stats.display_name && (
+          <span className={styles.handle}>{stats.handle}</span>
+        )}
+      </h3>
       <div className={styles.metrics}>
         <div>
           <div className={styles.metricLabel}>Messages</div>

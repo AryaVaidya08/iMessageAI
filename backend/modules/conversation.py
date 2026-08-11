@@ -9,9 +9,12 @@ from .announcement import Announcement
 class Conversation:
     id: str
     is_group_chat: bool
+
+    
     
     participants: list[Participant]
 
+    convo_name: str
     relationship_type: RelationshipType
 
     messages: list[Message] = field(default_factory=list)

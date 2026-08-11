@@ -97,6 +97,7 @@ def get_participant_stats(conversation_id: str, conn=Depends(get_db), resolver=D
         participants_out.append({
             "participant_id": pid,
             "display_name": resolved.display_name,
+            "handle": resolved.handle,
             "message_count": counts_by_sender.get(pid, 0),
             "median_reply_seconds": reply_seconds.get(pid),
             "reply_histogram": [

@@ -82,6 +82,7 @@ class HistogramBucket(BaseModel):
 class ParticipantStats(BaseModel):
     participant_id: str
     display_name: str
+    handle: str
     message_count: int
     median_reply_seconds: float | None
     reply_histogram: list[HistogramBucket]

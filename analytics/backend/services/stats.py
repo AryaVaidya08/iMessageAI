@@ -1,7 +1,7 @@
 import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from statistics import median
 
 import emoji as emoji_lib
@@ -225,20 +225,46 @@ def longest_silence(days: list[DayActivity]) -> dict | None:
     return {"before": before, "after": after, "gap_seconds": gap_seconds}
 
 
+def _fill_daily_gaps(day_counts: list[tuple[str, int]]) -> list[tuple[str, int]]:
+    """
+    Expands day_counts to include every day between the first and last day,
+    with a count of 0 for days that had no messages. Without this, silent
+    periods are simply absent from the data instead of showing as zero, which
+    makes volume charts misrepresent activity trends (e.g. a month-long gap
+    looks the same as a single quiet day).
+    """
+    counts = dict(day_counts)
+    start = date.fromisoformat(day_counts[0][0])
+    end = date.fromisoformat(day_counts[-1][0])
+    filled: list[tuple[str, int]] = []
+    d = start
+    while d <= end:
+        key = d.isoformat()
+        filled.append((key, counts.get(key, 0)))
+        d += timedelta(days=1)
+    return filled
+
+
 def bucket_volume(day_counts: list[tuple[str, int]], granularity: str) -> list[tuple[str, int]]:
     """
     day_counts: [(YYYY-MM-DD, count), ...] sorted ascending by day.
     granularity: 'day' | 'week' | 'month'.
     Returns [(bucket_label, count), ...] ascending; bucket_label is the
     bucket's Monday (week) or day (day) as YYYY-MM-DD, or YYYY-MM (month).
+    Buckets with no messages are included with a count of 0, so charts can
+    render true gaps in activity rather than skipping over silent stretches.
     """
-    if granularity == "day":
-        return list(day_counts)
-    if granularity not in ("week", "month"):
+    if granularity not in ("day", "week", "month"):
         raise ValueError(f"unknown granularity: {granularity}")
+    if not day_counts:
+        return []
+
+    filled = _fill_daily_gaps(day_counts)
+    if granularity == "day":
+        return filled
 
     buckets: dict[str, int] = defaultdict(int)
-    for day_str, count in day_counts:
+    for day_str, count in filled:
         d = date.fromisoformat(day_str)
         if granularity == "week":
             monday = date.fromordinal(d.toordinal() - d.weekday())

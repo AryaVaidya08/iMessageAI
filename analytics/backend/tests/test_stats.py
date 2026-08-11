@@ -122,6 +122,36 @@ def test_bucket_volume_week_spans_year_boundary():
     assert bucket_volume(day_counts, "week") == [("2024-12-30", 10), ("2025-01-06", 7)]
 
 
+def test_bucket_volume_day_fills_gaps_with_zero():
+    day_counts = [("2024-01-01", 5), ("2024-01-04", 3)]
+    assert bucket_volume(day_counts, "day") == [
+        ("2024-01-01", 5),
+        ("2024-01-02", 0),
+        ("2024-01-03", 0),
+        ("2024-01-04", 3),
+    ]
+
+
+def test_bucket_volume_week_fills_silent_weeks_with_zero():
+    # 2024-01-01 and 2024-01-22 are both Mondays, three weeks apart.
+    day_counts = [("2024-01-01", 5), ("2024-01-22", 2)]
+    assert bucket_volume(day_counts, "week") == [
+        ("2024-01-01", 5),
+        ("2024-01-08", 0),
+        ("2024-01-15", 0),
+        ("2024-01-22", 2),
+    ]
+
+
+def test_bucket_volume_month_fills_silent_months_with_zero():
+    day_counts = [("2024-01-05", 5), ("2024-03-10", 2)]
+    assert bucket_volume(day_counts, "month") == [
+        ("2024-01", 5),
+        ("2024-02", 0),
+        ("2024-03", 2),
+    ]
+
+
 def test_median_reply_seconds_raises_on_unsorted_input():
     events = [
         MessageEvent("a", "2024-01-01T09:05:00"),

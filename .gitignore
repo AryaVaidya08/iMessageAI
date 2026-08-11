@@ -4,6 +4,7 @@ backend/parser/storage/*
 .vscode/*
 backend/parser/scripts/extract_specific_convo.sh
 __pycache__/
+backend/storage/data/*
 participant_registry.json
 imessage.db
 .env.local

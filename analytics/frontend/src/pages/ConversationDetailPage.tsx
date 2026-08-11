@@ -7,7 +7,6 @@ import {
   type ConversationStreakSilence,
   type GroupSizePoint,
   type Granularity,
-  type JoinLeaveEvent,
   type ParticipantStats,
   type ReplyGraphEdge,
   type VolumePoint,
@@ -46,7 +45,6 @@ export function ConversationDetailPage() {
   const [heatmap, setHeatmap] = useState<number[][] | null>(null);
   const [streakSilence, setStreakSilence] = useState<ConversationStreakSilence | null>(null);
   const [groupSize, setGroupSize] = useState<GroupSizePoint[]>([]);
-  const [joinLeave, setJoinLeave] = useState<JoinLeaveEvent[]>([]);
   const [replyGraph, setReplyGraph] = useState<ReplyGraphEdge[]>([]);
   const [tab, setTab] = useState<Tab>("overview");
   const [detailError, setDetailError] = useState<string | null>(null);
@@ -66,7 +64,6 @@ export function ConversationDetailPage() {
     setHeatmap(null);
     setStreakSilence(null);
     setGroupSize([]);
-    setJoinLeave([]);
     setReplyGraph([]);
     setTab("overview");
     setDetailError(null);
@@ -84,7 +81,6 @@ export function ConversationDetailPage() {
     // for them anyway, but there's no reason to fetch data that won't render).
     if (!id || !detail?.is_group_chat) return;
     api.conversationGroupSize(id).then((r) => setGroupSize(r.points)).catch(() => {});
-    api.conversationJoinLeave(id).then((r) => setJoinLeave(r.items)).catch(() => {});
   }, [id, detail?.is_group_chat]);
 
   useEffect(() => {
@@ -156,12 +152,7 @@ export function ConversationDetailPage() {
           {volumeError ? (
             <div className={styles.error}>Couldn't load volume: {volumeError}</div>
           ) : (
-            <VolumeChart
-              points={volume}
-              granularity={granularity}
-              onGranularityChange={setGranularity}
-              joinLeaveEvents={detail.is_group_chat ? joinLeave : undefined}
-            />
+            <VolumeChart points={volume} granularity={granularity} onGranularityChange={setGranularity} />
           )}
 
           {detail.is_group_chat && groupSize.length > 0 && <GroupSizeChart points={groupSize} />}
