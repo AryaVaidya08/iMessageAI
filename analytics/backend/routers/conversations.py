@@ -13,6 +13,9 @@ from models import (
     JoinLeaveResponse,
     MessagesPage,
     ParticipantStatsResponse,
+    PersonalityLeaderboardEntry,
+    PersonalityLeaderboardResponse,
+    PersonalityLeaderboardTrait,
     ReplyGraphEdge,
     ReplyGraphResponse,
     SearchMessagesResponse,
@@ -122,6 +125,42 @@ def get_participant_stats(conversation_id: str, conn=Depends(get_db), resolver=D
             ],
         })
     return ParticipantStatsResponse(participants=participants_out)
+
+
+@router.get("/{conversation_id}/personality-leaderboard", response_model=PersonalityLeaderboardResponse)
+def get_personality_leaderboard(conversation_id: str, conn=Depends(get_db), resolver=Depends(get_resolver)):
+    participants = queries.get_conversation_participants_resolved(conn, resolver, conversation_id)
+    if not participants:
+        raise HTTPException(status_code=404, detail="conversation not found")
+
+    message_rows = queries.get_conversation_messages_for_stats(conn, conversation_id)
+    texts_by_sender: dict[str, list[str]] = {}
+    message_counts: dict[str, int] = dict.fromkeys(participants, 0)
+    for r in message_rows:
+        texts_by_sender.setdefault(r["sender_id"], []).append(r["text"])
+        if r["sender_id"] in message_counts:
+            message_counts[r["sender_id"]] += 1
+
+    hits_by_participant = {pid: stats.personality_hits(texts_by_sender.get(pid, [])) for pid in participants}
+    leaderboard = stats.personality_leaderboard(hits_by_participant, message_counts)
+
+    return PersonalityLeaderboardResponse(
+        traits=[
+            PersonalityLeaderboardTrait(
+                trait=trait,
+                entries=[
+                    PersonalityLeaderboardEntry(
+                        participant_id=pid,
+                        display_name=participants[pid].display_name,
+                        message_count=count,
+                        share=share,
+                    )
+                    for pid, count, share in entries
+                ],
+            )
+            for trait, entries in leaderboard.items()
+        ]
+    )
 
 
 @router.get("/{conversation_id}/messages", response_model=MessagesPage)

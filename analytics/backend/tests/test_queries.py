@@ -65,7 +65,7 @@ def test_get_messages_page_before_cursor_scoped_to_conversation(conn):
     # all (i.e. fall back to conv2's actual first page), not silently borrow
     # conv1's ordering/messages.
     conn.execute("INSERT INTO participants VALUES ('other', '+15553330000', NULL, 0)")
-    conn.execute("INSERT INTO conversations VALUES ('conv2', 0, 'other')")
+    conn.execute("INSERT INTO conversations (id, is_group_chat, relationship_type) VALUES ('conv2', 0, 'other')")
     conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'me')")
     conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'other')")
     conn.executemany(
@@ -133,7 +133,7 @@ def test_get_messages_page_same_timestamp_no_loss_or_duplication_across_pages(co
 
 def test_get_top_conversations_ranks_by_message_count(conn, resolver):
     conn.execute("INSERT INTO participants VALUES ('other', '+15553330000', NULL, 0)")
-    conn.execute("INSERT INTO conversations VALUES ('conv2', 0, 'other')")
+    conn.execute("INSERT INTO conversations (id, is_group_chat, relationship_type) VALUES ('conv2', 0, 'other')")
     conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'me')")
     conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'other')")
     conn.execute(
@@ -243,7 +243,7 @@ def test_get_day_activity_by_conversation_groups_by_day(conn):
 
 def test_get_conversation_day_activity_scoped_to_one_conversation(conn):
     conn.execute("INSERT INTO participants VALUES ('other', '+15553330000', NULL, 0)")
-    conn.execute("INSERT INTO conversations VALUES ('conv2', 0, 'other')")
+    conn.execute("INSERT INTO conversations (id, is_group_chat, relationship_type) VALUES ('conv2', 0, 'other')")
     conn.execute(
         "INSERT INTO messages VALUES ('c2m1', 'conv2', 'other', '2024-05-05T10:00:00', 'yo', 0, 0, NULL)"
     )
@@ -254,7 +254,7 @@ def test_get_conversation_day_activity_scoped_to_one_conversation(conn):
 
 def test_get_streak_leaderboard_picks_longest_streak(conn, resolver):
     conn.execute("INSERT INTO participants VALUES ('other', '+15553330000', NULL, 0)")
-    conn.execute("INSERT INTO conversations VALUES ('conv2', 0, 'other')")
+    conn.execute("INSERT INTO conversations (id, is_group_chat, relationship_type) VALUES ('conv2', 0, 'other')")
     conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'me')")
     conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'other')")
     conn.executemany(
@@ -282,7 +282,7 @@ def test_get_silence_leaderboard_picks_largest_gap(conn, resolver):
 
 def test_get_fastest_reply_relationship_type_picks_lowest_median(conn, resolver):
     conn.execute("INSERT INTO participants VALUES ('fam', '+15554440000', NULL, 0)")
-    conn.execute("INSERT INTO conversations VALUES ('conv2', 0, 'family')")
+    conn.execute("INSERT INTO conversations (id, is_group_chat, relationship_type) VALUES ('conv2', 0, 'family')")
     conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'me')")
     conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'fam')")
     conn.executemany(

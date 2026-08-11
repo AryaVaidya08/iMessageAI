@@ -7,7 +7,7 @@ CREATE TABLE participants (
     id TEXT PRIMARY KEY, phone_num TEXT, email TEXT, is_me INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE conversations (
-    id TEXT PRIMARY KEY, is_group_chat INTEGER NOT NULL, relationship_type TEXT NOT NULL
+    id TEXT PRIMARY KEY, is_group_chat INTEGER NOT NULL, relationship_type TEXT NOT NULL, convo_name TEXT
 );
 CREATE TABLE conversation_participants (
     conversation_id TEXT NOT NULL REFERENCES conversations(id),
@@ -53,7 +53,7 @@ def conn():
 
     connection.execute("INSERT INTO participants VALUES ('me', '+15551110000', NULL, 1)")
     connection.execute("INSERT INTO participants VALUES ('them', '+15552220000', NULL, 0)")
-    connection.execute("INSERT INTO conversations VALUES ('conv1', 0, 'other')")
+    connection.execute("INSERT INTO conversations (id, is_group_chat, relationship_type) VALUES ('conv1', 0, 'other')")
     connection.execute("INSERT INTO conversation_participants VALUES ('conv1', 'me')")
     connection.execute("INSERT INTO conversation_participants VALUES ('conv1', 'them')")
     connection.executemany(

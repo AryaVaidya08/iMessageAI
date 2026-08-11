@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS participants (
 CREATE TABLE IF NOT EXISTS conversations (
     id TEXT PRIMARY KEY,
     is_group_chat INTEGER NOT NULL,
-    relationship_type TEXT NOT NULL
+    relationship_type TEXT NOT NULL,
+    convo_name TEXT
 );
 
 CREATE TABLE IF NOT EXISTS conversation_participants (

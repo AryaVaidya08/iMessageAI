@@ -60,7 +60,7 @@ def get_conversation_participants_raw(conn: sqlite3.Connection) -> dict[str, lis
 
 
 def get_all_conversations(conn: sqlite3.Connection) -> list[sqlite3.Row]:
-    return conn.execute("SELECT id, is_group_chat, relationship_type FROM conversations").fetchall()
+    return conn.execute("SELECT id, is_group_chat, relationship_type, convo_name FROM conversations").fetchall()
 
 
 def get_top_conversations(conn: sqlite3.Connection, resolver, limit: int) -> list[dict]:
@@ -75,7 +75,7 @@ def get_top_conversations(conn: sqlite3.Connection, resolver, limit: int) -> lis
         resolved = _resolve_participants(rows, resolver)
         result.append({
             "conversation_id": conv_id,
-            "display_name": names.build_conversation_display_name(resolved),
+            "display_name": names.build_conversation_display_name(resolved, convs[conv_id]["convo_name"] if conv_id in convs else None),
             "message_count": count,
             "is_group_chat": bool(convs[conv_id]["is_group_chat"]) if conv_id in convs else False,
         })
@@ -97,7 +97,7 @@ def list_conversations(
         resolved = _resolve_participants(rows, resolver)
         items.append({
             "id": conv_id,
-            "display_name": names.build_conversation_display_name(resolved),
+            "display_name": names.build_conversation_display_name(resolved, conv["convo_name"]),
             "is_group_chat": bool(conv["is_group_chat"]),
             "relationship_type": conv["relationship_type"],
             "message_count": count,
@@ -138,7 +138,7 @@ def get_conversation_participants_resolved(
 
 def get_conversation_detail(conn: sqlite3.Connection, resolver, conversation_id: str) -> dict | None:
     conv = conn.execute(
-        "SELECT id, is_group_chat, relationship_type FROM conversations WHERE id = ?",
+        "SELECT id, is_group_chat, relationship_type, convo_name FROM conversations WHERE id = ?",
         (conversation_id,),
     ).fetchone()
     if conv is None:
@@ -146,6 +146,7 @@ def get_conversation_detail(conn: sqlite3.Connection, resolver, conversation_id:
     participants = get_conversation_participants_resolved(conn, resolver, conversation_id)
     return {
         "id": conv["id"],
+        "display_name": names.build_conversation_display_name(list(participants.values()), conv["convo_name"]),
         "is_group_chat": bool(conv["is_group_chat"]),
         "relationship_type": conv["relationship_type"],
         "participants": [
@@ -341,8 +342,9 @@ def get_tapbacks_for_messages(
 
 def get_conversation_display_names(conn: sqlite3.Connection, resolver) -> dict[str, str]:
     participants_by_conv = get_conversation_participants_raw(conn)
+    convo_names = {c["id"]: c["convo_name"] for c in get_all_conversations(conn)}
     return {
-        conv_id: names.build_conversation_display_name(_resolve_participants(rows, resolver))
+        conv_id: names.build_conversation_display_name(_resolve_participants(rows, resolver), convo_names.get(conv_id))
         for conv_id, rows in participants_by_conv.items()
     }
 

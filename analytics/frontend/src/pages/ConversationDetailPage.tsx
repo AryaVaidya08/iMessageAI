@@ -7,22 +7,23 @@ import {
   type ConversationStreakSilence,
   type Granularity,
   type ParticipantStats,
+  type PersonalityLeaderboardTrait,
   type ReplyGraphEdge,
   type VolumePoint,
 } from "../api/client";
 import { ChatBubbleList } from "../components/ChatBubbleList";
 import { Heatmap } from "../components/Heatmap";
 import { ParticipantStatsCard } from "../components/ParticipantStatsCard";
+import { RecordCard, RecordCardEmpty, RecordCardSkeleton } from "../components/RecordCard";
 import { ReplyGraph } from "../components/ReplyGraph";
 import { StatCard } from "../components/StatCard";
 import { VolumeChart } from "../components/VolumeChart";
 import styles from "./ConversationDetailPage.module.css";
 
-type Tab = "overview" | "stats";
+type Tab = "overview" | "stats" | "personality";
 
 function buildTitle(detail: ConversationDetail): string {
-  const others = detail.participants.filter((p) => !p.is_me).map((p) => p.display_name);
-  return others.length ? others.join(", ") : "You";
+  return detail.display_name;
 }
 
 function formatDuration(seconds: number): string {
@@ -44,10 +45,12 @@ export function ConversationDetailPage() {
   const [heatmap, setHeatmap] = useState<number[][] | null>(null);
   const [streakSilence, setStreakSilence] = useState<ConversationStreakSilence | null>(null);
   const [replyGraph, setReplyGraph] = useState<ReplyGraphEdge[]>([]);
+  const [personalityLeaderboard, setPersonalityLeaderboard] = useState<PersonalityLeaderboardTrait[] | null>(null);
   const [tab, setTab] = useState<Tab>("overview");
   const [detailError, setDetailError] = useState<string | null>(null);
   const [statsError, setStatsError] = useState<string | null>(null);
   const [volumeError, setVolumeError] = useState<string | null>(null);
+  const [personalityError, setPersonalityError] = useState<string | null>(null);
 
   useEffect(() => {
     // React Router keeps this component mounted across an id-only navigation
@@ -63,9 +66,11 @@ export function ConversationDetailPage() {
     setHeatmap(null);
     setStreakSilence(null);
     setReplyGraph([]);
+    setPersonalityLeaderboard(null);
     setTab("overview");
     setDetailError(null);
     setStatsError(null);
+    setPersonalityError(null);
     api.conversation(id).then(setDetail).catch((e) => setDetailError(String(e)));
     api
       .participantStats(id)
@@ -75,6 +80,10 @@ export function ConversationDetailPage() {
     api.conversationHeatmap(id).then((r) => setHeatmap(r.grid)).catch(() => {});
     api.conversationStreakSilence(id).then(setStreakSilence).catch(() => {});
     api.conversationReplyGraph(id).then((r) => setReplyGraph(r.edges)).catch(() => {});
+    api
+      .conversationPersonalityLeaderboard(id)
+      .then((r) => setPersonalityLeaderboard(r.traits))
+      .catch((e) => setPersonalityError(String(e)));
   }, [id]);
 
   useEffect(() => {
@@ -124,9 +133,45 @@ export function ConversationDetailPage() {
         >
           Stats
         </button>
+        <button
+          type="button"
+          className={tab === "personality" ? styles.tabActive : styles.tab}
+          onClick={() => setTab("personality")}
+        >
+          Personality
+        </button>
       </div>
 
-      {tab === "stats" ? (
+      {tab === "personality" ? (
+        personalityError ? (
+          <div className={styles.error}>Couldn't load personality leaderboard: {personalityError}</div>
+        ) : personalityLeaderboard === null ? (
+          <div className={styles.leaderboardGrid}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <RecordCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : (
+          <div className={styles.leaderboardGrid}>
+            {personalityLeaderboard.map((t) =>
+              t.entries.length === 0 ? (
+                <RecordCardEmpty key={t.trait} title={t.trait} />
+              ) : (
+                <RecordCard
+                  key={t.trait}
+                  title={t.trait}
+                  headline={t.entries[0].display_name}
+                  subtext={`${t.entries[0].share}% of their own messages are ${t.trait.toLowerCase()} (${t.entries[0].message_count.toLocaleString()} messages)`}
+                  items={t.entries.slice(1, 6).map((e) => ({
+                    label: e.display_name,
+                    value: `${e.share}%`,
+                  }))}
+                />
+              ),
+            )}
+          </div>
+        )
+      ) : tab === "stats" ? (
         statsError ? (
           <div className={styles.error}>Couldn't load participant stats: {statsError}</div>
         ) : statsLoading ? (

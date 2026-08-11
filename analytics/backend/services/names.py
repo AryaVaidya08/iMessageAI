@@ -19,7 +19,9 @@ def resolve_participant(id_: str, phone_num: str | None, email: str | None, is_m
     return ResolvedParticipant(id=id_, handle=handle, display_name=name, is_me=bool(is_me))
 
 
-def build_conversation_display_name(participants: list[ResolvedParticipant]) -> str:
+def build_conversation_display_name(participants: list[ResolvedParticipant], convo_name: str | None = None) -> str:
+    if convo_name:
+        return convo_name
     others = [p.display_name for p in participants if not p.is_me]
     if not others:
         return "You"

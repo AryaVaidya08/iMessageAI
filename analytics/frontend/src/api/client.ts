@@ -53,6 +53,7 @@ export interface ParticipantOut {
 
 export interface ConversationDetail {
   id: string;
+  display_name: string;
   is_group_chat: boolean;
   relationship_type: string;
   participants: ParticipantOut[];
@@ -220,6 +221,22 @@ export interface ReplyGraphResponse {
   edges: ReplyGraphEdge[];
 }
 
+export interface PersonalityLeaderboardEntry {
+  participant_id: string;
+  display_name: string;
+  message_count: number;
+  share: number;
+}
+
+export interface PersonalityLeaderboardTrait {
+  trait: string;
+  entries: PersonalityLeaderboardEntry[];
+}
+
+export interface PersonalityLeaderboardResponse {
+  traits: PersonalityLeaderboardTrait[];
+}
+
 // --- Contact merge ---
 
 export interface MergeParticipantOut {
@@ -246,13 +263,49 @@ export interface MergeHistoryEntry {
   keep_id: string;
   keep_display_name: string;
   keep_handle: string;
+  keep_message_count: number;
   remove_id: string;
   remove_display_name: string;
   remove_handle: string;
+  remove_message_count: number;
 }
 
 export interface MergeHistoryResponse {
   items: MergeHistoryEntry[];
+}
+
+// --- Conversation merge ---
+
+export interface MergeConversationOut {
+  id: string;
+  display_name: string;
+  subtext: string;
+  is_group_chat: boolean;
+  message_count: number;
+}
+
+export interface MergeConversationsResponse {
+  conversations: MergeConversationOut[];
+}
+
+export interface MergeConversationResponse {
+  ok: boolean;
+  keep_id: string;
+  removed_id: string;
+}
+
+export interface MergeConversationHistoryEntry {
+  merged_at: string;
+  keep_id: string;
+  keep_display_name: string;
+  keep_message_count: number;
+  remove_id: string;
+  remove_display_name: string;
+  remove_message_count: number;
+}
+
+export interface MergeConversationHistoryResponse {
+  items: MergeConversationHistoryEntry[];
 }
 
 const BASE_URL = "http://localhost:8000";
@@ -361,6 +414,9 @@ export const api = {
 
   conversationReplyGraph: (id: string) => getJSON<ReplyGraphResponse>(`/api/conversations/${id}/reply-graph`),
 
+  conversationPersonalityLeaderboard: (id: string) =>
+    getJSON<PersonalityLeaderboardResponse>(`/api/conversations/${id}/personality-leaderboard`),
+
   leaderboardAttachments: (limit = 10) =>
     getJSON<AttachmentLeaderboardResponse>(`/api/leaderboards/attachments?limit=${limit}`),
 
@@ -380,4 +436,12 @@ export const api = {
     postJSON<MergeResponse>("/api/merge", { keep_id: keepId, remove_id: removeId }),
 
   mergeHistory: () => getJSON<MergeHistoryResponse>("/api/merge-history"),
+
+  conversationsForMerge: () => getJSON<MergeConversationsResponse>("/api/conversations-for-merge"),
+
+  mergeConversations: (keepId: string, removeId: string) =>
+    postJSON<MergeConversationResponse>("/api/merge-conversation", { keep_id: keepId, remove_id: removeId }),
+
+  conversationMergeHistory: () =>
+    getJSON<MergeConversationHistoryResponse>("/api/merge-conversation-history"),
 };

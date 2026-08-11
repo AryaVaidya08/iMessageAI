@@ -88,13 +88,19 @@ def save_conversation(conn: sqlite3.Connection, conversation: Conversation) -> N
 
         conn.execute(
             """
-            INSERT INTO conversations (id, is_group_chat, relationship_type)
-            VALUES (?, ?, ?)
+            INSERT INTO conversations (id, is_group_chat, relationship_type, convo_name)
+            VALUES (?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
                 is_group_chat = excluded.is_group_chat,
-                relationship_type = excluded.relationship_type
+                relationship_type = excluded.relationship_type,
+                convo_name = excluded.convo_name
             """,
-            (conversation.id, int(conversation.is_group_chat), conversation.relationship_type.value),
+            (
+                conversation.id,
+                int(conversation.is_group_chat),
+                conversation.relationship_type.value,
+                conversation.convo_name,
+            ),
         )
 
         for participant in conversation.participants:

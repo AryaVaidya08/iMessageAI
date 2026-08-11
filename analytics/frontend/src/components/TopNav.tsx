@@ -19,8 +19,8 @@ export function TopNav() {
           <NavLink to="/leaderboards" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
             Leaderboards
           </NavLink>
-          <NavLink to="/merge-contacts" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
-            Merge Contacts
+          <NavLink to="/merge" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+            Merge
           </NavLink>
         </div>
         <div className={styles.controls}>

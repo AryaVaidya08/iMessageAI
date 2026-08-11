@@ -50,6 +50,12 @@
   gap: 16px;
 }
 
+.leaderboardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
 @media (max-width: 700px) {
   .statsColumn {
     grid-template-columns: 1fr;

@@ -54,6 +54,7 @@ class ParticipantOut(BaseModel):
 
 class ConversationDetail(BaseModel):
     id: str
+    display_name: str
     is_group_chat: bool
     relationship_type: str
     participants: list[ParticipantOut]
@@ -247,6 +248,22 @@ class ReplyGraphResponse(BaseModel):
     edges: list[ReplyGraphEdge]
 
 
+class PersonalityLeaderboardEntry(BaseModel):
+    participant_id: str
+    display_name: str
+    message_count: int
+    share: float
+
+
+class PersonalityLeaderboardTrait(BaseModel):
+    trait: str
+    entries: list[PersonalityLeaderboardEntry]
+
+
+class PersonalityLeaderboardResponse(BaseModel):
+    traits: list[PersonalityLeaderboardTrait]
+
+
 # --- Contact merge -----------------------------------------------------
 
 
@@ -279,10 +296,52 @@ class MergeHistoryEntry(BaseModel):
     keep_id: str
     keep_display_name: str
     keep_handle: str
+    keep_message_count: int
     remove_id: str
     remove_display_name: str
     remove_handle: str
+    remove_message_count: int
 
 
 class MergeHistoryResponse(BaseModel):
     items: list[MergeHistoryEntry]
+
+
+# --- Conversation merge -------------------------------------------------
+
+
+class MergeConversationOut(BaseModel):
+    id: str
+    display_name: str
+    subtext: str
+    is_group_chat: bool
+    message_count: int
+
+
+class MergeConversationsResponse(BaseModel):
+    conversations: list[MergeConversationOut]
+
+
+class MergeConversationRequest(BaseModel):
+    keep_id: str
+    remove_id: str
+
+
+class MergeConversationResponse(BaseModel):
+    ok: bool
+    keep_id: str
+    removed_id: str
+
+
+class MergeConversationHistoryEntry(BaseModel):
+    merged_at: str
+    keep_id: str
+    keep_display_name: str
+    keep_message_count: int
+    remove_id: str
+    remove_display_name: str
+    remove_message_count: int
+
+
+class MergeConversationHistoryResponse(BaseModel):
+    items: list[MergeConversationHistoryEntry]

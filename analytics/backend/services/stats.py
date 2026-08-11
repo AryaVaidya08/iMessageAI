@@ -414,35 +414,21 @@ def _shout_words(text: str) -> list[str]:
     return [w for w in _CAPS_WORD_RE.findall(text) if w not in _CAPS_STOPLIST]
 
 
-def personality_scores(texts: list[str]) -> list[tuple[str, float]]:
+def personality_hits(texts: list[str]) -> dict[str, int]:
     """
     texts: one participant's message bodies, any order, empty/None entries
     ignored. For each of PERSONALITY_TRAITS, checks every message against a
     lexicon/punctuation/emoji heuristic (mirroring the VADER-lexicon approach
     used by sentiment_series, since there's no ML classifier in this
     pipeline) as a per-message yes/no hit -- a message can hit several traits
-    (or none). Hits are then normalized across PERSONALITY_TRAITS so the six
-    percentages sum to ~100: a relative profile of *this person's* texting
-    style, not an independent per-trait rate.
-
-    Deliberately picks high-contrast archetypes (Aggressive vs. Chill,
-    Chaotic vs. Wholesome) rather than close synonyms of the same "polite
-    texter" register: an earlier version normalized six near-synonymous
-    traits to 100 and two extremely common surface patterns (an exclamation
-    mark, a one-word "ok") ate the whole pie for nearly everyone. Spreading
-    the lexicons across genuinely distinct registers means the sum-to-100
-    normalization no longer collapses everyone onto the same one or two
-    traits.
-
-    Returns [] if the participant has no text messages; returns all traits
-    at 0.0 if messages exist but none of them tripped any heuristic.
+    (or none). Returns the raw hit count per trait (NOT a percentage); see
+    personality_scores for a single participant's normalized profile and
+    personality_leaderboard for hit counts compared across participants.
     """
-    texts = [t for t in texts if t]
-    if not texts:
-        return []
-
     hits: dict[str, int] = dict.fromkeys(PERSONALITY_TRAITS, 0)
     for text in texts:
+        if not text:
+            continue
         normalized = text.lower().replace("’", "'")
         words = _WORD_RE.findall(normalized)
         emojis = {item["emoji"].replace("️", "") for item in emoji_lib.emoji_list(text)}
@@ -470,11 +456,75 @@ def personality_scores(texts: list[str]) -> list[tuple[str, float]]:
             hits["Chill"] += 1
         if any(w in _WHOLESOME_WORDS for w in words) or (emojis & _WHOLESOME_EMOJI):
             hits["Wholesome"] += 1
+    return hits
 
+
+def personality_scores(texts: list[str]) -> list[tuple[str, float]]:
+    """
+    texts: one participant's message bodies, any order, empty/None entries
+    ignored. Runs personality_hits and normalizes across PERSONALITY_TRAITS
+    so the six percentages sum to ~100: a relative profile of *this
+    person's* texting style, not an independent per-trait rate.
+
+    Deliberately picks high-contrast archetypes (Aggressive vs. Chill,
+    Chaotic vs. Wholesome) rather than close synonyms of the same "polite
+    texter" register: an earlier version normalized six near-synonymous
+    traits to 100 and two extremely common surface patterns (an exclamation
+    mark, a one-word "ok") ate the whole pie for nearly everyone. Spreading
+    the lexicons across genuinely distinct registers means the sum-to-100
+    normalization no longer collapses everyone onto the same one or two
+    traits.
+
+    Returns [] if the participant has no text messages; returns all traits
+    at 0.0 if messages exist but none of them tripped any heuristic.
+    """
+    texts = [t for t in texts if t]
+    if not texts:
+        return []
+
+    hits = personality_hits(texts)
     total = sum(hits.values())
     if total == 0:
         return [(trait, 0.0) for trait in PERSONALITY_TRAITS]
     return [(trait, round(hits[trait] / total * 100, 1)) for trait in PERSONALITY_TRAITS]
+
+
+def personality_leaderboard(
+    hits_by_participant: dict[str, dict[str, int]],
+    message_counts: dict[str, int],
+    min_messages: int = 20,
+) -> dict[str, list[tuple[str, int, float]]]:
+    """
+    hits_by_participant: participant_id -> their personality_hits() result.
+    message_counts: participant_id -> their total text message count in the
+    conversation.
+
+    For each trait, ranks participants by RATE -- the percentage of *their
+    own* messages that hit the trait -- not by raw hit count or share of the
+    trait's conversation-wide total. An earlier version ranked by share of
+    total hits, which just reproduced the conversation's overall
+    message-count ranking on every single trait: whoever sends the most
+    messages racks up the most hits everywhere, even if their actual rate of
+    e.g. aggression is unremarkable. Rate surfaces who is proportionally the
+    most X, which is what a personality leaderboard should mean.
+
+    Participants under min_messages total messages are excluded entirely (a
+    rate computed from a handful of messages isn't a meaningful signal), as
+    are participants with a zero rate for that trait. Returns
+    {trait: [(participant_id, hit_count, rate_pct), ...]} sorted by rate_pct
+    descending.
+    """
+    eligible = {pid: count for pid, count in message_counts.items() if count >= min_messages}
+
+    result: dict[str, list[tuple[str, int, float]]] = {}
+    for trait in PERSONALITY_TRAITS:
+        entries = [
+            (pid, hits_by_participant[pid][trait], round(hits_by_participant[pid][trait] / count * 100, 1))
+            for pid, count in eligible.items()
+            if hits_by_participant.get(pid, {}).get(trait, 0) > 0
+        ]
+        result[trait] = sorted(entries, key=lambda e: e[2], reverse=True)
+    return result
 
 
 def top_emojis(texts: list[str], limit: int = 10) -> list[tuple[str, int]]:

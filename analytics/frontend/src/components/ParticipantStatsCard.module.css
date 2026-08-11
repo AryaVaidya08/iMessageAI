@@ -35,33 +35,6 @@
   margin-top: 16px;
 }
 
-.tabRow {
-  display: flex;
-  gap: 6px;
-  margin-top: 16px;
-  margin-bottom: -8px;
-}
-
-.tab {
-  border: none;
-  background: var(--color-bg);
-  color: var(--color-text-secondary);
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  transition: background 150ms var(--ease-spring), color 150ms var(--ease-spring);
-}
-
-.tab:hover {
-  color: var(--color-text-primary);
-}
-
-.tabActive {
-  background: var(--color-accent);
-  color: #fff;
-}
-
 .sectionLabel {
   font-size: 12px;
   color: var(--color-text-secondary);
@@ -85,6 +58,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+}
+
+.columns .section {
+  margin-top: 0;
 }
 
 .subLabel {

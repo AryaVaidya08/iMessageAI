@@ -12,7 +12,7 @@ DB_PATH = Path(
 # Once this file exists, it becomes the active database everywhere (see db.py) --
 # so a merge is visible immediately and further merges accumulate onto the same
 # copy instead of creating new ones.
-MERGED_DB_PATH = DB_PATH.parent / "imessages_contacts_merged.db"
+MERGED_DB_PATH = DB_PATH.parent / "imessages_merged.db"
 
 
 def active_db_path() -> Path:
