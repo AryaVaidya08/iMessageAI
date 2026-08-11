@@ -7,8 +7,10 @@ from backend.parser import parse_conversation as pc
 from backend.storage import get_connection, init_db, save_conversation
 
 RAW_EXPORT_DIR = "backend/parser/raw_export/all"
-REGISTRY_PATH = "backend/parser/data/participant_registry.json"
-DB_PATH = "backend/storage/imessages.db"
+
+REGISTRY_PATH = "backend/storage/data/participant_registry.json"
+DB_PATH = "backend/storage/data/imessages.db"
+
 FAILURE_LOG_PATH = "backend/parser/data/failed_files.log"
 
 

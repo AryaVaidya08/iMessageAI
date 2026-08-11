@@ -15,7 +15,7 @@ export function MessageBubble({ message, color, isMe }: { message: MessageOut; c
     <div className={`${styles.row} ${isMe ? styles.rowMe : styles.rowOther}`}>
       <div
         className={styles.bubble}
-        style={{ background: color, color: isMe ? "#fff" : "var(--color-text-primary)" }}
+        style={{ background: color, color: isMe ? "#fff" : "#1D1D1F" }}
       >
         {!isMe && <div className={styles.sender}>{message.sender_display_name}</div>}
         <div className={styles.text}>{message.text}</div>
