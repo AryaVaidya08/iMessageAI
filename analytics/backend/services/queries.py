@@ -209,6 +209,116 @@ def get_messages_page(conn: sqlite3.Connection, conversation_id: str, before: st
     return list(reversed(rows))
 
 
+def get_messages_after(conn: sqlite3.Connection, conversation_id: str, after: str, limit: int) -> list[sqlite3.Row]:
+    cursor_row = conn.execute(
+        "SELECT id, timestamp FROM messages WHERE id = ? AND conversation_id = ?",
+        (after, conversation_id),
+    ).fetchone()
+    if not cursor_row:
+        return []
+    return conn.execute(
+        """
+        SELECT id, sender_id, timestamp, text, has_attachment, has_sticker, reply_to
+        FROM messages
+        WHERE conversation_id = ? AND (timestamp, id) > (?, ?)
+        ORDER BY timestamp ASC, id ASC
+        LIMIT ?
+        """,
+        (conversation_id, cursor_row["timestamp"], cursor_row["id"], limit),
+    ).fetchall()
+
+
+def split_window_limits(limit: int) -> tuple[int, int]:
+    """Splits a page `limit` into (before_limit, after_limit) around an anchor
+    message, reserving one slot for the anchor itself."""
+    after_limit = max(limit // 2, 1)
+    before_limit = max(limit - after_limit - 1, 0)
+    return before_limit, after_limit
+
+
+def get_messages_around(
+    conn: sqlite3.Connection, conversation_id: str, anchor_id: str, limit: int
+) -> tuple[list[sqlite3.Row], list[sqlite3.Row], list[sqlite3.Row]]:
+    """Returns (before_rows_oldest_first, anchor_rows, after_rows), windowed
+    around anchor_id so a jump lands roughly centered with room to scroll
+    freely in either direction from there."""
+    anchor_row = conn.execute(
+        "SELECT id, timestamp FROM messages WHERE id = ? AND conversation_id = ?",
+        (anchor_id, conversation_id),
+    ).fetchone()
+    if not anchor_row:
+        return [], [], []
+
+    before_limit, after_limit = split_window_limits(limit)
+
+    before_rows = conn.execute(
+        """
+        SELECT id, sender_id, timestamp, text, has_attachment, has_sticker, reply_to
+        FROM messages
+        WHERE conversation_id = ? AND (timestamp, id) < (?, ?)
+        ORDER BY timestamp DESC, id DESC
+        LIMIT ?
+        """,
+        (conversation_id, anchor_row["timestamp"], anchor_row["id"], before_limit),
+    ).fetchall()
+    anchor_rows = conn.execute(
+        """
+        SELECT id, sender_id, timestamp, text, has_attachment, has_sticker, reply_to
+        FROM messages WHERE id = ? AND conversation_id = ?
+        """,
+        (anchor_id, conversation_id),
+    ).fetchall()
+    after_rows = conn.execute(
+        """
+        SELECT id, sender_id, timestamp, text, has_attachment, has_sticker, reply_to
+        FROM messages
+        WHERE conversation_id = ? AND (timestamp, id) > (?, ?)
+        ORDER BY timestamp ASC, id ASC
+        LIMIT ?
+        """,
+        (conversation_id, anchor_row["timestamp"], anchor_row["id"], after_limit),
+    ).fetchall()
+
+    return list(reversed(before_rows)), list(anchor_rows), list(after_rows)
+
+
+def resolve_message_id_for_date(conn: sqlite3.Connection, conversation_id: str, date: str) -> str | None:
+    row = conn.execute(
+        """
+        SELECT id FROM messages
+        WHERE conversation_id = ? AND substr(timestamp, 1, 10) >= ?
+        ORDER BY timestamp ASC, id ASC LIMIT 1
+        """,
+        (conversation_id, date),
+    ).fetchone()
+    if row:
+        return row["id"]
+    # The date is after the conversation's last message -- land on the last
+    # message instead of returning nothing.
+    row = conn.execute(
+        """
+        SELECT id FROM messages
+        WHERE conversation_id = ? AND substr(timestamp, 1, 10) < ?
+        ORDER BY timestamp DESC, id DESC LIMIT 1
+        """,
+        (conversation_id, date),
+    ).fetchone()
+    return row["id"] if row else None
+
+
+def search_messages(conn: sqlite3.Connection, conversation_id: str, query: str, limit: int) -> list[sqlite3.Row]:
+    escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return conn.execute(
+        """
+        SELECT id, timestamp, text FROM messages
+        WHERE conversation_id = ? AND text LIKE ? ESCAPE '\\'
+        ORDER BY timestamp ASC, id ASC
+        LIMIT ?
+        """,
+        (conversation_id, f"%{escaped}%", limit),
+    ).fetchall()
+
+
 def get_tapbacks_for_messages(
     conn: sqlite3.Connection, message_ids: list[str], participants: dict[str, "names.ResolvedParticipant"]
 ) -> dict[str, list[dict]]:

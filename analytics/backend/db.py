@@ -2,7 +2,7 @@ import sqlite3
 from contextlib import contextmanager
 from typing import Iterator
 
-from config import DB_PATH
+from config import active_db_path
 
 
 @contextmanager
@@ -15,7 +15,10 @@ def get_connection() -> Iterator[sqlite3.Connection]:
     # same-thread check is safe: it only allows one connection's own
     # setup/teardown to span threads, not concurrent access from multiple
     # threads at once.
-    uri = f"file:{DB_PATH}?mode=ro"
+    # active_db_path() is re-resolved on every call (not cached at import
+    # time) so a merge that creates the merged copy mid-session takes effect
+    # on the very next request, with no restart.
+    uri = f"file:{active_db_path()}?mode=ro"
     conn = sqlite3.connect(uri, uri=True, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     try:

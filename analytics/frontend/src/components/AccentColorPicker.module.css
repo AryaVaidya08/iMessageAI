@@ -1,0 +1,103 @@
+.root {
+  position: relative;
+}
+
+.trigger {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 150ms var(--ease-spring);
+}
+
+.trigger:hover {
+  transform: scale(1.05);
+}
+
+.triggerSwatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  background: var(--color-surface);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border);
+  padding: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px var(--color-border);
+  transition: transform 150ms var(--ease-spring);
+}
+
+.swatch:hover {
+  transform: scale(1.1);
+}
+
+.swatch[data-selected="true"] {
+  border-color: var(--color-surface);
+  box-shadow: 0 0 0 2px var(--color-text-primary);
+}
+
+.customSwatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  box-shadow: 0 0 0 1px var(--color-border);
+  transition: transform 150ms var(--ease-spring);
+}
+
+.customSwatch svg {
+  width: 13px;
+  height: 13px;
+}
+
+.customSwatch:hover {
+  transform: scale(1.1);
+}
+
+.customSwatch[data-selected="true"] {
+  border-color: var(--color-surface);
+  box-shadow: 0 0 0 2px var(--color-text-primary);
+}
+
+.customInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}

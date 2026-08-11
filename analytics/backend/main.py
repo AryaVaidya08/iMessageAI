@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from contacts import ContactResolver
-from routers import conversations, leaderboards, overview
+from routers import conversations, leaderboards, merge, overview
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -30,10 +30,11 @@ app = FastAPI(title="iMessage Analytics API", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
 app.include_router(overview.router)
 app.include_router(conversations.router)
 app.include_router(leaderboards.router)
+app.include_router(merge.router)

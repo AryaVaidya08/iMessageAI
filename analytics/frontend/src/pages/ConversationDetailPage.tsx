@@ -5,14 +5,12 @@ import {
   api,
   type ConversationDetail,
   type ConversationStreakSilence,
-  type GroupSizePoint,
   type Granularity,
   type ParticipantStats,
   type ReplyGraphEdge,
   type VolumePoint,
 } from "../api/client";
 import { ChatBubbleList } from "../components/ChatBubbleList";
-import { GroupSizeChart } from "../components/GroupSizeChart";
 import { Heatmap } from "../components/Heatmap";
 import { ParticipantStatsCard } from "../components/ParticipantStatsCard";
 import { ReplyGraph } from "../components/ReplyGraph";
@@ -20,7 +18,7 @@ import { StatCard } from "../components/StatCard";
 import { VolumeChart } from "../components/VolumeChart";
 import styles from "./ConversationDetailPage.module.css";
 
-type Tab = "overview" | "reply-graph";
+type Tab = "overview" | "stats";
 
 function buildTitle(detail: ConversationDetail): string {
   const others = detail.participants.filter((p) => !p.is_me).map((p) => p.display_name);
@@ -40,11 +38,11 @@ export function ConversationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [detail, setDetail] = useState<ConversationDetail | null>(null);
   const [stats, setStats] = useState<ParticipantStats[]>([]);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [volume, setVolume] = useState<VolumePoint[]>([]);
   const [granularity, setGranularity] = useState<Granularity>("week");
   const [heatmap, setHeatmap] = useState<number[][] | null>(null);
   const [streakSilence, setStreakSilence] = useState<ConversationStreakSilence | null>(null);
-  const [groupSize, setGroupSize] = useState<GroupSizePoint[]>([]);
   const [replyGraph, setReplyGraph] = useState<ReplyGraphEdge[]>([]);
   const [tab, setTab] = useState<Tab>("overview");
   const [detailError, setDetailError] = useState<string | null>(null);
@@ -61,27 +59,23 @@ export function ConversationDetailPage() {
     if (!id) return;
     setDetail(null);
     setStats([]);
+    setStatsLoading(true);
     setHeatmap(null);
     setStreakSilence(null);
-    setGroupSize([]);
     setReplyGraph([]);
     setTab("overview");
     setDetailError(null);
     setStatsError(null);
     api.conversation(id).then(setDetail).catch((e) => setDetailError(String(e)));
-    api.participantStats(id).then((r) => setStats(r.participants)).catch((e) => setStatsError(String(e)));
+    api
+      .participantStats(id)
+      .then((r) => setStats(r.participants))
+      .catch((e) => setStatsError(String(e)))
+      .finally(() => setStatsLoading(false));
     api.conversationHeatmap(id).then((r) => setHeatmap(r.grid)).catch(() => {});
     api.conversationStreakSilence(id).then(setStreakSilence).catch(() => {});
     api.conversationReplyGraph(id).then((r) => setReplyGraph(r.edges)).catch(() => {});
   }, [id]);
-
-  useEffect(() => {
-    // Group-only data: only fetched once we know is_group_chat, and skipped
-    // entirely for 1:1 conversations (these endpoints return empty series
-    // for them anyway, but there's no reason to fetch data that won't render).
-    if (!id || !detail?.is_group_chat) return;
-    api.conversationGroupSize(id).then((r) => setGroupSize(r.points)).catch(() => {});
-  }, [id, detail?.is_group_chat]);
 
   useEffect(() => {
     // Ignore-stale-response guard: rapidly toggling granularity fires a new
@@ -125,15 +119,28 @@ export function ConversationDetailPage() {
         </button>
         <button
           type="button"
-          className={tab === "reply-graph" ? styles.tabActive : styles.tab}
-          onClick={() => setTab("reply-graph")}
+          className={tab === "stats" ? styles.tabActive : styles.tab}
+          onClick={() => setTab("stats")}
         >
-          Who replies to whom
+          Stats
         </button>
       </div>
 
-      {tab === "reply-graph" ? (
-        <ReplyGraph edges={replyGraph} />
+      {tab === "stats" ? (
+        statsError ? (
+          <div className={styles.error}>Couldn't load participant stats: {statsError}</div>
+        ) : statsLoading ? (
+          <div className={styles.statsLoading} aria-busy="true">
+            <span className={styles.spinner} />
+            Computing stats…
+          </div>
+        ) : (
+          <div className={styles.statsColumn}>
+            {[...stats]
+              .sort((a, b) => b.message_count - a.message_count)
+              .map((s) => <ParticipantStatsCard key={s.participant_id} stats={s} />)}
+          </div>
+        )
       ) : (
         <>
           {streakSilence && (
@@ -155,19 +162,12 @@ export function ConversationDetailPage() {
             <VolumeChart points={volume} granularity={granularity} onGranularityChange={setGranularity} />
           )}
 
-          {detail.is_group_chat && groupSize.length > 0 && <GroupSizeChart points={groupSize} />}
-
           {heatmap && <Heatmap grid={heatmap} title="When you text" />}
 
-          <div className={styles.split}>
-            <ChatBubbleList conversationId={id} participants={detail.participants} />
-            <div className={styles.statsColumn}>
-              {statsError ? (
-                <div className={styles.error}>Couldn't load participant stats: {statsError}</div>
-              ) : (
-                stats.map((s) => <ParticipantStatsCard key={s.participant_id} stats={s} />)
-              )}
-            </div>
+          <ChatBubbleList conversationId={id} participants={detail.participants} />
+
+          <div className={styles.replyGraphWrap}>
+            <ReplyGraph edges={replyGraph} />
           </div>
         </>
       )}

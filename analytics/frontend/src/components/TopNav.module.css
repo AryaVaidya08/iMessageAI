@@ -28,6 +28,12 @@
   flex: 1;
 }
 
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .link, .linkActive {
   color: var(--color-text-secondary);
   font-size: 14px;

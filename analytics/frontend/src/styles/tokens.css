@@ -19,12 +19,14 @@
 
   /* Sequential ramp (one hue, light->dark) for the day/hour heatmaps --
      step 0 is "no activity" and reuses --color-border; steps 1-4 climb in
-     saturation/lightness toward --color-accent at the top of the scale. */
+     saturation/lightness toward --color-accent at the top of the scale.
+     Derived from --color-accent via color-mix so the ramp follows the
+     user's chosen accent color instead of being hardcoded to blue. */
   --heatmap-0: rgba(0, 0, 0, 0.06);
-  --heatmap-1: #CFE8FF;
-  --heatmap-2: #8FC7FF;
-  --heatmap-3: #4FA3FF;
-  --heatmap-4: #0A84FF;
+  --heatmap-1: color-mix(in srgb, var(--color-accent) 25%, white);
+  --heatmap-2: color-mix(in srgb, var(--color-accent) 55%, white);
+  --heatmap-3: color-mix(in srgb, var(--color-accent) 80%, white);
+  --heatmap-4: var(--color-accent);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -36,10 +38,10 @@
     --color-border: rgba(255, 255, 255, 0.08);
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
     --heatmap-0: rgba(255, 255, 255, 0.06);
-    --heatmap-1: #0D3A66;
-    --heatmap-2: #14538F;
-    --heatmap-3: #1C72C4;
-    --heatmap-4: #0A84FF;
+    --heatmap-1: color-mix(in srgb, var(--color-accent) 35%, black);
+    --heatmap-2: color-mix(in srgb, var(--color-accent) 55%, black);
+    --heatmap-3: color-mix(in srgb, var(--color-accent) 75%, black);
+    --heatmap-4: var(--color-accent);
   }
 }
 
@@ -51,8 +53,8 @@
   --color-border: rgba(255, 255, 255, 0.08);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
   --heatmap-0: rgba(255, 255, 255, 0.06);
-  --heatmap-1: #0D3A66;
-  --heatmap-2: #14538F;
-  --heatmap-3: #1C72C4;
-  --heatmap-4: #0A84FF;
+  --heatmap-1: color-mix(in srgb, var(--color-accent) 35%, black);
+  --heatmap-2: color-mix(in srgb, var(--color-accent) 55%, black);
+  --heatmap-3: color-mix(in srgb, var(--color-accent) 75%, black);
+  --heatmap-4: var(--color-accent);
 }

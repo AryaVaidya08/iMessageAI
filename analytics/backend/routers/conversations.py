@@ -15,6 +15,7 @@ from models import (
     ParticipantStatsResponse,
     ReplyGraphEdge,
     ReplyGraphResponse,
+    SearchMessagesResponse,
     VolumePoint,
     VolumeResponse,
 )
@@ -82,9 +83,12 @@ def get_participant_stats(conversation_id: str, conn=Depends(get_db), resolver=D
 
     texts_by_sender: dict[str, list[str]] = {}
     counts_by_sender: dict[str, int] = {}
+    sentiment_rows_by_sender: dict[str, list[tuple[str, str]]] = {}
     for r in message_rows:
         texts_by_sender.setdefault(r["sender_id"], []).append(r["text"])
         counts_by_sender[r["sender_id"]] = counts_by_sender.get(r["sender_id"], 0) + 1
+        if r["text"]:
+            sentiment_rows_by_sender.setdefault(r["sender_id"], []).append((r["timestamp"][:10], r["text"]))
 
     tapback_events = [
         stats.TapbackEvent(reactor_id=r["reactor_id"], target_sender_id=r["target_sender_id"], action=r["action"])
@@ -109,6 +113,13 @@ def get_participant_stats(conversation_id: str, conn=Depends(get_db), resolver=D
             "top_emojis": [{"emoji": e, "count": c} for e, c in stats.top_emojis(texts)],
             "tapbacks_given": [{"action": a, "count": c} for a, c in stats.tapbacks_given(tapback_events, pid)],
             "tapbacks_received": [{"action": a, "count": c} for a, c in stats.tapbacks_received(tapback_events, pid)],
+            "sentiment_series": [
+                {"bucket": b, "score": s}
+                for b, s in stats.sentiment_series(sentiment_rows_by_sender.get(pid, []), "week")
+            ],
+            "personality": [
+                {"trait": t, "percentage": p} for t, p in stats.personality_scores(texts)
+            ],
         })
     return ParticipantStatsResponse(participants=participants_out)
 
@@ -117,7 +128,10 @@ def get_participant_stats(conversation_id: str, conn=Depends(get_db), resolver=D
 def get_messages(
     conversation_id: str,
     before: str | None = None,
-    limit: int = Query(50, ge=1, le=200),
+    after: str | None = None,
+    around: str | None = None,
+    date: str | None = Query(None, pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    limit: int = Query(50, ge=1, le=500),
     conn=Depends(get_db),
     resolver=Depends(get_resolver),
 ):
@@ -125,7 +139,24 @@ def get_messages(
     if not participants:
         raise HTTPException(status_code=404, detail="conversation not found")
 
-    rows = queries.get_messages_page(conn, conversation_id, before, limit)
+    # `around`/`date` jump to an anchor point and return a window centered on
+    # it so the caller can then scroll freely in either direction from there,
+    # using the returned older/newer cursors with `before`/`after`.
+    anchor_id = around
+    if anchor_id is None and date is not None:
+        anchor_id = queries.resolve_message_id_for_date(conn, conversation_id, date)
+
+    windowed = anchor_id is not None
+    before_rows: list = []
+    after_rows: list = []
+    if windowed:
+        before_rows, anchor_rows, after_rows = queries.get_messages_around(conn, conversation_id, anchor_id, limit)
+        rows = before_rows + anchor_rows + after_rows
+    elif after is not None:
+        rows = queries.get_messages_after(conn, conversation_id, after, limit)
+    else:
+        rows = queries.get_messages_page(conn, conversation_id, before, limit)
+
     message_ids = [r["id"] for r in rows]
     tapbacks_by_message = queries.get_tapbacks_for_messages(conn, message_ids, participants)
 
@@ -144,8 +175,34 @@ def get_messages(
             "tapbacks": tapbacks_by_message.get(r["id"], []),
         })
 
-    next_cursor = rows[0]["id"] if len(rows) == limit else None
-    return MessagesPage(items=items, next_cursor=next_cursor)
+    if windowed:
+        before_limit, after_limit = queries.split_window_limits(limit)
+        older_cursor = items[0]["id"] if items and len(before_rows) == before_limit and before_limit > 0 else None
+        newer_cursor = items[-1]["id"] if items and len(after_rows) == after_limit else None
+    elif after is not None:
+        older_cursor = None
+        newer_cursor = rows[-1]["id"] if len(rows) == limit else None
+    else:
+        older_cursor = rows[0]["id"] if len(rows) == limit else None
+        newer_cursor = None
+    return MessagesPage(items=items, older_cursor=older_cursor, newer_cursor=newer_cursor)
+
+
+@router.get("/{conversation_id}/messages/search", response_model=SearchMessagesResponse)
+def search_conversation_messages(
+    conversation_id: str,
+    q: str = Query(..., min_length=1),
+    limit: int = Query(20, ge=1, le=100),
+    conn=Depends(get_db),
+    resolver=Depends(get_resolver),
+):
+    participants = queries.get_conversation_participants_resolved(conn, resolver, conversation_id)
+    if not participants:
+        raise HTTPException(status_code=404, detail="conversation not found")
+    rows = queries.search_messages(conn, conversation_id, q, limit)
+    return SearchMessagesResponse(
+        items=[{"id": r["id"], "timestamp": r["timestamp"], "text": r["text"]} for r in rows]
+    )
 
 
 @router.get("/{conversation_id}/heatmap", response_model=HeatmapResponse)

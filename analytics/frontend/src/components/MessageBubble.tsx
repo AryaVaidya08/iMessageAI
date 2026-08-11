@@ -2,19 +2,34 @@ import type { MessageOut } from "../api/client";
 import styles from "./MessageBubble.module.css";
 
 function formatTime(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, {
+  const date = new Date(iso);
+  return date.toLocaleString(undefined, {
     month: "short",
     day: "numeric",
+    year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
     hour: "numeric",
     minute: "2-digit",
   });
 }
 
-export function MessageBubble({ message, color, isMe }: { message: MessageOut; color: string; isMe: boolean }) {
+export function MessageBubble({
+  message,
+  color,
+  isMe,
+  highlighted,
+}: {
+  message: MessageOut;
+  color: string;
+  isMe: boolean;
+  highlighted?: boolean;
+}) {
   return (
-    <div className={`${styles.row} ${isMe ? styles.rowMe : styles.rowOther}`}>
+    <div
+      id={`message-${message.id}`}
+      className={`${styles.row} ${isMe ? styles.rowMe : styles.rowOther}`}
+    >
       <div
-        className={styles.bubble}
+        className={`${styles.bubble} ${highlighted ? styles.bubbleHighlighted : ""}`}
         style={{ background: color, color: isMe ? "#fff" : "#1D1D1F" }}
       >
         {!isMe && <div className={styles.sender}>{message.sender_display_name}</div>}

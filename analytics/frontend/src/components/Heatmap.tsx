@@ -1,7 +1,20 @@
+import { useState } from "react";
 import styles from "./Heatmap.module.css";
 
 const DOW_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const HOUR_MARKERS = new Set([0, 6, 12, 18]);
+
+// Compact axis-style formatting (1, 10, 100, 1.2k, 12.1k, 1.2M) for the
+// in-cell labels, where there's only room for a handful of characters.
+function formatCount(count: number): string {
+  if (count < 1000) return String(count);
+  if (count < 1_000_000) {
+    const v = count / 1000;
+    return `${v < 10 ? v.toFixed(1) : Math.round(v)}k`;
+  }
+  const v = count / 1_000_000;
+  return `${v < 10 ? v.toFixed(1) : Math.round(v)}M`;
+}
 
 // Quantile-bucketed levels (GitHub-contribution-graph style) rather than
 // fixed absolute thresholds, since the same component renders grids ranging
@@ -31,10 +44,20 @@ function computeLevels(grid: number[][]): number[][] {
 
 export function Heatmap({ grid, title }: { grid: number[][]; title?: string }) {
   const levels = computeLevels(grid);
+  const [showNumbers, setShowNumbers] = useState(true);
 
   return (
     <div className={styles.card}>
-      {title && <h3 className={styles.title}>{title}</h3>}
+      <div className={styles.header}>
+        {title ? <h3 className={styles.title}>{title}</h3> : <span />}
+        <button
+          type="button"
+          className={styles.toggleButton}
+          onClick={() => setShowNumbers((v) => !v)}
+        >
+          {showNumbers ? "Hide numbers" : "Show numbers"}
+        </button>
+      </div>
       <div className={styles.gridWrap}>
         <div className={styles.hourRow}>
           {Array.from({ length: 24 }, (_, hour) => (
@@ -52,7 +75,11 @@ export function Heatmap({ grid, title }: { grid: number[][]; title?: string }) {
                 className={styles.cell}
                 data-level={levels[dow][hour]}
                 title={`${label} ${hour}:00 — ${count.toLocaleString()} message${count === 1 ? "" : "s"}`}
-              />
+              >
+                {showNumbers && count > 0 && (
+                  <span className={styles.cellLabel}>{formatCount(count)}</span>
+                )}
+              </div>
             ))}
           </div>
         ))}

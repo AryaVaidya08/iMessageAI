@@ -9,13 +9,11 @@ from .announcement import Announcement
 class Conversation:
     id: str
     is_group_chat: bool
-
-    
     
     participants: list[Participant]
 
-    convo_name: str
     relationship_type: RelationshipType
+    convo_name: str | None = None
 
     messages: list[Message] = field(default_factory=list)
     announcements : list[Announcement] = field(default_factory=list)

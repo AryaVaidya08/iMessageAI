@@ -4,12 +4,18 @@
   border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
+  color: var(--color-text);
   font-size: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 150ms var(--ease-spring);
+}
+
+.toggle svg {
+  width: 16px;
+  height: 16px;
 }
 
 .toggle:hover {

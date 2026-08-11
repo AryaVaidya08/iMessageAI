@@ -15,7 +15,7 @@ import { VolumeChart } from "../components/VolumeChart";
 import styles from "./OverviewPage.module.css";
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  return new Date(iso).toLocaleDateString(undefined, { year: "2-digit", month: "numeric", day: "numeric" });
 }
 
 function formatReplySeconds(seconds: number): string {
@@ -75,6 +75,7 @@ export function OverviewPage() {
               <StatCard label="Participants" value={stats.total_participants.toLocaleString()} />
               <StatCard
                 label="Date range"
+                compact
                 value={
                   stats.date_range_start && stats.date_range_end
                     ? `${formatDate(stats.date_range_start)} – ${formatDate(stats.date_range_end)}`

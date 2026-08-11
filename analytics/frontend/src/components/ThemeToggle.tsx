@@ -1,3 +1,4 @@
+import { FiMoon, FiSun } from "react-icons/fi";
 import { useTheme } from "../hooks/useTheme";
 import styles from "./ThemeToggle.module.css";
 
@@ -10,7 +11,7 @@ export function ThemeToggle() {
       aria-label="Toggle color theme"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
     >
-      {theme === "dark" ? "🌙" : "☀️"}
+      {theme === "dark" ? <FiMoon /> : <FiSun />}
     </button>
   );
 }

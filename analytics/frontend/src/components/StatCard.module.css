@@ -17,6 +17,11 @@
   font-weight: 600;
 }
 
+.valueCompact {
+  font-size: 20px;
+  white-space: nowrap;
+}
+
 .skeletonLine {
   height: 1em;
   border-radius: 6px;

@@ -6,10 +6,32 @@
   animation: card-in 300ms var(--ease-spring) both;
 }
 
-.title {
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 0 0 12px;
+}
+
+.title {
+  margin: 0;
   font-size: 15px;
   font-weight: 600;
+}
+
+.toggleButton {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: var(--color-border);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.toggleButton:hover {
+  color: var(--color-text-primary);
 }
 
 .gridWrap {
@@ -49,7 +71,10 @@
 .cell {
   flex: 1;
   aspect-ratio: 1;
-  min-width: 10px;
+  min-width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 3px;
   background: var(--heatmap-0);
 }
@@ -58,6 +83,15 @@
 .cell[data-level="2"] { background: var(--heatmap-2); }
 .cell[data-level="3"] { background: var(--heatmap-3); }
 .cell[data-level="4"] { background: var(--heatmap-4); }
+
+.cellLabel {
+  font-size: 8px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+  pointer-events: none;
+  white-space: nowrap;
+}
 
 .legend {
   display: flex;

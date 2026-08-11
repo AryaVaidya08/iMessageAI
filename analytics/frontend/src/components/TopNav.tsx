@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 
+import { AccentColorPicker } from "./AccentColorPicker";
 import { ThemeToggle } from "./ThemeToggle";
 import styles from "./TopNav.module.css";
 
@@ -18,8 +19,14 @@ export function TopNav() {
           <NavLink to="/leaderboards" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
             Leaderboards
           </NavLink>
+          <NavLink to="/merge-contacts" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+            Merge Contacts
+          </NavLink>
         </div>
-        <ThemeToggle />
+        <div className={styles.controls}>
+          <ThemeToggle />
+          <AccentColorPicker />
+        </div>
       </div>
     </nav>
   );

@@ -5,6 +5,9 @@ from datetime import date, datetime, timedelta
 from statistics import median
 
 import emoji as emoji_lib
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+_sentiment_analyzer = SentimentIntensityAnalyzer()
 
 
 @dataclass(frozen=True)
@@ -324,6 +327,154 @@ def top_words(texts: list[str], limit: int = 15) -> list[tuple[str, int]]:
                 continue
             counts[word] = counts.get(word, 0) + 1
     return sorted(counts.items(), key=lambda kv: kv[1], reverse=True)[:limit]
+
+
+def sentiment_series(rows: list[tuple[str, str]], granularity: str = "week") -> list[tuple[str, float]]:
+    """
+    rows: (YYYY-MM-DD, text) pairs for one participant's messages, any order,
+    with empty/None text already filtered out. Scores each message with
+    VADER's compound score (-1 most negative .. +1 most positive) and
+    averages by bucket, using the same bucket-key scheme as bucket_volume.
+    Unlike bucket_volume, buckets with no messages are omitted rather than
+    filled with 0 -- a silent stretch has no sentiment, it isn't neutral.
+    """
+    if granularity not in ("day", "week", "month"):
+        raise ValueError(f"unknown granularity: {granularity}")
+    if not rows:
+        return []
+
+    sums: dict[str, float] = defaultdict(float)
+    counts: dict[str, int] = defaultdict(int)
+    for day_str, text in rows:
+        d = date.fromisoformat(day_str)
+        if granularity == "day":
+            key = day_str
+        elif granularity == "week":
+            monday = date.fromordinal(d.toordinal() - d.weekday())
+            key = monday.isoformat()
+        else:
+            key = f"{d.year:04d}-{d.month:02d}"
+        sums[key] += _sentiment_analyzer.polarity_scores(text)["compound"]
+        counts[key] += 1
+    return sorted((key, sums[key] / counts[key]) for key in sums)
+
+
+PERSONALITY_TRAITS: list[str] = ["Aggressive", "Chaotic", "Dramatic", "Sarcastic", "Chill", "Wholesome"]
+
+# Common all-caps texting abbreviations that would otherwise get misread as shouting -- an
+# earlier version of this heuristic counted ANY 2+ letter caps word, so "LOL"/"OMG"/"IDK" made
+# almost every texter look like they were yelling. Only a caps word absent from this stoplist
+# counts as genuine emphasis.
+_CAPS_STOPLIST = frozenset({
+    "LOL", "LMAO", "LMFAO", "ROFL", "OMG", "IDK", "TBH", "BTW", "ASAP", "ETA", "ILY", "WTF",
+    "RN", "HBU", "WYD", "IKR", "NGL", "SMH", "FYI", "IMO", "IMHO", "OK", "TTYL", "JK", "OMW",
+})
+_CAPS_WORD_RE = re.compile(r"\b[A-Z]{3,}\b")
+_ELONGATED_RE = re.compile(r"([a-zA-Z])\1{2,}")
+
+_AGGRESSIVE_WORDS = frozenset({
+    "fuck", "fucking", "fuckin", "fck", "shit", "bullshit", "damn", "hell", "wtf", "stfu", "shut",
+    "hate", "pissed", "idiot", "stupid", "dumb", "trash", "ugly", "furious", "angry", "rage",
+    "screw", "asshole", "jerk", "loser", "dumbass", "annoying", "ridiculous",
+})
+_AGGRESSIVE_EMOJI = frozenset({"😡", "🤬", "👿", "💢"})
+
+_CHAOTIC_WORDS = frozenset({
+    "unhinged", "feral", "deceased", "deranged", "chaos", "chaotic", "bestie", "icant", "sending",
+    "sendingme", "screaming", "wild", "insane", "crazy", "help",
+})
+_CHAOTIC_EMOJI = frozenset({"💀", "😭", "🤡", "🫠"})
+
+_DRAMATIC_WORDS = frozenset({
+    "literally", "actually", "obsessed", "iconic", "legendary", "epic", "worst", "best", "dying",
+    "crying", "done", "cannot", "unbelievable", "shaking", "speechless", "embarrassing", "mortifying",
+    "traumatized", "devastated",
+})
+
+_SARCASTIC_WORDS = frozenset({
+    "sure", "totally", "obviously", "right", "shocking", "wow", "great", "greeeat", "riiight",
+})
+
+_CHILL_WORDS = frozenset({
+    "chill", "chilling", "relax", "relaxing", "whatever", "vibes", "vibing", "lowkey", "mellow",
+    "calm", "easy", "fine", "cool", "noworries", "peace", "zen", "nbd",
+})
+_CHILL_EMOJI = frozenset({"😌", "🧘", "😎", "☮️"})
+
+_WHOLESOME_WORDS = frozenset({
+    "love", "loved", "loves", "loving", "miss", "missed", "missing", "thank", "thanks", "thankful",
+    "appreciate", "appreciated", "glad", "proud", "sweet", "care", "caring", "hug", "hugs", "best",
+    "ily", "iloveyou", "grateful", "sorry", "congrats", "congratulations", "welcome", "sweetheart",
+    "dear", "xoxo", "beautiful", "amazing", "wonderful", "support", "proudofyou",
+})
+_WHOLESOME_EMOJI = frozenset({"❤️", "💕", "😘", "🥰", "💖", "😍", "🤗", "☺️"})
+
+
+def _shout_words(text: str) -> list[str]:
+    return [w for w in _CAPS_WORD_RE.findall(text) if w not in _CAPS_STOPLIST]
+
+
+def personality_scores(texts: list[str]) -> list[tuple[str, float]]:
+    """
+    texts: one participant's message bodies, any order, empty/None entries
+    ignored. For each of PERSONALITY_TRAITS, checks every message against a
+    lexicon/punctuation/emoji heuristic (mirroring the VADER-lexicon approach
+    used by sentiment_series, since there's no ML classifier in this
+    pipeline) as a per-message yes/no hit -- a message can hit several traits
+    (or none). Hits are then normalized across PERSONALITY_TRAITS so the six
+    percentages sum to ~100: a relative profile of *this person's* texting
+    style, not an independent per-trait rate.
+
+    Deliberately picks high-contrast archetypes (Aggressive vs. Chill,
+    Chaotic vs. Wholesome) rather than close synonyms of the same "polite
+    texter" register: an earlier version normalized six near-synonymous
+    traits to 100 and two extremely common surface patterns (an exclamation
+    mark, a one-word "ok") ate the whole pie for nearly everyone. Spreading
+    the lexicons across genuinely distinct registers means the sum-to-100
+    normalization no longer collapses everyone onto the same one or two
+    traits.
+
+    Returns [] if the participant has no text messages; returns all traits
+    at 0.0 if messages exist but none of them tripped any heuristic.
+    """
+    texts = [t for t in texts if t]
+    if not texts:
+        return []
+
+    hits: dict[str, int] = dict.fromkeys(PERSONALITY_TRAITS, 0)
+    for text in texts:
+        normalized = text.lower().replace("’", "'")
+        words = _WORD_RE.findall(normalized)
+        emojis = {item["emoji"].replace("️", "") for item in emoji_lib.emoji_list(text)}
+
+        if any(w in _AGGRESSIVE_WORDS for w in words) or (emojis & _AGGRESSIVE_EMOJI) or _shout_words(text):
+            hits["Aggressive"] += 1
+        if (
+            text.count("!") >= 2
+            or len(emojis) >= 2
+            or _ELONGATED_RE.search(normalized)
+            or any(w in _CHAOTIC_WORDS for w in words)
+            or (emojis & _CHAOTIC_EMOJI)
+        ):
+            hits["Chaotic"] += 1
+        if (
+            any(w in _DRAMATIC_WORDS for w in words)
+            or text.count("?") >= 2
+            or "?!" in text
+            or "!?" in text
+        ):
+            hits["Dramatic"] += 1
+        if any(w in _SARCASTIC_WORDS for w in words) or "..." in text or "/s" in normalized:
+            hits["Sarcastic"] += 1
+        if any(w in _CHILL_WORDS for w in words) or (emojis & _CHILL_EMOJI):
+            hits["Chill"] += 1
+        if any(w in _WHOLESOME_WORDS for w in words) or (emojis & _WHOLESOME_EMOJI):
+            hits["Wholesome"] += 1
+
+    total = sum(hits.values())
+    if total == 0:
+        return [(trait, 0.0) for trait in PERSONALITY_TRAITS]
+    return [(trait, round(hits[trait] / total * 100, 1)) for trait in PERSONALITY_TRAITS]
 
 
 def top_emojis(texts: list[str], limit: int = 10) -> list[tuple[str, int]]:

@@ -79,6 +79,16 @@ class HistogramBucket(BaseModel):
     count: int
 
 
+class SentimentPoint(BaseModel):
+    bucket: str
+    score: float
+
+
+class PersonalityTrait(BaseModel):
+    trait: str
+    percentage: float
+
+
 class ParticipantStats(BaseModel):
     participant_id: str
     display_name: str
@@ -92,6 +102,8 @@ class ParticipantStats(BaseModel):
     top_emojis: list[EmojiCount]
     tapbacks_given: list[TapbackCount]
     tapbacks_received: list[TapbackCount]
+    sentiment_series: list[SentimentPoint]
+    personality: list[PersonalityTrait]
 
 
 class ParticipantStatsResponse(BaseModel):
@@ -118,7 +130,18 @@ class MessageOut(BaseModel):
 
 class MessagesPage(BaseModel):
     items: list[MessageOut]
-    next_cursor: str | None
+    older_cursor: str | None
+    newer_cursor: str | None
+
+
+class SearchMessageResult(BaseModel):
+    id: str
+    timestamp: str
+    text: str
+
+
+class SearchMessagesResponse(BaseModel):
+    items: list[SearchMessageResult]
 
 
 # --- Leaderboards ----------------------------------------------------------
@@ -222,3 +245,44 @@ class ReplyGraphEdge(BaseModel):
 
 class ReplyGraphResponse(BaseModel):
     edges: list[ReplyGraphEdge]
+
+
+# --- Contact merge -----------------------------------------------------
+
+
+class MergeParticipantOut(BaseModel):
+    id: str
+    phone_num: str | None
+    email: str | None
+    handle: str
+    display_name: str
+    is_me: bool
+
+
+class MergeParticipantsResponse(BaseModel):
+    participants: list[MergeParticipantOut]
+
+
+class MergeRequest(BaseModel):
+    keep_id: str
+    remove_id: str
+
+
+class MergeResponse(BaseModel):
+    ok: bool
+    keep_id: str
+    removed_id: str
+
+
+class MergeHistoryEntry(BaseModel):
+    merged_at: str
+    keep_id: str
+    keep_display_name: str
+    keep_handle: str
+    remove_id: str
+    remove_display_name: str
+    remove_handle: str
+
+
+class MergeHistoryResponse(BaseModel):
+    items: list[MergeHistoryEntry]

@@ -63,6 +63,16 @@ export interface EmojiCount { emoji: string; count: number; }
 export interface TapbackCount { action: string; count: number; }
 export interface HistogramBucket { label: string; count: number; }
 
+export interface SentimentPoint {
+  bucket: string;
+  score: number;
+}
+
+export interface PersonalityTrait {
+  trait: string;
+  percentage: number;
+}
+
 export interface ParticipantStats {
   participant_id: string;
   display_name: string;
@@ -76,6 +86,8 @@ export interface ParticipantStats {
   top_emojis: EmojiCount[];
   tapbacks_given: TapbackCount[];
   tapbacks_received: TapbackCount[];
+  sentiment_series: SentimentPoint[];
+  personality: PersonalityTrait[];
 }
 
 export interface ParticipantStatsResponse {
@@ -102,7 +114,18 @@ export interface MessageOut {
 
 export interface MessagesPage {
   items: MessageOut[];
-  next_cursor: string | null;
+  older_cursor: string | null;
+  newer_cursor: string | null;
+}
+
+export interface SearchMessageResult {
+  id: string;
+  timestamp: string;
+  text: string;
+}
+
+export interface SearchMessagesResponse {
+  items: SearchMessageResult[];
 }
 
 // --- Leaderboards ---
@@ -175,15 +198,6 @@ export interface ConversationStreakSilence {
   silence_after: string | null;
 }
 
-export interface GroupSizePoint {
-  datetime: string;
-  size: number;
-}
-
-export interface GroupSizeResponse {
-  points: GroupSizePoint[];
-}
-
 export interface JoinLeaveEvent {
   datetime: string;
   kind: "joined" | "left";
@@ -206,6 +220,41 @@ export interface ReplyGraphResponse {
   edges: ReplyGraphEdge[];
 }
 
+// --- Contact merge ---
+
+export interface MergeParticipantOut {
+  id: string;
+  phone_num: string | null;
+  email: string | null;
+  handle: string;
+  display_name: string;
+  is_me: boolean;
+}
+
+export interface MergeParticipantsResponse {
+  participants: MergeParticipantOut[];
+}
+
+export interface MergeResponse {
+  ok: boolean;
+  keep_id: string;
+  removed_id: string;
+}
+
+export interface MergeHistoryEntry {
+  merged_at: string;
+  keep_id: string;
+  keep_display_name: string;
+  keep_handle: string;
+  remove_id: string;
+  remove_display_name: string;
+  remove_handle: string;
+}
+
+export interface MergeHistoryResponse {
+  items: MergeHistoryEntry[];
+}
+
 const BASE_URL = "http://localhost:8000";
 
 async function getJSON<T>(path: string): Promise<T> {
@@ -221,6 +270,27 @@ async function getJSON<T>(path: string): Promise<T> {
       // response body wasn't JSON (or was empty) -- fall back to statusText
     }
     throw new Error(`${res.status} ${detail}`);
+  }
+  return res.json() as Promise<T>;
+}
+
+async function postJSON<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    let detail = res.statusText;
+    try {
+      const responseBody = await res.json();
+      if (typeof responseBody?.detail === "string") {
+        detail = responseBody.detail;
+      }
+    } catch {
+      // response body wasn't JSON (or was empty) -- fall back to statusText
+    }
+    throw new Error(detail);
   }
   return res.json() as Promise<T>;
 }
@@ -257,6 +327,26 @@ export const api = {
     return getJSON<MessagesPage>(`/api/conversations/${id}/messages?${qs.toString()}`);
   },
 
+  messagesAfter: (id: string, after: string, limit = 50) => {
+    const qs = new URLSearchParams({ after, limit: String(limit) });
+    return getJSON<MessagesPage>(`/api/conversations/${id}/messages?${qs.toString()}`);
+  },
+
+  messagesForDate: (id: string, date: string, limit = 60) => {
+    const qs = new URLSearchParams({ date, limit: String(limit) });
+    return getJSON<MessagesPage>(`/api/conversations/${id}/messages?${qs.toString()}`);
+  },
+
+  messagesAround: (id: string, around: string, limit = 60) => {
+    const qs = new URLSearchParams({ around, limit: String(limit) });
+    return getJSON<MessagesPage>(`/api/conversations/${id}/messages?${qs.toString()}`);
+  },
+
+  searchMessages: (id: string, q: string, limit = 20) => {
+    const qs = new URLSearchParams({ q, limit: String(limit) });
+    return getJSON<SearchMessagesResponse>(`/api/conversations/${id}/messages/search?${qs.toString()}`);
+  },
+
   overviewHeatmap: () => getJSON<HeatmapResponse>("/api/overview/heatmap"),
 
   overviewFastestReplyRelationship: () =>
@@ -266,8 +356,6 @@ export const api = {
 
   conversationStreakSilence: (id: string) =>
     getJSON<ConversationStreakSilence>(`/api/conversations/${id}/streak-silence`),
-
-  conversationGroupSize: (id: string) => getJSON<GroupSizeResponse>(`/api/conversations/${id}/group-size`),
 
   conversationJoinLeave: (id: string) => getJSON<JoinLeaveResponse>(`/api/conversations/${id}/join-leave`),
 
@@ -285,4 +373,11 @@ export const api = {
   leaderboardStreak: () => getJSON<StreakLeaderboard | null>("/api/leaderboards/streak"),
 
   leaderboardSilence: () => getJSON<SilenceLeaderboard | null>("/api/leaderboards/silence"),
+
+  participants: () => getJSON<MergeParticipantsResponse>("/api/participants"),
+
+  mergeContacts: (keepId: string, removeId: string) =>
+    postJSON<MergeResponse>("/api/merge", { keep_id: keepId, remove_id: removeId }),
+
+  mergeHistory: () => getJSON<MergeHistoryResponse>("/api/merge-history"),
 };

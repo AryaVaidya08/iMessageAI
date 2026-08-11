@@ -47,7 +47,44 @@ def test_conversation_messages_pagination(conn, resolver):
     assert response.status_code == 200
     body = response.json()
     assert [m["id"] for m in body["items"]] == ["m2", "m3"]
-    assert body["next_cursor"] == "m2"
+    assert body["older_cursor"] == "m2"
+    app.dependency_overrides.clear()
+
+
+def test_conversation_messages_around_anchor(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/conversations/conv1/messages?around=m2&limit=10")
+    assert response.status_code == 200
+    body = response.json()
+    assert [m["id"] for m in body["items"]] == ["m1", "m2", "m3"]
+    app.dependency_overrides.clear()
+
+
+def test_conversation_messages_by_date(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/conversations/conv1/messages?date=2024-01-01&limit=10")
+    assert response.status_code == 200
+    body = response.json()
+    assert [m["id"] for m in body["items"]] == ["m1", "m2", "m3"]
+    app.dependency_overrides.clear()
+
+
+def test_conversation_messages_after_cursor(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/conversations/conv1/messages?after=m1&limit=10")
+    assert response.status_code == 200
+    body = response.json()
+    assert [m["id"] for m in body["items"]] == ["m2", "m3"]
+    assert body["newer_cursor"] is None
+    app.dependency_overrides.clear()
+
+
+def test_conversation_messages_search(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/conversations/conv1/messages/search?q=hi")
+    assert response.status_code == 200
+    body = response.json()
+    assert [m["id"] for m in body["items"]] == ["m2"]
     app.dependency_overrides.clear()
 
 

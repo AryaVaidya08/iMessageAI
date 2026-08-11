@@ -11,8 +11,8 @@ from bs4 import BeautifulSoup
 import bs4
 
 import uuid
-import nanoid
 import hashlib
+import re
 
 load_dotenv(".env.local")
 PERSONAL_NUMBER = os.getenv("PERSONAL_NUMBER")
@@ -21,6 +21,18 @@ participants: dict[str, Participant] = {}
 currentParticipants: dict[str, Participant] = {}
 
 # -- Local Helper Functions --
+
+_GROUP_NAME_PATTERN = re.compile(r"^(.*) - \d+$")
+
+def _extract_convo_name(file_stem: str, is_group_chat: bool) -> str | None:
+    if not is_group_chat:
+        return None
+
+    match = _GROUP_NAME_PATTERN.match(file_stem)
+    if match:
+        return match.group(1).strip()
+
+    return None
 
 def _stable_conversation_id(file_name: str) -> str:
     return hashlib.sha256(file_name.encode("utf-8")).hexdigest()[:16]
@@ -273,6 +285,7 @@ def parse_conversation(fileName : str):
     global currentParticipants
 
     currentParticipants = {}
+
     soup = BeautifulSoup(open(fileName, "r"), features="html.parser")
 
     messages = extract_messages(soup)
@@ -280,8 +293,13 @@ def parse_conversation(fileName : str):
 
     convoID = _stable_conversation_id(fileName)
 
+    is_group_chat = len(currentParticipants) > 2 or fileName.count(",") > 0
+
+    file_stem = os.path.splitext(os.path.basename(fileName))[0]
+    convo_name = _extract_convo_name(file_stem, is_group_chat)
+
     #RelationshipType temp set to other
-    conversation = Conversation(id=convoID, is_group_chat=len(currentParticipants) > 2 or fileName.count(",") > 0, 
+    conversation = Conversation(id=convoID, is_group_chat=len(currentParticipants) > 2 or fileName.count(",") > 0, convo_name=convo_name,
                                    participants=list(currentParticipants.values()), relationship_type=RelationshipType.OTHER,
                                    messages=messages, announcements=announcements)
 

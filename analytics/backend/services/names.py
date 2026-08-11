@@ -23,10 +23,8 @@ def build_conversation_display_name(participants: list[ResolvedParticipant]) -> 
     others = [p.display_name for p in participants if not p.is_me]
     if not others:
         return "You"
-    if len(others) == 1:
-        return f"You, {others[0]}"
     if len(others) <= 3:
-        return "You, " + ", ".join(others)
+        return ", ".join(others)
     shown = others[:2]
     remaining = len(others) - 2
-    return f"You, {', '.join(shown)} +{remaining} more"
+    return f"{', '.join(shown)} +{remaining} more"
