@@ -15,6 +15,7 @@
 - 8/3/26 - Started message & annoucement parsing
 - 8/5/26 - Completed participant logic for parsing
 - 8/10/26 - Built SQLite storage system and polished parsing logic
+- 8/11/26 - Developed analysis frontend to view messages and statistics
 
 ## Notes
 - all .gitkeep files are temporary placeholders to retain the structure of the codebase
