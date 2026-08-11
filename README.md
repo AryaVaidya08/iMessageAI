@@ -14,6 +14,7 @@
 - 8/2/26 - Setup project goals and structure repository
 - 8/3/26 - Started message & annoucement parsing
 - 8/5/26 - Completed participant logic for parsing
+- 8/10/26 - Built SQLite storage system and polished parsing logic
 
 ## Notes
 - all .gitkeep files are temporary placeholders to retain the structure of the codebase

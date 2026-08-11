@@ -270,15 +270,10 @@ def extract_announcements(soup):
 # -- Main Function --
 
 def parse_conversation(fileName : str):
-    print(fileName)
     global currentParticipants
 
     currentParticipants = {}
     soup = BeautifulSoup(open(fileName, "r"), features="html.parser")
-
-    #+16098744084.html
-    #+17328536966.html
-    #+18482295363.html
 
     messages = extract_messages(soup)
     announcements = extract_announcements(soup)
@@ -289,8 +284,5 @@ def parse_conversation(fileName : str):
     conversation = Conversation(id=convoID, is_group_chat=len(currentParticipants) > 2 or fileName.count(",") > 0, 
                                    participants=list(currentParticipants.values()), relationship_type=RelationshipType.OTHER,
                                    messages=messages, announcements=announcements)
-
-    print(len(list(participants.keys())), len(list(currentParticipants.keys())), len(messages), len(announcements))
-    print("=" * 50)
 
     return conversation
