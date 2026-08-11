@@ -1,0 +1,35 @@
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  animation: card-in 300ms var(--ease-spring) both;
+}
+
+.label {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.value {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.skeletonLine {
+  height: 1em;
+  border-radius: 6px;
+  background: var(--color-border);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonValue {
+  height: 1.6em;
+  margin-top: 10px;
+}
+
+@keyframes shimmer {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}

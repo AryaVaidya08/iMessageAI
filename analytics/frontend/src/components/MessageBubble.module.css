@@ -1,0 +1,54 @@
+.row {
+  display: flex;
+  padding: 2px 16px;
+  animation: card-in 200ms var(--ease-spring) both;
+}
+
+.rowMe {
+  justify-content: flex-end;
+}
+
+.rowOther {
+  justify-content: flex-start;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 8px 14px;
+  border-radius: 18px;
+  position: relative;
+}
+
+.sender {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+
+.text {
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.time {
+  display: block;
+  font-size: 10px;
+  opacity: 0.6;
+  margin-top: 4px;
+}
+
+.tapbacks {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.tapback {
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-pill);
+  padding: 1px 6px;
+}

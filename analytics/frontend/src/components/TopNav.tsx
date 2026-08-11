@@ -1,0 +1,23 @@
+import { Link, NavLink } from "react-router-dom";
+
+import { ThemeToggle } from "./ThemeToggle";
+import styles from "./TopNav.module.css";
+
+export function TopNav() {
+  return (
+    <nav className={styles.nav}>
+      <div className={styles.inner}>
+        <Link to="/" className={styles.brand}>iMessage Analytics</Link>
+        <div className={styles.links}>
+          <NavLink to="/" end className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+            Overview
+          </NavLink>
+          <NavLink to="/conversations" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+            Conversations
+          </NavLink>
+        </div>
+        <ThemeToggle />
+      </div>
+    </nav>
+  );
+}

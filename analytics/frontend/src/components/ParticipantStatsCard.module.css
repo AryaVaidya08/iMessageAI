@@ -1,0 +1,71 @@
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  animation: card-in 300ms var(--ease-spring) both;
+}
+
+.name {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.metrics {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.metricLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 2px;
+}
+
+.section {
+  margin-top: 16px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  background: var(--color-bg);
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.subLabel {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+
+.subEmpty {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.tapbackRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 2px 0;
+}

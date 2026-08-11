@@ -1,0 +1,40 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.brand {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.links {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+}
+
+.link, .linkActive {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  padding: 6px 0;
+}
+
+.linkActive {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}

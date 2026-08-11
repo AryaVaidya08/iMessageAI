@@ -1,0 +1,43 @@
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  animation: card-in 300ms var(--ease-spring) both;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.segmented {
+  display: flex;
+  background: var(--color-bg);
+  border-radius: var(--radius-pill);
+  padding: 2px;
+}
+
+.segment, .segmentActive {
+  border: none;
+  background: transparent;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  text-transform: capitalize;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.segmentActive {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-card);
+}
