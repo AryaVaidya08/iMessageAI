@@ -16,9 +16,6 @@ export function TopNav() {
           <NavLink to="/conversations" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
             Conversations
           </NavLink>
-          <NavLink to="/leaderboards" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
-            Leaderboards
-          </NavLink>
           <NavLink to="/merge" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
             Merge
           </NavLink>

@@ -559,39 +559,6 @@ def tapbacks_received(events: list[TapbackEvent], participant_id: str, limit: in
     return sorted(counts.items(), key=lambda kv: kv[1], reverse=True)[:limit]
 
 
-def best_streak_conversation(activity_by_conversation: dict[str, list[DayActivity]]) -> tuple[str, int] | None:
-    """
-    activity_by_conversation: conversation_id -> its DayActivity list (sorted
-    ascending by day, as required by longest_streak_days). Returns the
-    (conversation_id, streak_length) of whichever conversation has the
-    longest consecutive-day streak, or None if there are no conversations.
-    """
-    best: tuple[str, int] | None = None
-    for conv_id, days in activity_by_conversation.items():
-        streak = longest_streak_days(days)
-        if best is None or streak > best[1]:
-            best = (conv_id, streak)
-    return best
-
-
-def best_silence_conversation(activity_by_conversation: dict[str, list[DayActivity]]) -> tuple[str, dict] | None:
-    """
-    activity_by_conversation: conversation_id -> its DayActivity list (sorted
-    ascending by day, as required by longest_silence). Returns the
-    (conversation_id, silence_dict) of whichever conversation has the
-    largest gap between active days, or None if no conversation has at
-    least 2 active days.
-    """
-    best: tuple[str, dict] | None = None
-    for conv_id, days in activity_by_conversation.items():
-        silence = longest_silence(days)
-        if silence is None:
-            continue
-        if best is None or silence["gap_seconds"] > best[1]["gap_seconds"]:
-            best = (conv_id, silence)
-    return best
-
-
 MEMBERSHIP_DELTAS = {"added person": 1, "removed person": -1, "left convo": -1}
 
 

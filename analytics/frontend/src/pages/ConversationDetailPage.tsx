@@ -3,11 +3,14 @@ import { useParams } from "react-router-dom";
 
 import {
   api,
+  RELATIONSHIP_TYPE_LABELS,
+  RELATIONSHIP_TYPES,
   type ConversationDetail,
   type ConversationStreakSilence,
   type Granularity,
   type ParticipantStats,
   type PersonalityLeaderboardTrait,
+  type RelationshipType,
   type ReplyGraphEdge,
   type VolumePoint,
 } from "../api/client";
@@ -51,6 +54,18 @@ export function ConversationDetailPage() {
   const [statsError, setStatsError] = useState<string | null>(null);
   const [volumeError, setVolumeError] = useState<string | null>(null);
   const [personalityError, setPersonalityError] = useState<string | null>(null);
+  const [relationshipSaving, setRelationshipSaving] = useState(false);
+
+  function handleRelationshipChange(next: RelationshipType) {
+    if (!id || !detail) return;
+    const previous = detail.relationship_type;
+    setDetail({ ...detail, relationship_type: next });
+    setRelationshipSaving(true);
+    api
+      .updateConversationRelationshipType(id, next)
+      .catch(() => setDetail((d) => (d ? { ...d, relationship_type: previous } : d)))
+      .finally(() => setRelationshipSaving(false));
+  }
 
   useEffect(() => {
     // React Router keeps this component mounted across an id-only navigation
@@ -116,7 +131,22 @@ export function ConversationDetailPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.heading}>{buildTitle(detail)}</h1>
+      <div className={styles.headingRow}>
+        <h1 className={styles.heading}>{buildTitle(detail)}</h1>
+        <select
+          className={styles.relationshipSelect}
+          value={detail.relationship_type}
+          disabled={relationshipSaving}
+          onChange={(e) => handleRelationshipChange(e.target.value as RelationshipType)}
+          aria-label="Relationship type"
+        >
+          {RELATIONSHIP_TYPES.map((rt) => (
+            <option key={rt} value={rt}>
+              {RELATIONSHIP_TYPE_LABELS[rt]}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className={styles.tabs}>
         <button

@@ -5,8 +5,6 @@ from services.stats import (
     HISTOGRAM_BUCKETS,
     MessageEvent,
     TapbackEvent,
-    best_silence_conversation,
-    best_streak_conversation,
     build_heatmap_grid,
     build_reply_graph,
     bucket_volume,
@@ -482,47 +480,6 @@ def test_longest_silence_finds_largest_gap():
 def test_longest_silence_fewer_than_two_days_returns_none():
     assert longest_silence([]) is None
     assert longest_silence([DayActivity("2024-01-01", "x", "x")]) is None
-
-
-def test_best_streak_conversation_picks_the_longer_one():
-    activity = {
-        "conv1": [
-            DayActivity("2024-01-01", "x", "x"),
-            DayActivity("2024-01-02", "x", "x"),
-        ],
-        "conv2": [
-            DayActivity("2024-01-01", "x", "x"),
-            DayActivity("2024-01-02", "x", "x"),
-            DayActivity("2024-01-03", "x", "x"),
-        ],
-    }
-    assert best_streak_conversation(activity) == ("conv2", 3)
-
-
-def test_best_streak_conversation_empty_returns_none():
-    assert best_streak_conversation({}) is None
-
-
-def test_best_silence_conversation_picks_the_largest_gap():
-    activity = {
-        "conv1": [
-            DayActivity("2024-01-01", "2024-01-01T09:00:00", "2024-01-01T10:00:00"),
-            DayActivity("2024-01-02", "2024-01-02T09:00:00", "2024-01-02T10:00:00"),
-        ],
-        "conv2": [
-            DayActivity("2024-01-01", "2024-01-01T09:00:00", "2024-01-01T10:00:00"),
-            DayActivity("2024-03-01", "2024-03-01T09:00:00", "2024-03-01T10:00:00"),
-        ],
-        "conv3": [DayActivity("2024-01-01", "x", "x")],  # only 1 active day, no silence
-    }
-    conv_id, silence = best_silence_conversation(activity)
-    assert conv_id == "conv2"
-    assert silence["before"] == "2024-01-01T10:00:00"
-
-
-def test_best_silence_conversation_no_eligible_conversation_returns_none():
-    activity = {"conv1": [DayActivity("2024-01-01", "x", "x")]}
-    assert best_silence_conversation(activity) is None
 
 
 def test_group_size_over_time_ends_at_current_size():

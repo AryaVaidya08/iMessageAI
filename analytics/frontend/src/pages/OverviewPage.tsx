@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import {
   api,
-  type FastestReplyRelationship,
   type Granularity,
   type StatCards,
   type TopConversationOut,
@@ -18,20 +17,12 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { year: "2-digit", month: "numeric", day: "numeric" });
 }
 
-function formatReplySeconds(seconds: number): string {
-  if (seconds < 60) return `${Math.round(seconds)}s`;
-  if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
-  if (seconds < 86400) return `${Math.round(seconds / 3600)}h`;
-  return `${Math.round(seconds / 86400)}d`;
-}
-
 export function OverviewPage() {
   const [stats, setStats] = useState<StatCards | null>(null);
   const [volume, setVolume] = useState<VolumePoint[]>([]);
   const [granularity, setGranularity] = useState<Granularity>("week");
   const [top, setTop] = useState<TopConversationOut[]>([]);
   const [heatmap, setHeatmap] = useState<number[][] | null>(null);
-  const [fastestReply, setFastestReply] = useState<FastestReplyRelationship | null | undefined>(undefined);
   const [statsError, setStatsError] = useState<string | null>(null);
   const [topError, setTopError] = useState<string | null>(null);
   const [volumeError, setVolumeError] = useState<string | null>(null);
@@ -40,7 +31,6 @@ export function OverviewPage() {
     api.overviewStats().then(setStats).catch((e) => setStatsError(String(e)));
     api.topConversations(10).then((r) => setTop(r.items)).catch((e) => setTopError(String(e)));
     api.overviewHeatmap().then((r) => setHeatmap(r.grid)).catch(() => {});
-    api.overviewFastestReplyRelationship().then(setFastestReply).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -82,18 +72,9 @@ export function OverviewPage() {
                     : "—"
                 }
               />
-              {fastestReply === undefined ? (
-                <StatCardSkeleton />
-              ) : (
-                <StatCard
-                  label="Fastest replies from"
-                  value={fastestReply ? `${fastestReply.relationship_type} · ${formatReplySeconds(fastestReply.median_reply_seconds)}` : "—"}
-                />
-              )}
             </>
           ) : (
             <>
-              <StatCardSkeleton />
               <StatCardSkeleton />
               <StatCardSkeleton />
               <StatCardSkeleton />

@@ -170,77 +170,6 @@ def test_get_conversation_tapback_events_includes_target_sender(conn):
     assert events[0]["target_sender_id"] == "me"
 
 
-# --- Leaderboards ---------------------------------------------------------
-
-
-def test_get_attachment_leaderboard_ranks_by_count(conn, resolver):
-    conn.executemany(
-        "INSERT INTO messages VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-            ("a1", "conv1", "them", "2024-01-01T09:20:00", "pic", 1, 0, None),
-            ("a2", "conv1", "them", "2024-01-01T09:21:00", "pic2", 1, 0, None),
-            ("a3", "conv1", "me", "2024-01-01T09:22:00", "sticker", 0, 1, None),
-        ],
-    )
-    conn.commit()
-    result = queries.get_attachment_leaderboard(conn, resolver, limit=10)
-    assert result[0]["participant_id"] == "them"
-    assert result[0]["count"] == 2
-    assert result[1]["participant_id"] == "me"
-    assert result[1]["count"] == 1
-
-
-def test_get_attachment_leaderboard_ignores_plain_messages(conn, resolver):
-    result = queries.get_attachment_leaderboard(conn, resolver, limit=10)
-    assert result == []
-
-
-def test_get_most_tapbacked_messages_includes_context(conn, resolver):
-    result = queries.get_most_tapbacked_messages(conn, resolver, limit=10)
-    assert len(result) == 1
-    item = result[0]
-    assert item["message_id"] == "m1"
-    assert item["text"] == "hey"
-    assert item["sender_id"] == "me"
-    assert item["conversation_id"] == "conv1"
-    assert item["tapback_count"] == 1
-
-
-def test_get_most_tapbacked_messages_empty_when_no_tapbacks(conn, resolver):
-    conn.execute("DELETE FROM tapbacks")
-    conn.commit()
-    assert queries.get_most_tapbacked_messages(conn, resolver, limit=10) == []
-
-
-def test_get_most_replied_messages_ranks_by_reply_count(conn, resolver):
-    conn.executemany(
-        "INSERT INTO messages VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-            ("r1", "conv1", "them", "2024-01-01T09:20:00", "reply a", 0, 0, "m2"),
-            ("r2", "conv1", "me", "2024-01-01T09:21:00", "reply b", 0, 0, "m2"),
-        ],
-    )
-    conn.commit()
-    result = queries.get_most_replied_messages(conn, resolver, limit=10)
-    assert result[0]["message_id"] == "m2"
-    assert result[0]["reply_count"] == 2
-    assert result[0]["text"] == "hi there"
-
-
-def test_get_most_replied_messages_empty_when_no_replies(conn, resolver):
-    assert queries.get_most_replied_messages(conn, resolver, limit=10) == []
-
-
-def test_get_day_activity_by_conversation_groups_by_day(conn):
-    activity = queries.get_day_activity_by_conversation(conn)
-    assert list(activity.keys()) == ["conv1"]
-    days = activity["conv1"]
-    assert len(days) == 1
-    assert days[0].day == "2024-01-01"
-    assert days[0].start_ts == "2024-01-01T09:00:00"
-    assert days[0].end_ts == "2024-01-01T09:10:00"
-
-
 def test_get_conversation_day_activity_scoped_to_one_conversation(conn):
     conn.execute("INSERT INTO participants VALUES ('other', '+15553330000', NULL, 0)")
     conn.execute("INSERT INTO conversations (id, is_group_chat, relationship_type) VALUES ('conv2', 0, 'other')")
@@ -250,34 +179,6 @@ def test_get_conversation_day_activity_scoped_to_one_conversation(conn):
     conn.commit()
     days = queries.get_conversation_day_activity(conn, "conv1")
     assert [d.day for d in days] == ["2024-01-01"]
-
-
-def test_get_streak_leaderboard_picks_longest_streak(conn, resolver):
-    conn.execute("INSERT INTO participants VALUES ('other', '+15553330000', NULL, 0)")
-    conn.execute("INSERT INTO conversations (id, is_group_chat, relationship_type) VALUES ('conv2', 0, 'other')")
-    conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'me')")
-    conn.execute("INSERT INTO conversation_participants VALUES ('conv2', 'other')")
-    conn.executemany(
-        "INSERT INTO messages VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-            ("c2m1", "conv2", "me", "2024-02-01T09:00:00", "yo", 0, 0, None),
-            ("c2m2", "conv2", "other", "2024-02-02T09:00:00", "sup", 0, 0, None),
-            ("c2m3", "conv2", "me", "2024-02-03T09:00:00", "hi", 0, 0, None),
-        ],
-    )
-    conn.commit()
-    result = queries.get_streak_leaderboard(conn, resolver)
-    assert result["conversation_id"] == "conv2"
-    assert result["streak_days"] == 3
-
-
-def test_get_silence_leaderboard_picks_largest_gap(conn, resolver):
-    conn.execute("INSERT INTO messages VALUES ('m4', 'conv1', 'me', '2024-06-01T09:00:00', 'later', 0, 0, NULL)")
-    conn.commit()
-    result = queries.get_silence_leaderboard(conn, resolver)
-    assert result["conversation_id"] == "conv1"
-    assert result["before"] == "2024-01-01T09:10:00"
-    assert result["after"] == "2024-06-01T09:00:00"
 
 
 def test_get_fastest_reply_relationship_type_picks_lowest_median(conn, resolver):

@@ -60,6 +60,28 @@ class ConversationDetail(BaseModel):
     participants: list[ParticipantOut]
 
 
+# Mirrors backend/modules/relationship.py's RelationshipType values -- kept as a
+# plain list here since analytics/backend is a separately deployed app that
+# doesn't import from backend/.
+RELATIONSHIP_TYPES = [
+    "sigother",
+    "parent",
+    "close_family",
+    "family",
+    "close_friend",
+    "friend",
+    "classmate",
+    "professor",
+    "coworker",
+    "boss",
+    "other",
+]
+
+
+class UpdateRelationshipTypeRequest(BaseModel):
+    relationship_type: str
+
+
 class WordCount(BaseModel):
     word: str
     count: int
@@ -143,59 +165,6 @@ class SearchMessageResult(BaseModel):
 
 class SearchMessagesResponse(BaseModel):
     items: list[SearchMessageResult]
-
-
-# --- Leaderboards ----------------------------------------------------------
-
-
-class AttachmentLeaderboardEntry(BaseModel):
-    participant_id: str
-    display_name: str
-    count: int
-
-
-class AttachmentLeaderboardResponse(BaseModel):
-    items: list[AttachmentLeaderboardEntry]
-
-
-class MessageLeaderboardEntryBase(BaseModel):
-    message_id: str
-    text: str
-    sender_id: str
-    sender_display_name: str
-    conversation_id: str
-    conversation_display_name: str
-    timestamp: str
-
-
-class LovedMessageEntry(MessageLeaderboardEntryBase):
-    tapback_count: int
-
-
-class LovedMessagesResponse(BaseModel):
-    items: list[LovedMessageEntry]
-
-
-class ArguedMessageEntry(MessageLeaderboardEntryBase):
-    reply_count: int
-
-
-class ArguedMessagesResponse(BaseModel):
-    items: list[ArguedMessageEntry]
-
-
-class StreakLeaderboard(BaseModel):
-    conversation_id: str
-    conversation_display_name: str
-    streak_days: int
-
-
-class SilenceLeaderboard(BaseModel):
-    conversation_id: str
-    conversation_display_name: str
-    gap_seconds: float
-    before: str
-    after: str
 
 
 class FastestReplyRelationship(BaseModel):

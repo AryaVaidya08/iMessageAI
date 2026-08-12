@@ -59,6 +59,36 @@ export interface ConversationDetail {
   participants: ParticipantOut[];
 }
 
+export const RELATIONSHIP_TYPES = [
+  "sigother",
+  "parent",
+  "close_family",
+  "family",
+  "close_friend",
+  "friend",
+  "classmate",
+  "professor",
+  "coworker",
+  "boss",
+  "other",
+] as const;
+
+export type RelationshipType = (typeof RELATIONSHIP_TYPES)[number];
+
+export const RELATIONSHIP_TYPE_LABELS: Record<RelationshipType, string> = {
+  sigother: "Significant Other",
+  parent: "Parent",
+  close_family: "Close Family",
+  family: "Family",
+  close_friend: "Close Friend",
+  friend: "Friend",
+  classmate: "Classmate",
+  professor: "Professor",
+  coworker: "Coworker",
+  boss: "Boss",
+  other: "Other",
+};
+
 export interface WordCount { word: string; count: number; }
 export interface EmojiCount { emoji: string; count: number; }
 export interface TapbackCount { action: string; count: number; }
@@ -127,63 +157,6 @@ export interface SearchMessageResult {
 
 export interface SearchMessagesResponse {
   items: SearchMessageResult[];
-}
-
-// --- Leaderboards ---
-
-export interface AttachmentLeaderboardEntry {
-  participant_id: string;
-  display_name: string;
-  count: number;
-}
-
-export interface AttachmentLeaderboardResponse {
-  items: AttachmentLeaderboardEntry[];
-}
-
-export interface MessageLeaderboardEntryBase {
-  message_id: string;
-  text: string;
-  sender_id: string;
-  sender_display_name: string;
-  conversation_id: string;
-  conversation_display_name: string;
-  timestamp: string;
-}
-
-export interface LovedMessageEntry extends MessageLeaderboardEntryBase {
-  tapback_count: number;
-}
-
-export interface LovedMessagesResponse {
-  items: LovedMessageEntry[];
-}
-
-export interface ArguedMessageEntry extends MessageLeaderboardEntryBase {
-  reply_count: number;
-}
-
-export interface ArguedMessagesResponse {
-  items: ArguedMessageEntry[];
-}
-
-export interface StreakLeaderboard {
-  conversation_id: string;
-  conversation_display_name: string;
-  streak_days: number;
-}
-
-export interface SilenceLeaderboard {
-  conversation_id: string;
-  conversation_display_name: string;
-  gap_seconds: number;
-  before: string;
-  after: string;
-}
-
-export interface FastestReplyRelationship {
-  relationship_type: string;
-  median_reply_seconds: number;
 }
 
 // --- Conversation detail additions ---
@@ -368,6 +341,11 @@ export const api = {
 
   conversation: (id: string) => getJSON<ConversationDetail>(`/api/conversations/${id}`),
 
+  updateConversationRelationshipType: (id: string, relationshipType: RelationshipType) =>
+    postJSON<ConversationDetail>(`/api/conversations/${id}/relationship-type`, {
+      relationship_type: relationshipType,
+    }),
+
   conversationVolume: (id: string, granularity: Granularity) =>
     getJSON<VolumeResponse>(`/api/conversations/${id}/volume?granularity=${granularity}`),
 
@@ -402,9 +380,6 @@ export const api = {
 
   overviewHeatmap: () => getJSON<HeatmapResponse>("/api/overview/heatmap"),
 
-  overviewFastestReplyRelationship: () =>
-    getJSON<FastestReplyRelationship | null>("/api/overview/fastest-reply-relationship"),
-
   conversationHeatmap: (id: string) => getJSON<HeatmapResponse>(`/api/conversations/${id}/heatmap`),
 
   conversationStreakSilence: (id: string) =>
@@ -416,19 +391,6 @@ export const api = {
 
   conversationPersonalityLeaderboard: (id: string) =>
     getJSON<PersonalityLeaderboardResponse>(`/api/conversations/${id}/personality-leaderboard`),
-
-  leaderboardAttachments: (limit = 10) =>
-    getJSON<AttachmentLeaderboardResponse>(`/api/leaderboards/attachments?limit=${limit}`),
-
-  leaderboardMostLoved: (limit = 10) =>
-    getJSON<LovedMessagesResponse>(`/api/leaderboards/most-loved?limit=${limit}`),
-
-  leaderboardMostArgued: (limit = 10) =>
-    getJSON<ArguedMessagesResponse>(`/api/leaderboards/most-argued?limit=${limit}`),
-
-  leaderboardStreak: () => getJSON<StreakLeaderboard | null>("/api/leaderboards/streak"),
-
-  leaderboardSilence: () => getJSON<SilenceLeaderboard | null>("/api/leaderboards/silence"),
 
   participants: () => getJSON<MergeParticipantsResponse>("/api/participants"),
 

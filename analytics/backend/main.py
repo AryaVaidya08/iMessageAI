@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from contacts import ContactResolver
-from routers import conversations, leaderboards, merge, overview
+from routers import conversations, merge, overview
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -36,5 +36,4 @@ app.add_middleware(
 
 app.include_router(overview.router)
 app.include_router(conversations.router)
-app.include_router(leaderboards.router)
 app.include_router(merge.router)

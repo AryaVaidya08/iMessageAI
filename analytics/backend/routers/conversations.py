@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from dependencies import get_db, get_resolver
 from models import (
+    RELATIONSHIP_TYPES,
     ConversationDetail,
     ConversationListResponse,
     ConversationStreakSilence,
@@ -19,10 +20,11 @@ from models import (
     ReplyGraphEdge,
     ReplyGraphResponse,
     SearchMessagesResponse,
+    UpdateRelationshipTypeRequest,
     VolumePoint,
     VolumeResponse,
 )
-from services import queries, stats
+from services import merge, queries, stats
 
 router = APIRouter(prefix="/api/conversations", tags=["conversations"])
 
@@ -50,6 +52,26 @@ def get_conversation(conversation_id: str, conn=Depends(get_db), resolver=Depend
     detail = queries.get_conversation_detail(conn, resolver, conversation_id)
     if detail is None:
         raise HTTPException(status_code=404, detail="conversation not found")
+    return ConversationDetail(**detail)
+
+
+@router.post("/{conversation_id}/relationship-type", response_model=ConversationDetail)
+def update_conversation_relationship_type(
+    conversation_id: str,
+    body: UpdateRelationshipTypeRequest,
+    resolver=Depends(get_resolver),
+):
+    if body.relationship_type not in RELATIONSHIP_TYPES:
+        raise HTTPException(status_code=400, detail="invalid relationship_type")
+    with merge.get_write_connection() as conn:
+        cur = conn.execute(
+            "UPDATE conversations SET relationship_type = ? WHERE id = ?",
+            (body.relationship_type, conversation_id),
+        )
+        if cur.rowcount == 0:
+            raise HTTPException(status_code=404, detail="conversation not found")
+        conn.commit()
+        detail = queries.get_conversation_detail(conn, resolver, conversation_id)
     return ConversationDetail(**detail)
 
 

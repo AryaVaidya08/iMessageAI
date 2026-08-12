@@ -160,8 +160,7 @@ export function MergePage() {
         <>
           <p className={styles.description}>
             If the same person shows up as two separate contacts (e.g. a phone number and an email), merge them
-            here. This never edits the original database — it writes to a separate merged copy, which the rest of
-            the app will use automatically once it exists.
+            here.
           </p>
 
           {contactsLoadError && <div className={styles.error}>Couldn't load contacts: {contactsLoadError}</div>}
@@ -202,8 +201,7 @@ export function MergePage() {
         <>
           <p className={styles.description}>
             If the same conversation shows up twice (e.g. after merging two contacts that used to be separate
-            threads), merge them here. This never edits the original database — it writes to a separate merged
-            copy, which the rest of the app will use automatically once it exists.
+            threads), merge them here.
           </p>
 
           {conversationsLoadError && (
