@@ -15,6 +15,8 @@ export function RecordCard({
   items,
   linkTo,
   linkLabel = "View conversation →",
+  onClick,
+  actionLabel = "Jump to message →",
 }: {
   title: string;
   headline?: string;
@@ -22,9 +24,26 @@ export function RecordCard({
   items?: RecordCardListItem[];
   linkTo?: string;
   linkLabel?: string;
+  onClick?: () => void;
+  actionLabel?: string;
 }) {
   return (
-    <div className={styles.card}>
+    <div
+      className={onClick ? `${styles.card} ${styles.clickable}` : styles.card}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+    >
       <h3 className={styles.title}>{title}</h3>
       {headline && <div className={styles.headline}>{headline}</div>}
       {subtext && <div className={styles.subtext}>{subtext}</div>}
@@ -43,6 +62,7 @@ export function RecordCard({
           {linkLabel}
         </Link>
       )}
+      {onClick && <span className={styles.link}>{actionLabel}</span>}
     </div>
   );
 }

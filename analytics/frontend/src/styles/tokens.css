@@ -27,6 +27,11 @@
   --heatmap-2: color-mix(in srgb, var(--color-accent) 55%, white);
   --heatmap-3: color-mix(in srgb, var(--color-accent) 80%, white);
   --heatmap-4: var(--color-accent);
+
+  /* Rings that mark the busiest (max) and quietest non-zero (min) cells
+     in a heatmap, independent of the sequential ramp above. */
+  --heatmap-ring-max: #D4AF37;
+  --heatmap-ring-min: #8E8E93;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,6 +47,8 @@
     --heatmap-2: color-mix(in srgb, var(--color-accent) 55%, black);
     --heatmap-3: color-mix(in srgb, var(--color-accent) 75%, black);
     --heatmap-4: var(--color-accent);
+    --heatmap-ring-max: #E5C158;
+    --heatmap-ring-min: #98989D;
   }
 }
 
@@ -57,4 +64,6 @@
   --heatmap-2: color-mix(in srgb, var(--color-accent) 55%, black);
   --heatmap-3: color-mix(in srgb, var(--color-accent) 75%, black);
   --heatmap-4: var(--color-accent);
+  --heatmap-ring-max: #E5C158;
+  --heatmap-ring-min: #98989D;
 }

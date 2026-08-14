@@ -84,6 +84,22 @@
 .cell[data-level="3"] { background: var(--heatmap-3); }
 .cell[data-level="4"] { background: var(--heatmap-4); }
 
+.cell[data-extreme="max"] {
+  outline: 2px solid var(--heatmap-ring-max);
+  outline-offset: -2px;
+}
+
+.cell[data-extreme="min"] {
+  outline: 2px solid var(--heatmap-ring-min);
+  outline-offset: -2px;
+}
+
+.cell[data-extreme="both"] {
+  outline: 2px solid var(--heatmap-ring-max);
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 4px var(--heatmap-ring-min);
+}
+
 .cellLabel {
   font-size: 8px;
   line-height: 1;
@@ -98,7 +114,13 @@
   align-items: center;
   gap: 4px;
   margin-top: 10px;
-  justify-content: flex-end;
+  justify-content: space-between;
+}
+
+.scaleLegend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .legendLabel {
@@ -117,3 +139,19 @@
 .legendSwatch[data-level="2"] { background: var(--heatmap-2); }
 .legendSwatch[data-level="3"] { background: var(--heatmap-3); }
 .legendSwatch[data-level="4"] { background: var(--heatmap-4); }
+
+.extremeLegend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legendSwatch[data-extreme="max"] {
+  outline: 2px solid var(--heatmap-ring-max);
+  outline-offset: -2px;
+}
+
+.legendSwatch[data-extreme="min"] {
+  outline: 2px solid var(--heatmap-ring-min);
+  outline-offset: -2px;
+}

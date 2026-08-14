@@ -24,10 +24,13 @@ def _check_sorted_ascending(messages: list[MessageEvent]) -> None:
             raise ValueError("messages must be sorted by timestamp ascending")
 
 
-def _reply_deltas_by_sender(messages: list[MessageEvent]) -> dict[str, list[float]]:
+def reply_deltas_by_sender(messages: list[MessageEvent]) -> dict[str, list[float]]:
     """
-    Shared by median_reply_seconds and reply_time_histogram. Caller must
-    have already validated `messages` is sorted ascending.
+    Shared by median_reply_seconds and reply_time_histogram, and called directly by
+    queries.get_person_reply_stats (which needs the raw per-sender delta lists, not a
+    precomputed median/histogram, so it can pool one sender's deltas across several
+    conversations before summarizing). Caller must have already validated `messages` is
+    sorted ascending.
 
     Whenever the sender changes between two consecutive messages, the later
     message counts as a "reply" with delay = later.timestamp -
@@ -57,7 +60,7 @@ def median_reply_seconds(messages: list[MessageEvent]) -> dict[str, float | None
     single overnight gap doesn't dominate the figure.
     """
     _check_sorted_ascending(messages)
-    deltas = _reply_deltas_by_sender(messages)
+    deltas = reply_deltas_by_sender(messages)
 
     # Separate pass over all senders (not just those seen as `curr` above) so
     # a sender who never triggers a reply transition -- e.g. someone who only
@@ -75,7 +78,7 @@ def reply_deltas_seconds(messages: list[MessageEvent]) -> list[float]:
     relationship type) without caring which side did the replying.
     """
     _check_sorted_ascending(messages)
-    return [d for deltas in _reply_deltas_by_sender(messages).values() for d in deltas]
+    return [d for deltas in reply_deltas_by_sender(messages).values() for d in deltas]
 
 
 HISTOGRAM_BUCKETS: list[tuple[str, float]] = [
@@ -89,6 +92,24 @@ HISTOGRAM_BUCKETS: list[tuple[str, float]] = [
 ]
 
 
+def bucket_reply_deltas(deltas: list[float]) -> list[tuple[str, int]]:
+    """
+    Buckets a flat list of reply-delay seconds into HISTOGRAM_BUCKETS, in bucket order --
+    including zero-count buckets, so the frontend can render a stable set of bars without
+    re-deriving bucket labels. Split out of reply_time_histogram so
+    queries.get_person_reply_stats can bucket one sender's deltas pooled across several
+    conversations, without re-deriving per-sender delta lists from a synthetic combined
+    timeline (which would misdetect reply transitions at conversation boundaries).
+    """
+    counts = [0] * len(HISTOGRAM_BUCKETS)
+    for delta in deltas:
+        for i, (_, upper) in enumerate(HISTOGRAM_BUCKETS):
+            if delta < upper:
+                counts[i] += 1
+                break
+    return [(label, count) for (label, _), count in zip(HISTOGRAM_BUCKETS, counts)]
+
+
 def reply_time_histogram(messages: list[MessageEvent]) -> dict[str, list[tuple[str, int]]]:
     """
     `messages` must be sorted by timestamp ascending (raises ValueError if
@@ -98,19 +119,9 @@ def reply_time_histogram(messages: list[MessageEvent]) -> dict[str, list[tuple[s
     can render a stable set of bars without re-deriving bucket labels.
     """
     _check_sorted_ascending(messages)
-    deltas = _reply_deltas_by_sender(messages)
+    deltas = reply_deltas_by_sender(messages)
     senders = {m.sender_id for m in messages}
-
-    result: dict[str, list[tuple[str, int]]] = {}
-    for sender_id in senders:
-        counts = [0] * len(HISTOGRAM_BUCKETS)
-        for delta in deltas.get(sender_id, []):
-            for i, (_, upper) in enumerate(HISTOGRAM_BUCKETS):
-                if delta < upper:
-                    counts[i] += 1
-                    break
-        result[sender_id] = [(label, count) for (label, _), count in zip(HISTOGRAM_BUCKETS, counts)]
-    return result
+    return {sender_id: bucket_reply_deltas(deltas.get(sender_id, [])) for sender_id in senders}
 
 
 def fastest_reply_relationship_types(deltas_by_relationship: dict[str, list[float]]) -> list[tuple[str, float]]:
@@ -489,6 +500,28 @@ def personality_scores(texts: list[str]) -> list[tuple[str, float]]:
     return [(trait, round(hits[trait] / total * 100, 1)) for trait in PERSONALITY_TRAITS]
 
 
+def personality_rates(texts: list[str], min_messages: int = 20) -> list[tuple[str, float]]:
+    """
+    texts: one participant's message bodies, any order, empty/None entries
+    ignored. For each trait, returns the RATE -- the percentage of *their
+    own* messages that hit the trait -- not a share normalized against the
+    other traits (unlike personality_scores) and not a share of the
+    conversation-wide total. Mirrors the ranking logic in
+    personality_leaderboard, applied to a single participant.
+
+    Participants with fewer than min_messages text messages are excluded
+    entirely: a rate computed from a handful of messages isn't a meaningful
+    signal, and without this floor a low-volume participant with one lucky
+    hit could dominate. Returns [] in that case, or if there are no texts.
+    """
+    texts = [t for t in texts if t]
+    if len(texts) < min_messages:
+        return []
+
+    hits = personality_hits(texts)
+    return [(trait, round(hits[trait] / len(texts) * 100, 1)) for trait in PERSONALITY_TRAITS]
+
+
 def personality_leaderboard(
     hits_by_participant: dict[str, dict[str, int]],
     message_counts: dict[str, int],
@@ -579,6 +612,56 @@ def group_size_over_time(current_size: int, events: list[tuple[str, str]]) -> li
         size += MEMBERSHIP_DELTAS.get(action, 0)
         points.append((dt, size))
     return points
+
+
+def message_emoji_count(text: str) -> int:
+    """Total emoji glyphs (not distinct) in a single message's text."""
+    if not text:
+        return 0
+    return len(emoji_lib.emoji_list(text))
+
+
+def message_aggressive_score(text: str) -> int:
+    """
+    Single-message intensity score for the "most aggressive message" record --
+    reuses the same lexicon/shout/emoji signals as personality_hits' Aggressive
+    trait, but sums every hit (word/shout/emoji) instead of a single per-message
+    yes/no, so a message with three slurs and all-caps outranks one with just
+    one flagged word.
+    """
+    if not text:
+        return 0
+    normalized = text.lower().replace("’", "'")
+    words = _WORD_RE.findall(normalized)
+    emojis = {item["emoji"].replace("️", "") for item in emoji_lib.emoji_list(text)}
+    return (
+        sum(1 for w in words if w in _AGGRESSIVE_WORDS)
+        + len(_shout_words(text))
+        + len(emojis & _AGGRESSIVE_EMOJI)
+    )
+
+
+def message_sentiment(text: str) -> float:
+    """VADER compound sentiment (-1 most negative .. +1 most positive) for one message's text."""
+    if not text:
+        return 0.0
+    return _sentiment_analyzer.polarity_scores(text)["compound"]
+
+
+_LATE_NIGHT_PEAK_MINUTES = 3 * 60  # 3:00am -- the deepest point of the late-night window
+
+
+def late_night_distance_minutes(timestamp: str) -> float:
+    """
+    Minutes between a message's local clock time and 3:00am (the midpoint of
+    LATE_NIGHT_HOURS), wrapped to the shorter direction around the 24h clock.
+    Smaller is "later into the night" -- used to rank late-night messages
+    since raw hour-of-day doesn't order 11pm before 1am.
+    """
+    dt = datetime.fromisoformat(timestamp)
+    minutes = dt.hour * 60 + dt.minute
+    diff = abs(minutes - _LATE_NIGHT_PEAK_MINUTES)
+    return min(diff, 24 * 60 - diff)
 
 
 def build_reply_graph(edges: list[tuple[str, str]]) -> list[tuple[str, str, int]]:

@@ -73,6 +73,22 @@
   text-decoration: underline;
 }
 
+.clickable {
+  cursor: pointer;
+  transition: transform 120ms var(--ease-spring), box-shadow 120ms ease;
+}
+
+.clickable:hover,
+.clickable:focus-visible {
+  box-shadow: var(--shadow-card-hover, 0 4px 16px rgba(0, 0, 0, 0.12));
+  transform: translateY(-2px);
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .skeletonLine {
   height: 1em;
   border-radius: 6px;

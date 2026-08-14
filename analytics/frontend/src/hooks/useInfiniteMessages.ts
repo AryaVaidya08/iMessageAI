@@ -2,7 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, type MessageOut } from "../api/client";
 
-export function useInfiniteMessages(conversationId: string) {
+export function useInfiniteMessages(
+  conversationId: string,
+  initialJump?: { messageId: string; nonce: number } | null
+) {
   const [messages, setMessages] = useState<MessageOut[]>([]);
   const [olderCursor, setOlderCursor] = useState<string | null>(null);
   const [newerCursor, setNewerCursor] = useState<string | null>(null);
@@ -26,6 +29,17 @@ export function useInfiniteMessages(conversationId: string) {
   const loadingOlderRef = useRef(false);
   const loadingNewerRef = useRef(false);
   const generationRef = useRef(0);
+  // Guards the initial-load decision (jump to `initialJump` vs. load the latest
+  // tail) so it fires exactly once per mount/conversation. Without this, React
+  // 18 StrictMode's dev-only double-invoke of mount effects re-runs
+  // resetToLatest a second time *between* the two decision-effect passes,
+  // which re-arms loadingOlderRef and lets a second, unrelated "load the tail"
+  // call win the generation race against the jump's own in-flight fetch --
+  // the jump's response arrives, finds itself stale, and is silently dropped.
+  // Gating both branches behind one ref (reset by resetToLatest itself, so
+  // both passes agree on which branch to take) keeps the two passes
+  // consistent instead of racing each other.
+  const initialLoadStartedRef = useRef(false);
 
   const loadOlder = useCallback(async () => {
     if (!conversationId) return;
@@ -83,6 +97,7 @@ export function useInfiniteMessages(conversationId: string) {
     generationRef.current += 1;
     loadingOlderRef.current = false;
     loadingNewerRef.current = false;
+    initialLoadStartedRef.current = false;
     setMessages([]);
     setOlderCursor(null);
     setNewerCursor(null);
@@ -96,13 +111,6 @@ export function useInfiniteMessages(conversationId: string) {
     resetToLatest();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId]);
-
-  useEffect(() => {
-    if (!hasLoadedOnce) {
-      loadOlder();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationId, hasLoadedOnce]);
 
   const jumpToAnchor = useCallback(
     async (fetcher: () => Promise<{ items: MessageOut[]; older_cursor: string | null; newer_cursor: string | null }>, targetId: string | null) => {
@@ -149,6 +157,17 @@ export function useInfiniteMessages(conversationId: string) {
     },
     [conversationId]
   );
+
+  useEffect(() => {
+    if (initialLoadStartedRef.current || hasLoadedOnce) return;
+    initialLoadStartedRef.current = true;
+    if (initialJump) {
+      jumpToAnchor(() => api.messagesAround(conversationId, initialJump.messageId), initialJump.messageId);
+    } else {
+      loadOlder();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, hasLoadedOnce, initialJump]);
 
   const jumpToDate = useCallback(
     (date: string) => jumpToAnchor(() => api.messagesForDate(conversationId, date), null),

@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS announcements (
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
 CREATE INDEX IF NOT EXISTS idx_messages_reply_to ON messages(reply_to);
+CREATE INDEX IF NOT EXISTS idx_messages_convo_ts_id ON messages(conversation_id, timestamp, id);
 CREATE INDEX IF NOT EXISTS idx_tapbacks_message ON tapbacks(message_id);
 CREATE INDEX IF NOT EXISTS idx_announcements_conversation ON announcements(conversation_id);
 """

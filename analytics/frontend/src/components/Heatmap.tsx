@@ -42,8 +42,17 @@ function computeLevels(grid: number[][]): number[][] {
   );
 }
 
+// Finds the busiest and quietest (non-zero) cells so they can be ringed —
+// ties all get marked, and a single-value grid marks that cell as both.
+function computeExtremes(grid: number[][]): { max: number; min: number } | null {
+  const values = grid.flat().filter((v) => v > 0);
+  if (values.length === 0) return null;
+  return { max: Math.max(...values), min: Math.min(...values) };
+}
+
 export function Heatmap({ grid, title }: { grid: number[][]; title?: string }) {
   const levels = computeLevels(grid);
+  const extremes = computeExtremes(grid);
   const [showNumbers, setShowNumbers] = useState(true);
 
   return (
@@ -69,27 +78,46 @@ export function Heatmap({ grid, title }: { grid: number[][]; title?: string }) {
         {DOW_LABELS.map((label, dow) => (
           <div key={dow} className={styles.row}>
             <span className={styles.rowLabel}>{label}</span>
-            {grid[dow].map((count, hour) => (
-              <div
-                key={hour}
-                className={styles.cell}
-                data-level={levels[dow][hour]}
-                title={`${label} ${hour}:00 — ${count.toLocaleString()} message${count === 1 ? "" : "s"}`}
-              >
-                {showNumbers && count > 0 && (
-                  <span className={styles.cellLabel}>{formatCount(count)}</span>
-                )}
-              </div>
-            ))}
+            {grid[dow].map((count, hour) => {
+              const isMax = extremes !== null && count === extremes.max;
+              const isMin = extremes !== null && count === extremes.min;
+              const extreme = isMax && isMin ? "both" : isMax ? "max" : isMin ? "min" : undefined;
+              const extremeNote = isMax && isMin ? " (only active slot)" : isMax ? " (busiest)" : isMin ? " (quietest)" : "";
+              return (
+                <div
+                  key={hour}
+                  className={styles.cell}
+                  data-level={levels[dow][hour]}
+                  data-extreme={extreme}
+                  title={`${label} ${hour}:00 — ${count.toLocaleString()} message${count === 1 ? "" : "s"}${extremeNote}`}
+                >
+                  {showNumbers && count > 0 && (
+                    <span className={styles.cellLabel}>{formatCount(count)}</span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
       </div>
       <div className={styles.legend}>
-        <span className={styles.legendLabel}>Less</span>
-        {[0, 1, 2, 3, 4].map((lvl) => (
-          <div key={lvl} className={styles.legendSwatch} data-level={lvl} />
-        ))}
-        <span className={styles.legendLabel}>More</span>
+        <div className={styles.extremeLegend}>
+          {extremes && (
+            <>
+              <div className={styles.legendSwatch} data-extreme="max" />
+              <span className={styles.legendLabel}>Busiest</span>
+              <div className={styles.legendSwatch} data-extreme="min" />
+              <span className={styles.legendLabel}>Quietest</span>
+            </>
+          )}
+        </div>
+        <div className={styles.scaleLegend}>
+          <span className={styles.legendLabel}>Less</span>
+          {[0, 1, 2, 3, 4].map((lvl) => (
+            <div key={lvl} className={styles.legendSwatch} data-level={lvl} />
+          ))}
+          <span className={styles.legendLabel}>More</span>
+        </div>
       </div>
     </div>
   );

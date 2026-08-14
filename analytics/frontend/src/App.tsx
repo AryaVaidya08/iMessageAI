@@ -6,6 +6,8 @@ import { ConversationsListPage } from "./pages/ConversationsListPage";
 import { MergePage } from "./pages/MergePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { OverviewPage } from "./pages/OverviewPage";
+import { PeopleListPage } from "./pages/PeopleListPage";
+import { PersonDetailPage } from "./pages/PersonDetailPage";
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
           <Route path="/" element={<OverviewPage />} />
           <Route path="/conversations" element={<ConversationsListPage />} />
           <Route path="/conversations/:id" element={<ConversationDetailPage />} />
+          <Route path="/people" element={<PeopleListPage />} />
+          <Route path="/people/:id" element={<PersonDetailPage />} />
           <Route path="/merge" element={<MergePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

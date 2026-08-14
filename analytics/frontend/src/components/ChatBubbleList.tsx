@@ -34,9 +34,13 @@ function formatResultDate(iso: string): string {
 export function ChatBubbleList({
   conversationId,
   participants,
+  jumpTarget,
 }: {
   conversationId: string;
   participants: ParticipantOut[];
+  /** Set (with a fresh `nonce` each time, even for the same messageId) to scroll to and highlight a message
+   * from outside this component -- e.g. a "jump to message" action on the leaderboard tab. */
+  jumpTarget?: { messageId: string; nonce: number } | null;
 }) {
   const {
     messages,
@@ -51,7 +55,7 @@ export function ChatBubbleList({
     error,
     hasOlder,
     hasNewer,
-  } = useInfiniteMessages(conversationId);
+  } = useInfiniteMessages(conversationId, jumpTarget);
   const scrollRef = useRef<HTMLDivElement>(null);
   const topSentinelRef = useRef<HTMLDivElement>(null);
   const bottomSentinelRef = useRef<HTMLDivElement>(null);
@@ -60,7 +64,11 @@ export function ChatBubbleList({
   const prevJumpVersion = useRef(0);
 
   const [dateInput, setDateInput] = useState("");
-  const [viewingAnchor, setViewingAnchor] = useState(false);
+  // Initialized from `jumpTarget` (rather than set later via an effect) since
+  // the initial jump-to-anchor fetch is now handled by useInfiniteMessages
+  // itself as part of its mount-time load decision -- see that hook's
+  // `initialLoadStartedRef` for why a separate effect here raced it.
+  const [viewingAnchor, setViewingAnchor] = useState(() => !!jumpTarget);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchMessageResult[] | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);

@@ -4,6 +4,7 @@ from dependencies import get_db, get_resolver
 from models import (
     RELATIONSHIP_TYPES,
     ConversationDetail,
+    ConversationLeaderboard,
     ConversationListResponse,
     ConversationStreakSilence,
     GroupSizePoint,
@@ -28,10 +29,7 @@ from services import merge, queries, stats
 
 router = APIRouter(prefix="/api/conversations", tags=["conversations"])
 
-# A reply counts as "breaking a silence" once at least this long has passed
-# since the previous message (from anyone) -- chosen as a round number well
-# above typical back-and-forth reply latency but well below a full day.
-GAP_INITIATOR_THRESHOLD_SECONDS = 6 * 3600
+GAP_INITIATOR_THRESHOLD_SECONDS = queries.GAP_INITIATOR_THRESHOLD_SECONDS
 
 
 @router.get("", response_model=ConversationListResponse)
@@ -96,9 +94,9 @@ def get_participant_stats(conversation_id: str, conn=Depends(get_db), resolver=D
     if not participants:
         raise HTTPException(status_code=404, detail="conversation not found")
 
-    message_rows = queries.get_conversation_messages_for_stats(conn, conversation_id)
-    tapback_rows = queries.get_conversation_tapback_events(conn, conversation_id)
-    hours_by_sender = queries.get_conversation_hours_by_sender(conn, conversation_id)
+    message_rows = queries.get_messages_for_stats(conn, "conversation_id = ?", (conversation_id,))
+    tapback_rows = queries.get_tapback_events(conn, "conversation_id = ?", (conversation_id,))
+    hours_by_sender = queries.get_hours_by_sender(conn, "conversation_id = ?", (conversation_id,))
 
     events = [stats.MessageEvent(sender_id=r["sender_id"], timestamp=r["timestamp"]) for r in message_rows]
     reply_seconds = stats.median_reply_seconds(events)
@@ -143,7 +141,7 @@ def get_participant_stats(conversation_id: str, conn=Depends(get_db), resolver=D
                 for b, s in stats.sentiment_series(sentiment_rows_by_sender.get(pid, []), "week")
             ],
             "personality": [
-                {"trait": t, "percentage": p} for t, p in stats.personality_scores(texts)
+                {"trait": t, "percentage": p} for t, p in stats.personality_rates(texts)
             ],
         })
     return ParticipantStatsResponse(participants=participants_out)
@@ -155,7 +153,7 @@ def get_personality_leaderboard(conversation_id: str, conn=Depends(get_db), reso
     if not participants:
         raise HTTPException(status_code=404, detail="conversation not found")
 
-    message_rows = queries.get_conversation_messages_for_stats(conn, conversation_id)
+    message_rows = queries.get_messages_for_stats(conn, "conversation_id = ?", (conversation_id,))
     texts_by_sender: dict[str, list[str]] = {}
     message_counts: dict[str, int] = dict.fromkeys(participants, 0)
     for r in message_rows:
@@ -271,7 +269,7 @@ def get_conversation_heatmap(conversation_id: str, conn=Depends(get_db), resolve
     participants = queries.get_conversation_participants_resolved(conn, resolver, conversation_id)
     if not participants:
         raise HTTPException(status_code=404, detail="conversation not found")
-    cells = queries.get_conversation_dow_hour_counts(conn, conversation_id)
+    cells = queries.get_dow_hour_counts(conn, "conversation_id = ?", (conversation_id,))
     return HeatmapResponse(grid=stats.build_heatmap_grid(cells))
 
 
@@ -306,6 +304,16 @@ def get_conversation_join_leave(conversation_id: str, conn=Depends(get_db), reso
         raise HTTPException(status_code=404, detail="conversation not found")
     items = queries.get_conversation_join_leave_events(conn, resolver, conversation_id)
     return JoinLeaveResponse(items=[JoinLeaveEvent(**item) for item in items])
+
+
+@router.get("/{conversation_id}/leaderboard", response_model=ConversationLeaderboard)
+def get_conversation_leaderboard(conversation_id: str, conn=Depends(get_db), resolver=Depends(get_resolver)):
+    participants = queries.get_conversation_participants_resolved(conn, resolver, conversation_id)
+    if not participants:
+        raise HTTPException(status_code=404, detail="conversation not found")
+    scope = queries.conversation_leaderboard_scope(conversation_id)
+    leaderboard = queries.get_leaderboard(conn, resolver, participants, scope)
+    return ConversationLeaderboard(**leaderboard)
 
 
 @router.get("/{conversation_id}/reply-graph", response_model=ReplyGraphResponse)

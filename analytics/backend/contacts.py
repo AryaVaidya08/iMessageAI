@@ -107,7 +107,14 @@ class ContactResolver:
         self._loaded = False
 
     def load(self) -> None:
-        for db_path in find_addressbook_dbs():
+        try:
+            db_paths = find_addressbook_dbs()
+        except OSError:
+            # find_addressbook_dbs() itself can raise (e.g. PermissionError iterating the
+            # Sources directory without Full Disk Access), not just the per-db read below --
+            # treat it the same way: degrade to no contacts loaded.
+            db_paths = []
+        for db_path in db_paths:
             try:
                 for record in _read_one_db(db_path):
                     for phone in record.phones:
@@ -117,6 +124,10 @@ class ContactResolver:
             except sqlite3.OperationalError:
                 # Likely missing Full Disk Access permission — skip, degrade gracefully
                 continue
+        # Always mark loaded, even after a failure above: resolve() below calls load() again
+        # whenever _loaded is still False, so leaving it False here would turn a single
+        # permission failure into a repeated crash on every future resolve() call instead of
+        # the "degrade to raw phone/email handles" behavior main.py's startup handler intends.
         self._loaded = True
 
     def resolve(self, handle: str) -> str | None:

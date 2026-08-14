@@ -57,6 +57,9 @@ export interface ConversationDetail {
   is_group_chat: boolean;
   relationship_type: string;
   participants: ParticipantOut[];
+  message_count: number;
+  first_message_at: string | null;
+  last_message_at: string | null;
 }
 
 export const RELATIONSHIP_TYPES = [
@@ -208,6 +211,86 @@ export interface PersonalityLeaderboardTrait {
 
 export interface PersonalityLeaderboardResponse {
   traits: PersonalityLeaderboardTrait[];
+}
+
+export interface LeaderboardMessageEntry {
+  message_id: string;
+  sender_id: string;
+  sender_display_name: string;
+  timestamp: string;
+  text: string;
+  value: number;
+}
+
+export interface LeaderboardParticipantEntry {
+  participant_id: string;
+  display_name: string;
+  count: number;
+}
+
+export interface ConversationLeaderboard {
+  longest_message: LeaderboardMessageEntry | null;
+  most_argued_message: LeaderboardMessageEntry | null;
+  most_loved_message: LeaderboardMessageEntry | null;
+  most_laughed_message: LeaderboardMessageEntry | null;
+  most_disliked_message: LeaderboardMessageEntry | null;
+  most_reacted_message: LeaderboardMessageEntry | null;
+  most_aggressive_message: LeaderboardMessageEntry | null;
+  happiest_message: LeaderboardMessageEntry | null;
+  angriest_message: LeaderboardMessageEntry | null;
+  most_emoji_message: LeaderboardMessageEntry | null;
+  late_night_message: LeaderboardMessageEntry | null;
+  fastest_reply_message: LeaderboardMessageEntry | null;
+  top_renamer: LeaderboardParticipantEntry | null;
+  top_photo_changer: LeaderboardParticipantEntry | null;
+  top_unsender: LeaderboardParticipantEntry | null;
+  most_revolving_door: LeaderboardParticipantEntry | null;
+}
+
+// --- People ---
+
+export interface PersonSummary {
+  id: string;
+  handle: string;
+  display_name: string;
+  message_count: number;
+  conversation_count: number;
+  last_message_at: string | null;
+}
+
+export interface PeopleListResponse {
+  items: PersonSummary[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface PersonOut {
+  id: string;
+  handle: string;
+  display_name: string;
+}
+
+export interface PersonConversationOut {
+  conversation_id: string;
+  display_name: string;
+  relationship_type: string;
+  is_group_chat: boolean;
+  message_count: number;
+}
+
+export interface PersonDetail {
+  id: string;
+  handle: string;
+  display_name: string;
+  message_count: number;
+  conversation_count: number;
+  first_message_at: string | null;
+  last_message_at: string | null;
+  heatmap: HeatmapResponse;
+  stats: ParticipantStats;
+  leaderboard: ConversationLeaderboard;
+  conversations: PersonConversationOut[];
 }
 
 // --- Contact merge ---
@@ -391,6 +474,22 @@ export const api = {
 
   conversationPersonalityLeaderboard: (id: string) =>
     getJSON<PersonalityLeaderboardResponse>(`/api/conversations/${id}/personality-leaderboard`),
+
+  conversationLeaderboard: (id: string) =>
+    getJSON<ConversationLeaderboard>(`/api/conversations/${id}/leaderboard`),
+
+  people: (params: { search?: string; sort?: "count" | "recent"; page?: number; page_size?: number }) => {
+    const qs = new URLSearchParams();
+    if (params.search) qs.set("search", params.search);
+    if (params.sort) qs.set("sort", params.sort);
+    qs.set("page", String(params.page ?? 1));
+    qs.set("page_size", String(params.page_size ?? 25));
+    return getJSON<PeopleListResponse>(`/api/people?${qs.toString()}`);
+  },
+
+  person: (id: string) => getJSON<PersonOut>(`/api/people/${id}`),
+
+  personDetail: (id: string) => getJSON<PersonDetail>(`/api/people/${id}/detail`),
 
   participants: () => getJSON<MergeParticipantsResponse>("/api/participants"),
 

@@ -11,10 +11,14 @@ from services.stats import (
     fastest_reply_relationship_types,
     gap_initiators,
     group_size_over_time,
+    late_night_distance_minutes,
     late_night_ratio,
     longest_silence,
     longest_streak_days,
     median_reply_seconds,
+    message_aggressive_score,
+    message_emoji_count,
+    message_sentiment,
     reply_deltas_seconds,
     reply_time_histogram,
     tapbacks_given,
@@ -517,3 +521,29 @@ def test_build_reply_graph_excludes_self_replies():
     edges = [("a", "a"), ("a", "b")]
     graph = build_reply_graph(edges)
     assert graph == [("a", "b", 1)]
+
+
+def test_message_aggressive_score_counts_every_hit():
+    # "stupid" + "hate" (lexicon words) + "STUPID" (shout) + 😡 (aggressive emoji) = 4 hits.
+    assert message_aggressive_score("you are so STUPID and I hate this 😡") == 4
+
+
+def test_message_aggressive_score_empty_text():
+    assert message_aggressive_score("") == 0
+
+
+def test_message_emoji_count():
+    assert message_emoji_count("nice 🔥🔥 job 👏") == 3
+
+
+def test_message_sentiment_positive_and_negative():
+    assert message_sentiment("I love this so much!") > 0
+    assert message_sentiment("I hate everything about this") < 0
+    assert message_sentiment("") == 0.0
+
+
+def test_late_night_distance_minutes_peaks_at_3am():
+    assert late_night_distance_minutes("2024-01-01T03:00:00") == 0
+    assert late_night_distance_minutes("2024-01-01T15:00:00") == 720
+    # 11pm and 4am are both closer to 3am than to noon.
+    assert late_night_distance_minutes("2024-01-01T23:00:00") < late_night_distance_minutes("2024-01-01T12:00:00")

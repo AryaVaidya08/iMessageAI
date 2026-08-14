@@ -170,6 +170,7 @@ def test_participant_stats_includes_new_fields(conn, resolver):
         "/api/conversations/does-not-exist/group-size",
         "/api/conversations/does-not-exist/join-leave",
         "/api/conversations/does-not-exist/reply-graph",
+        "/api/conversations/does-not-exist/leaderboard",
     ],
 )
 def test_conversation_detail_addition_endpoints_404_consistently(conn, resolver, path):
@@ -236,6 +237,17 @@ def test_conversation_reply_graph_endpoint(conn, resolver):
     ]
 
 
+def test_conversation_leaderboard_endpoint(conn, resolver):
+    conn.execute("INSERT INTO tapbacks (message_id, reactor_id, action) VALUES ('m2', 'me', 'Loved')")
+    conn.commit()
+    client = make_client(conn, resolver)
+    response = client.get("/api/conversations/conv1/leaderboard")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["most_loved_message"]["message_id"] == "m2"
+    assert body["top_renamer"] is None
+
+
 def test_overview_heatmap_endpoint(conn, resolver):
     client = make_client(conn, resolver)
     response = client.get("/api/overview/heatmap")
@@ -258,3 +270,60 @@ def test_overview_fastest_reply_relationship_none_when_no_replies(conn, resolver
     response = client.get("/api/overview/fastest-reply-relationship")
     assert response.status_code == 200
     assert response.json() is None
+
+
+# --- People ----------------------------------------------------------------
+
+
+def test_list_people_includes_me_and_stats(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/people")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["total"] == 2
+    by_id = {i["id"]: i for i in body["items"]}
+    assert by_id["them"]["message_count"] == 1
+    assert by_id["them"]["conversation_count"] == 1
+    assert by_id["me"]["display_name"] == "You"
+    assert by_id["me"]["message_count"] == 2
+
+
+def test_list_people_search_filters(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/people?search=nomatch")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["items"] == []
+    assert body["total"] == 0
+
+
+def test_get_person_endpoint(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/people/them")
+    assert response.status_code == 200
+    assert response.json() == {"id": "them", "handle": "+15552220000", "display_name": "+15552220000"}
+
+
+def test_get_person_not_found_returns_404(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/people/does-not-exist")
+    assert response.status_code == 404
+
+
+def test_get_person_detail_endpoint(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/people/them/detail")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["message_count"] == 1
+    assert body["conversation_count"] == 1
+    assert len(body["conversations"]) == 1
+    assert body["conversations"][0]["conversation_id"] == "conv1"
+    assert body["stats"]["participant_id"] == "them"
+    assert len(body["heatmap"]["grid"]) == 7
+
+
+def test_get_person_detail_not_found_returns_404(conn, resolver):
+    client = make_client(conn, resolver)
+    response = client.get("/api/people/does-not-exist/detail")
+    assert response.status_code == 404

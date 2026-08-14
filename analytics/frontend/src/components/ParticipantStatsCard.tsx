@@ -12,15 +12,32 @@ function formatReplySeconds(seconds: number | null): string {
   return `${Math.round(seconds / 86400)}d`;
 }
 
-export function ParticipantStatsCard({ stats }: { stats: ParticipantStats }) {
+export function ParticipantStatsCard({
+  stats,
+  badges = [],
+}: {
+  stats: ParticipantStats;
+  badges?: string[];
+}) {
   return (
     <div className={styles.card}>
-      <h3 className={styles.name}>
-        {stats.display_name}
-        {stats.handle && stats.handle !== stats.display_name && (
-          <span className={styles.handle}>{stats.handle}</span>
+      <div className={styles.nameRow}>
+        <h3 className={styles.name}>
+          {stats.display_name}
+          {stats.handle && stats.handle !== stats.display_name && (
+            <span className={styles.handle}>{stats.handle}</span>
+          )}
+        </h3>
+        {badges.length > 0 && (
+          <div className={styles.personalityChips}>
+            {badges.map((badge) => (
+              <span key={badge} className={styles.personalityChip}>
+                {badge}
+              </span>
+            ))}
+          </div>
         )}
-      </h3>
+      </div>
       <div className={styles.metrics}>
         <div>
           <div className={styles.metricLabel}>Messages</div>

@@ -58,6 +58,9 @@ class ConversationDetail(BaseModel):
     is_group_chat: bool
     relationship_type: str
     participants: list[ParticipantOut]
+    message_count: int
+    first_message_at: str | None
+    last_message_at: str | None
 
 
 # Mirrors backend/modules/relationship.py's RelationshipType values -- kept as a
@@ -217,6 +220,39 @@ class ReplyGraphResponse(BaseModel):
     edges: list[ReplyGraphEdge]
 
 
+class LeaderboardMessageEntry(BaseModel):
+    message_id: str
+    sender_id: str
+    sender_display_name: str
+    timestamp: str
+    text: str
+    value: float
+
+
+class LeaderboardParticipantEntry(BaseModel):
+    participant_id: str
+    display_name: str
+    count: int
+
+
+class ConversationLeaderboard(BaseModel):
+    longest_message: LeaderboardMessageEntry | None
+    most_argued_message: LeaderboardMessageEntry | None
+    most_loved_message: LeaderboardMessageEntry | None
+    most_laughed_message: LeaderboardMessageEntry | None
+    most_disliked_message: LeaderboardMessageEntry | None
+    most_reacted_message: LeaderboardMessageEntry | None
+    most_aggressive_message: LeaderboardMessageEntry | None
+    happiest_message: LeaderboardMessageEntry | None
+    most_emoji_message: LeaderboardMessageEntry | None
+    late_night_message: LeaderboardMessageEntry | None
+    fastest_reply_message: LeaderboardMessageEntry | None
+    top_renamer: LeaderboardParticipantEntry | None
+    top_photo_changer: LeaderboardParticipantEntry | None
+    top_unsender: LeaderboardParticipantEntry | None
+    most_revolving_door: LeaderboardParticipantEntry | None
+
+
 class PersonalityLeaderboardEntry(BaseModel):
     participant_id: str
     display_name: str
@@ -231,6 +267,57 @@ class PersonalityLeaderboardTrait(BaseModel):
 
 class PersonalityLeaderboardResponse(BaseModel):
     traits: list[PersonalityLeaderboardTrait]
+
+
+# --- People --------------------------------------------------------------
+
+
+class PersonOut(BaseModel):
+    id: str
+    handle: str
+    display_name: str
+
+
+class PersonSummary(BaseModel):
+    id: str
+    handle: str
+    display_name: str
+    message_count: int
+    conversation_count: int
+    last_message_at: str | None
+
+
+class PeopleListResponse(BaseModel):
+    items: list[PersonSummary]
+    total: int
+    page: int
+    page_size: int
+
+
+class PersonConversationOut(BaseModel):
+    conversation_id: str
+    display_name: str
+    relationship_type: str
+    is_group_chat: bool
+    message_count: int
+
+
+class PersonConversationsResponse(BaseModel):
+    items: list[PersonConversationOut]
+
+
+class PersonDetail(BaseModel):
+    id: str
+    handle: str
+    display_name: str
+    message_count: int
+    conversation_count: int
+    first_message_at: str | None
+    last_message_at: str | None
+    heatmap: HeatmapResponse
+    stats: ParticipantStats
+    leaderboard: ConversationLeaderboard
+    conversations: list[PersonConversationOut]
 
 
 # --- Contact merge -----------------------------------------------------
