@@ -1,0 +1,189 @@
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+
+import type { IngestSubscribe } from "../../engine/protocol";
+import styles from "./DebugConsole.module.css";
+import { formatDuration, formatLogLine, type IngestState } from "./reducer";
+import { useIngestEvents } from "./useIngestEvents";
+
+const ROW_H = 18;
+const OVERSCAN = 10;
+const STORAGE_KEY = "debugConsole.collapsed";
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function Bar({ value, total, error }: { value: number; total: number; error?: boolean }) {
+  const pct = total > 0 ? Math.min(100, (value / total) * 100) : 0;
+  return (
+    <div className={styles.bar} role="progressbar" aria-valuenow={Math.round(pct)} aria-valuemin={0} aria-valuemax={100}>
+      <div className={error ? styles.barFillError : styles.barFill} style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
+
+function LogView({ log }: { log: IngestState["log"] }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [height, setHeight] = useState(200);
+  const [pinned, setPinned] = useState(true);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    setHeight(el.clientHeight);
+    if (pinned) {
+      el.scrollTop = el.scrollHeight;
+      setScrollTop(el.scrollTop);
+    }
+  }, [log, pinned]);
+
+  const onScroll = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    setScrollTop(el.scrollTop);
+    setPinned(el.scrollHeight - el.scrollTop - el.clientHeight < ROW_H * 2);
+  }, []);
+
+  const start = Math.max(0, Math.floor(scrollTop / ROW_H) - OVERSCAN);
+  const end = Math.min(log.length, Math.ceil((scrollTop + height) / ROW_H) + OVERSCAN);
+  return (
+    <div className={styles.logWrap}>
+      <div ref={ref} className={styles.log} onScroll={onScroll} data-testid="log">
+        <div style={{ height: log.length * ROW_H, position: "relative" }}>
+          {log.slice(start, end).map((l, i) => (
+            <div
+              key={l.id}
+              className={`${styles.line} ${styles[l.level]}`}
+              style={{ top: (start + i) * ROW_H, height: ROW_H }}
+            >
+              {formatLogLine(l)}
+            </div>
+          ))}
+        </div>
+      </div>
+      {!pinned && (
+        <button
+          type="button"
+          className={styles.resume}
+          onClick={() => {
+            setPinned(true);
+            const el = ref.current;
+            if (el) el.scrollTop = el.scrollHeight;
+          }}
+        >
+          Paused - jump to latest
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function DebugConsole({ subscribe }: { subscribe: IngestSubscribe }) {
+  const { state: s } = useIngestEvents(subscribe);
+  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, collapsed ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }, [collapsed]);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(s.log.map(formatLogLine).join("\n"));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const o = s.overall;
+  const pct = o.messagesTotal > 0 ? Math.round((o.messagesDone / o.messagesTotal) * 100) : 0;
+  const status = s.finished ? "Done" : s.running ? (s.phaseLabel ?? s.phase ?? "Working") : "Idle";
+  const mem = s.memory;
+
+  return (
+    <aside className={styles.dock} aria-label="Ingest debug console">
+      <button type="button" className={styles.header} onClick={() => setCollapsed((c) => !c)} aria-expanded={!collapsed}>
+        <span className={`${styles.dot} ${s.errorCount ? styles.dotError : s.running ? styles.dotRun : ""}`} />
+        <span className={styles.title}>Import</span>
+        <span className={styles.status}>
+          {status}
+          {s.running || s.finished ? ` - ${pct}%` : ""}
+        </span>
+        {s.errorCount > 0 && <span className={styles.errBadge}>{s.errorCount} errors</span>}
+        <span className={styles.chev}>{collapsed ? "▲" : "▼"}</span>
+      </button>
+      {!collapsed && (
+        <div className={styles.body}>
+          <div className={styles.grid}>
+            <section>
+              <div className={styles.label}>Current chat</div>
+              {s.currentChat ? (
+                <>
+                  <div className={styles.row}>
+                    <span className={styles.name}>{s.currentChat.name}</span>
+                    <span className={styles.num}>
+                      {s.currentChat.done.toLocaleString()} / {s.currentChat.total.toLocaleString()}
+                    </span>
+                  </div>
+                  <Bar value={s.currentChat.done} total={s.currentChat.total} />
+                </>
+              ) : (
+                <div className={styles.muted}>none</div>
+              )}
+            </section>
+            <section>
+              <div className={styles.label}>Overall</div>
+              <div className={styles.row}>
+                <span className={styles.num}>
+                  {o.messagesDone.toLocaleString()} / {o.messagesTotal.toLocaleString()} msgs
+                </span>
+                <span className={styles.num}>
+                  chats {o.chatsDone}/{o.chatsTotal}
+                </span>
+              </div>
+              <Bar value={o.messagesDone} total={o.messagesTotal} />
+              <div className={styles.row}>
+                <span className={styles.muted}>{Math.round(s.throughput).toLocaleString()} msgs/s</span>
+                <span className={styles.muted}>ETA {s.running ? formatDuration(s.etaSeconds) : "--"}</span>
+              </div>
+            </section>
+            <section>
+              <div className={styles.label}>Memory</div>
+              {mem ? (
+                <>
+                  <div className={styles.row}>
+                    <span className={styles.num}>
+                      {Math.round(mem.usedMB)} / {Math.round(mem.limitMB)} MB
+                    </span>
+                  </div>
+                  <Bar value={mem.usedMB} total={mem.limitMB} error={mem.limitMB > 0 && mem.usedMB / mem.limitMB > 0.85} />
+                </>
+              ) : (
+                <div className={styles.muted}>n/a</div>
+              )}
+            </section>
+          </div>
+          {s.lastError && <div className={styles.errorBox}>Last error: {s.lastError}</div>}
+          <div className={styles.logHead}>
+            <span className={styles.label}>Log ({s.log.length})</span>
+            <button type="button" className={styles.copy} onClick={copy}>
+              {copied ? "Copied" : "Copy log"}
+            </button>
+          </div>
+          <LogView log={s.log} />
+        </div>
+      )}
+    </aside>
+  );
+}
