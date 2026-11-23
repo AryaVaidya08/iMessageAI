@@ -16,6 +16,7 @@
     "test:e2e": "playwright test -c playwright.e2e.config.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "emoji-regex": "^11.0.0",
     "html-to-image": "^1.11.13",
     "jspdf": "^4.2.1",
