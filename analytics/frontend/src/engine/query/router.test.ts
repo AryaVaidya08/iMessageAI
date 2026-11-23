@@ -7,6 +7,9 @@ const fakeDb: QueryDb = {
   async all(_sql, _bind) {
     return [{ n: 42 }];
   },
+  async get(_sql, _bind) {
+    return { n: 42 };
+  },
   async run() {},
 };
 const getDb = async () => fakeDb;

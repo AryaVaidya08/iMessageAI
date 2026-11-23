@@ -21,9 +21,9 @@ const golden = JSON.parse(readFileSync(join(dir, "overview.golden.json"), "utf8"
 
 function wrap(d: Database.Database): QueryDb {
   return {
-    all: async (sql, p = []) => d.prepare(sql).all(...p) as never,
-    get: async (sql, p = []) => d.prepare(sql).get(...p) as never,
-    run: async (sql, p = []) => void d.prepare(sql).run(...p),
+    all: async (sql, p = []) => d.prepare(sql).all(...(p as unknown[])) as never,
+    get: async (sql, p = []) => d.prepare(sql).get(...(p as unknown[])) as never,
+    run: async (sql, p = []) => void d.prepare(sql).run(...(p as unknown[])),
   };
 }
 
