@@ -20,10 +20,6 @@ export function ImportBanner() {
       </div>
     );
   }
-  if (!s.running) return null;
-  return (
-    <div role="status" style={bar}>
-      Still importing: {s.percent}% — data is updating live. <Link to="/debug">Open debug console</Link>
-    </div>
-  );
+  // No banner while loading: progress is shown by the import console.
+  return null;
 }

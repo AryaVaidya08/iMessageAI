@@ -28,11 +28,13 @@
 .dock.inline { position: static; width: 100%; margin: 16px 0; z-index: auto; box-shadow: var(--shadow-card); }
 .errBadge { background: #FF453A; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-pill); }
 .body { padding: 0 16px 16px; }
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid { display: grid; grid-template-columns: 1fr 2fr 2fr; gap: 16px; }
+.gridNoCurrent { grid-template-columns: 1fr 4fr; }
+.grid > section { min-width: 0; }
 @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
 .label { color: var(--color-text-secondary); font-size: 12px; margin-bottom: 6px; }
 .row { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; margin: 4px 0; }
-.name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.name { flex: 1 1 0; min-width: 0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .muted { color: var(--color-text-secondary); font-size: 12px; }
 .bar { height: 6px; border-radius: var(--radius-pill); background: var(--color-border); overflow: hidden; }
@@ -41,7 +43,7 @@
 .barFillError { background: #FF453A; }
 .errorBox { margin-top: 12px; padding: 8px 12px; border-radius: 10px; background: rgba(255, 69, 58, 0.12); color: #FF453A; font-size: 13px; }
 .logHead { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
-.copy { border: 1px solid var(--color-border); background: none; color: var(--color-text-primary); border-radius: var(--radius-pill); padding: 3px 12px; font-size: 12px; cursor: pointer; }
+.copy { display: inline-flex; align-items: center; justify-content: center; border: 0; background: none; color: var(--color-accent); padding: 4px; font-size: 15px; cursor: pointer; }
 .logWrap { position: relative; }
 .log { height: 200px; overflow-y: auto; background: var(--color-bg); border-radius: 10px; font-family: var(--font-mono); font-size: 11.5px; }
 .line { position: absolute; left: 0; right: 0; padding: 0 10px; line-height: 18px; white-space: pre; overflow: hidden; text-overflow: ellipsis; }

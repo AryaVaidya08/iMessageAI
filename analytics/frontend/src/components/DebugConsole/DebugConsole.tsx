@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { FaRegCopy } from "react-icons/fa";
 
 import type { IngestSubscribe } from "../../engine/protocol";
 import styles from "./DebugConsole.module.css";
@@ -165,24 +166,37 @@ export function DebugConsole({
       </button>
       {open && (
         <div className={styles.body}>
-          <div className={styles.grid}>
-            <section>
-              <div className={styles.label}>Current chat</div>
-              {s.currentChat ? (
+          <div className={`${styles.grid} ${s.currentChat ? "" : styles.gridNoCurrent}`}>
+            <section className={styles.memory}>
+              <div className={styles.label}>Memory</div>
+              {mem ? (
                 <>
                   <div className={styles.row}>
-                    <span className={styles.name}>{s.currentChat.name}</span>
                     <span className={styles.num}>
-                      {s.currentChat.done.toLocaleString()} / {s.currentChat.total.toLocaleString()}
+                      {Math.round(mem.usedMB)} / {Math.round(mem.limitMB)} MB
                     </span>
                   </div>
-                  <Bar value={s.currentChat.done} total={s.currentChat.total} />
+                  <Bar value={mem.usedMB} total={mem.limitMB} error={mem.limitMB > 0 && mem.usedMB / mem.limitMB > 0.85} />
                 </>
               ) : (
-                <div className={styles.muted}>none</div>
+                <div className={styles.muted}>n/a</div>
               )}
             </section>
-            <section>
+            {s.currentChat && (
+              <section className={styles.current}>
+                <div className={styles.label}>Current chat</div>
+                <div className={styles.row}>
+                  <span className={styles.name} title={s.currentChat.name}>
+                    {s.currentChat.name}
+                  </span>
+                  <span className={styles.num}>
+                    {s.currentChat.done.toLocaleString()} / {s.currentChat.total.toLocaleString()}
+                  </span>
+                </div>
+                <Bar value={s.currentChat.done} total={s.currentChat.total} />
+              </section>
+            )}
+            <section className={styles.overall}>
               <div className={styles.label}>Overall</div>
               <div className={styles.row}>
                 <span className={styles.num}>
@@ -198,27 +212,18 @@ export function DebugConsole({
                 <span className={styles.muted}>ETA {s.running ? formatDuration(s.etaSeconds) : "--"}</span>
               </div>
             </section>
-            <section>
-              <div className={styles.label}>Memory</div>
-              {mem ? (
-                <>
-                  <div className={styles.row}>
-                    <span className={styles.num}>
-                      {Math.round(mem.usedMB)} / {Math.round(mem.limitMB)} MB
-                    </span>
-                  </div>
-                  <Bar value={mem.usedMB} total={mem.limitMB} error={mem.limitMB > 0 && mem.usedMB / mem.limitMB > 0.85} />
-                </>
-              ) : (
-                <div className={styles.muted}>n/a</div>
-              )}
-            </section>
           </div>
           {s.lastError && <div className={styles.errorBox}>Last error: {s.lastError}</div>}
           <div className={styles.logHead}>
             <span className={styles.label}>Log ({s.log.length})</span>
-            <button type="button" className={styles.copy} onClick={copy}>
-              {copied ? "Copied" : "Copy log"}
+            <button
+              type="button"
+              className={styles.copy}
+              onClick={copy}
+              aria-label={copied ? "Copied" : "Copy log"}
+              title={copied ? "Copied" : "Copy log"}
+            >
+              <FaRegCopy aria-hidden />
             </button>
           </div>
           <LogView log={s.log} />

@@ -859,6 +859,8 @@ def list_people(
     rows = get_all_participants_with_stats(conn)
     items = []
     for r in rows:
+        if r["is_me"]:
+            continue
         resolved = names.resolve_participant(r["id"], r["phone_num"], r["email"], r["is_me"], resolver)
         items.append({
             "id": r["id"],
