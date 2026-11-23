@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import { TopNav } from "./components/TopNav";
 import { ConversationDetailPage } from "./pages/ConversationDetailPage";
 import { ConversationsListPage } from "./pages/ConversationsListPage";
+import { HomePage } from "./pages/HomePage";
 import { MergePage } from "./pages/MergePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { OverviewPage } from "./pages/OverviewPage";
@@ -15,7 +16,8 @@ export default function App() {
       <TopNav />
       <main>
         <Routes>
-          <Route path="/" element={<OverviewPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/overview" element={<OverviewPage />} />
           <Route path="/conversations" element={<ConversationsListPage />} />
           <Route path="/conversations/:id" element={<ConversationDetailPage />} />
           <Route path="/people" element={<PeopleListPage />} />
