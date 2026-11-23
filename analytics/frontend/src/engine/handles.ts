@@ -14,6 +14,7 @@ export function normalizeHandle(raw: string, defaultRegion: Region = DEFAULT_REG
   if (!s) return '';
   s = s.replace(/^(mailto|tel|sms):/i, '').trim();
   if (s.includes('@')) return s.toLowerCase();
+  if (!/^[+\d\s().\-]+$/.test(s)) return s.toLowerCase(); // not phone-shaped (business ids etc.)
 
   const parsed = parsePhoneNumberFromString(s, defaultRegion);
   if (parsed && parsed.isValid()) return parsed.number;
