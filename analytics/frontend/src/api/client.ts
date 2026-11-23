@@ -1,3 +1,5 @@
+import { query } from "../engine/engineClient";
+
 export type Granularity = "day" | "week" | "month";
 
 export interface StatCards {
@@ -237,7 +239,6 @@ export interface ConversationLeaderboard {
   most_reacted_message: LeaderboardMessageEntry | null;
   most_aggressive_message: LeaderboardMessageEntry | null;
   happiest_message: LeaderboardMessageEntry | null;
-  angriest_message: LeaderboardMessageEntry | null;
   most_emoji_message: LeaderboardMessageEntry | null;
   late_night_message: LeaderboardMessageEntry | null;
   fastest_reply_message: LeaderboardMessageEntry | null;
@@ -364,132 +365,129 @@ export interface MergeConversationHistoryResponse {
   items: MergeConversationHistoryEntry[];
 }
 
-const BASE_URL = "http://localhost:8000";
+// All calls go to the in-browser query worker; route names mirror the old HTTP paths.
 
-async function getJSON<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`);
-  if (!res.ok) {
-    let detail = res.statusText;
-    try {
-      const body = await res.json();
-      if (typeof body?.detail === "string") {
-        detail = body.detail;
-      }
-    } catch {
-      // response body wasn't JSON (or was empty) -- fall back to statusText
-    }
-    throw new Error(`${res.status} ${detail}`);
-  }
-  return res.json() as Promise<T>;
+type Params = Record<string, unknown>;
+
+function errorMessage(e: unknown, withStatus: boolean): Error {
+  const err = e as { status?: number; detail?: string; message?: string };
+  const detail = err?.detail ?? err?.message ?? String(e);
+  // Preserve the old shapes: GET errors were "<status> <detail>", POST errors just <detail>.
+  return new Error(withStatus && err?.status ? `${err.status} ${detail}` : detail);
 }
 
-async function postJSON<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    let detail = res.statusText;
-    try {
-      const responseBody = await res.json();
-      if (typeof responseBody?.detail === "string") {
-        detail = responseBody.detail;
-      }
-    } catch {
-      // response body wasn't JSON (or was empty) -- fall back to statusText
-    }
-    throw new Error(detail);
+async function getJSON<T>(route: string, params: Params = {}): Promise<T> {
+  try {
+    return await query<T>(`GET ${route}`, params);
+  } catch (e) {
+    throw errorMessage(e, true);
   }
-  return res.json() as Promise<T>;
+}
+
+async function postJSON<T>(route: string, params: Params = {}): Promise<T> {
+  try {
+    return await query<T>(`POST ${route}`, params);
+  } catch (e) {
+    throw errorMessage(e, false);
+  }
+}
+
+/** Drop undefined/empty-string keys so handlers can test for presence. */
+function clean(p: Params): Params {
+  const out: Params = {};
+  for (const [k, v] of Object.entries(p)) if (v !== undefined && v !== "") out[k] = v;
+  return out;
 }
 
 export const api = {
   overviewStats: () => getJSON<StatCards>("/api/overview"),
 
   overviewVolume: (granularity: Granularity) =>
-    getJSON<VolumeResponse>(`/api/overview/volume?granularity=${granularity}`),
+    getJSON<VolumeResponse>("/api/overview/volume", { granularity }),
 
   topConversations: (limit = 10) =>
-    getJSON<TopConversationsResponse>(`/api/overview/top-conversations?limit=${limit}`),
+    getJSON<TopConversationsResponse>("/api/overview/top-conversations", { limit }),
 
-  conversations: (params: { search?: string; sort?: "count" | "recent"; page?: number; page_size?: number }) => {
-    const qs = new URLSearchParams();
-    if (params.search) qs.set("search", params.search);
-    if (params.sort) qs.set("sort", params.sort);
-    qs.set("page", String(params.page ?? 1));
-    qs.set("page_size", String(params.page_size ?? 25));
-    return getJSON<ConversationListResponse>(`/api/conversations?${qs.toString()}`);
-  },
+  conversations: (params: { search?: string; sort?: "count" | "recent"; page?: number; page_size?: number }) =>
+    getJSON<ConversationListResponse>(
+      "/api/conversations",
+      clean({
+        search: params.search,
+        sort: params.sort,
+        page: params.page ?? 1,
+        page_size: params.page_size ?? 25,
+      }),
+    ),
 
-  conversation: (id: string) => getJSON<ConversationDetail>(`/api/conversations/${id}`),
+  conversation: (id: string) => getJSON<ConversationDetail>("/api/conversations/:id", { id }),
 
   updateConversationRelationshipType: (id: string, relationshipType: RelationshipType) =>
-    postJSON<ConversationDetail>(`/api/conversations/${id}/relationship-type`, {
+    postJSON<ConversationDetail>("/api/conversations/:id/relationship-type", {
+      id,
       relationship_type: relationshipType,
     }),
 
   conversationVolume: (id: string, granularity: Granularity) =>
-    getJSON<VolumeResponse>(`/api/conversations/${id}/volume?granularity=${granularity}`),
+    getJSON<VolumeResponse>("/api/conversations/:id/volume", { id, granularity }),
 
   participantStats: (id: string) =>
-    getJSON<ParticipantStatsResponse>(`/api/conversations/${id}/participant-stats`),
+    getJSON<ParticipantStatsResponse>("/api/conversations/:id/participant-stats", { id }),
 
-  messages: (id: string, before?: string, limit = 50) => {
-    const qs = new URLSearchParams({ limit: String(limit) });
-    if (before) qs.set("before", before);
-    return getJSON<MessagesPage>(`/api/conversations/${id}/messages?${qs.toString()}`);
-  },
+  messages: (id: string, before?: string, limit = 50) =>
+    getJSON<MessagesPage>("/api/conversations/:id/messages", clean({ id, limit, before })),
 
-  messagesAfter: (id: string, after: string, limit = 50) => {
-    const qs = new URLSearchParams({ after, limit: String(limit) });
-    return getJSON<MessagesPage>(`/api/conversations/${id}/messages?${qs.toString()}`);
-  },
+  messagesAfter: (id: string, after: string, limit = 50) =>
+    getJSON<MessagesPage>("/api/conversations/:id/messages", { id, after, limit }),
 
-  messagesForDate: (id: string, date: string, limit = 60) => {
-    const qs = new URLSearchParams({ date, limit: String(limit) });
-    return getJSON<MessagesPage>(`/api/conversations/${id}/messages?${qs.toString()}`);
-  },
+  messagesForDate: (id: string, date: string, limit = 60) =>
+    getJSON<MessagesPage>("/api/conversations/:id/messages", { id, date, limit }),
 
-  messagesAround: (id: string, around: string, limit = 60) => {
-    const qs = new URLSearchParams({ around, limit: String(limit) });
-    return getJSON<MessagesPage>(`/api/conversations/${id}/messages?${qs.toString()}`);
-  },
+  messagesAround: (id: string, around: string, limit = 60) =>
+    getJSON<MessagesPage>("/api/conversations/:id/messages", { id, around, limit }),
 
-  searchMessages: (id: string, q: string, limit = 20) => {
-    const qs = new URLSearchParams({ q, limit: String(limit) });
-    return getJSON<SearchMessagesResponse>(`/api/conversations/${id}/messages/search?${qs.toString()}`);
-  },
+  searchMessages: (id: string, q: string, limit = 20) =>
+    getJSON<SearchMessagesResponse>("/api/conversations/:id/messages/search", { id, q, limit }),
 
   overviewHeatmap: () => getJSON<HeatmapResponse>("/api/overview/heatmap"),
 
-  conversationHeatmap: (id: string) => getJSON<HeatmapResponse>(`/api/conversations/${id}/heatmap`),
+  conversationHeatmap: (id: string) => getJSON<HeatmapResponse>("/api/conversations/:id/heatmap", { id }),
 
   conversationStreakSilence: (id: string) =>
-    getJSON<ConversationStreakSilence>(`/api/conversations/${id}/streak-silence`),
+    getJSON<ConversationStreakSilence>("/api/conversations/:id/streak-silence", { id }),
 
-  conversationJoinLeave: (id: string) => getJSON<JoinLeaveResponse>(`/api/conversations/${id}/join-leave`),
+  conversationJoinLeave: (id: string) =>
+    getJSON<JoinLeaveResponse>("/api/conversations/:id/join-leave", { id }),
 
-  conversationReplyGraph: (id: string) => getJSON<ReplyGraphResponse>(`/api/conversations/${id}/reply-graph`),
+  conversationReplyGraph: (id: string) =>
+    getJSON<ReplyGraphResponse>("/api/conversations/:id/reply-graph", { id }),
 
   conversationPersonalityLeaderboard: (id: string) =>
-    getJSON<PersonalityLeaderboardResponse>(`/api/conversations/${id}/personality-leaderboard`),
+    getJSON<PersonalityLeaderboardResponse>("/api/conversations/:id/personality-leaderboard", { id }),
 
   conversationLeaderboard: (id: string) =>
-    getJSON<ConversationLeaderboard>(`/api/conversations/${id}/leaderboard`),
+    getJSON<ConversationLeaderboard>("/api/conversations/:id/leaderboard", { id }),
 
-  people: (params: { search?: string; sort?: "count" | "recent"; page?: number; page_size?: number }) => {
-    const qs = new URLSearchParams();
-    if (params.search) qs.set("search", params.search);
-    if (params.sort) qs.set("sort", params.sort);
-    qs.set("page", String(params.page ?? 1));
-    qs.set("page_size", String(params.page_size ?? 25));
-    return getJSON<PeopleListResponse>(`/api/people?${qs.toString()}`);
-  },
+  people: (params: {
+    search?: string;
+    sort?: "count" | "recent" | "conversations";
+    order?: "asc" | "desc";
+    page?: number;
+    page_size?: number;
+  }) =>
+    getJSON<PeopleListResponse>(
+      "/api/people",
+      clean({
+        search: params.search,
+        sort: params.sort,
+        order: params.order,
+        page: params.page ?? 1,
+        page_size: params.page_size ?? 25,
+      }),
+    ),
 
-  person: (id: string) => getJSON<PersonOut>(`/api/people/${id}`),
+  person: (id: string) => getJSON<PersonOut>("/api/people/:id", { id }),
 
-  personDetail: (id: string) => getJSON<PersonDetail>(`/api/people/${id}/detail`),
+  personDetail: (id: string) => getJSON<PersonDetail>("/api/people/:id/detail", { id }),
 
   participants: () => getJSON<MergeParticipantsResponse>("/api/participants"),
 

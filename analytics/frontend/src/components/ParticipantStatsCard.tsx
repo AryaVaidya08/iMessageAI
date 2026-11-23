@@ -20,7 +20,7 @@ export function ParticipantStatsCard({
   badges?: string[];
 }) {
   return (
-    <div className={styles.card}>
+    <div className={styles.card} data-share-block="true">
       <div className={styles.nameRow}>
         <h3 className={styles.name}>
           {stats.display_name}

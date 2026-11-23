@@ -1,0 +1,13 @@
+{
+ "body": {
+  "display_name": "You",
+  "handle": "",
+  "id": "7732097f-b7c2-574f-9b9b-69194e6dc432"
+ },
+ "case": {
+  "method": "GET",
+  "name": "person-me",
+  "path": "/api/people/{person:me}"
+ },
+ "status": 200
+}

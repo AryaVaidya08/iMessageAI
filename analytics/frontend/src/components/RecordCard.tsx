@@ -30,6 +30,7 @@ export function RecordCard({
   return (
     <div
       className={onClick ? `${styles.card} ${styles.clickable}` : styles.card}
+      data-share-block="true"
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -79,7 +80,7 @@ export function RecordCardSkeleton() {
 
 export function RecordCardEmpty({ title }: { title: string }) {
   return (
-    <div className={styles.card}>
+    <div className={styles.card} data-share-block="true">
       <h3 className={styles.title}>{title}</h3>
       <div className={styles.subtext}>Not enough data yet.</div>
     </div>

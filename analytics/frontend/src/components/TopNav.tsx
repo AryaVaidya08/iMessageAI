@@ -10,7 +10,7 @@ export function TopNav() {
       <div className={styles.inner}>
         <Link to="/" className={styles.brand}>iMessage Analytics</Link>
         <div className={styles.links}>
-          <NavLink to="/" end className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+          <NavLink to="/overview" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
             Overview
           </NavLink>
           <NavLink to="/conversations" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
@@ -21,6 +21,9 @@ export function TopNav() {
           </NavLink>
           <NavLink to="/merge" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
             Merge
+          </NavLink>
+          <NavLink to="/share" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+            Share
           </NavLink>
         </div>
         <div className={styles.controls}>

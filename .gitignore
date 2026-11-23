@@ -18,3 +18,5 @@ analytics/frontend/dist/
 
 !backend/parser/raw_export/.gitkeep
 !backend/parser/storage/.gitkeep
+# test fixtures (generated)
+analytics/frontend/tests/.cache/

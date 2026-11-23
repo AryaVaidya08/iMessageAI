@@ -1,0 +1,49 @@
+{
+ "body": {
+  "display_name": "Weekend Crew 2",
+  "first_message_at": "2024-01-03T08:01:24.849",
+  "id": "1e30fd2e-d07d-5e4a-88f3-98d014aa0fb1",
+  "is_group_chat": true,
+  "last_message_at": "2024-04-04T10:43:55.547",
+  "message_count": 91,
+  "participants": [
+   {
+    "display_name": "Erin Evans",
+    "handle": "+15551110005",
+    "id": "17433b20-0e08-595b-86e1-636251353758",
+    "is_me": false
+   },
+   {
+    "display_name": "Bob Baker",
+    "handle": "+15551110002",
+    "id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "is_me": false
+   },
+   {
+    "display_name": "Alice Anders",
+    "handle": "+15551110001",
+    "id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+    "is_me": false
+   },
+   {
+    "display_name": "You",
+    "handle": "",
+    "id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "is_me": true
+   },
+   {
+    "display_name": "Carol Chen",
+    "handle": "carol@example.com",
+    "id": "fb293335-2fa0-5a69-b335-9179962680ef",
+    "is_me": false
+   }
+  ],
+  "relationship_type": "other"
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-group-detail",
+  "path": "/api/conversations/{conv:#6}"
+ },
+ "status": 200
+}

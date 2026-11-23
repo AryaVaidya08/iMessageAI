@@ -847,12 +847,20 @@ def get_all_participants_with_stats(conn: sqlite3.Connection) -> list[sqlite3.Ro
 
 
 def list_people(
-    conn: sqlite3.Connection, resolver, search: str | None, sort: str, page: int, page_size: int
+    conn: sqlite3.Connection,
+    resolver,
+    search: str | None,
+    sort: str,
+    page: int,
+    page_size: int,
+    order: str = "desc",
 ) -> dict:
     """Mirrors list_conversations' shape/pagination style."""
     rows = get_all_participants_with_stats(conn)
     items = []
     for r in rows:
+        if r["is_me"]:
+            continue
         resolved = names.resolve_participant(r["id"], r["phone_num"], r["email"], r["is_me"], resolver)
         items.append({
             "id": r["id"],
@@ -867,10 +875,13 @@ def list_people(
         needle = search.lower()
         items = [i for i in items if needle in i["display_name"].lower()]
 
+    reverse = order != "asc"
     if sort == "recent":
-        items.sort(key=lambda i: i["last_message_at"] or "", reverse=True)
+        items.sort(key=lambda i: i["last_message_at"] or "", reverse=reverse)
+    elif sort == "conversations":
+        items.sort(key=lambda i: i["conversation_count"], reverse=reverse)
     else:
-        items.sort(key=lambda i: i["message_count"], reverse=True)
+        items.sort(key=lambda i: i["message_count"], reverse=reverse)
 
     total = len(items)
     start = (page - 1) * page_size

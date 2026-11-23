@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDataVersion } from "../hooks/useLiveQuery";
 
 import {
   api,
@@ -74,10 +75,11 @@ export function MergePage() {
       .catch(() => setConversationHistory([]));
   }
 
-  useEffect(loadParticipants, []);
-  useEffect(loadContactHistory, []);
-  useEffect(loadConversations, []);
-  useEffect(loadConversationHistory, []);
+  const dataVersion = useDataVersion(); // reload the lists while an import runs / after merges
+  useEffect(loadParticipants, [dataVersion]);
+  useEffect(loadContactHistory, [dataVersion]);
+  useEffect(loadConversations, [dataVersion]);
+  useEffect(loadConversationHistory, [dataVersion]);
 
   async function handleMergeContacts() {
     if (!keepContact || !removeContact) return;

@@ -1,0 +1,67 @@
+{
+ "body": {
+  "fastest_reply_message": {
+   "message_id": "d1d6b4b6-1391-5cef-a0fc-d278e59325f8",
+   "sender_display_name": "Carol Chen",
+   "sender_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+   "text": "Tonight of cat and watch dad haha birthday work no they train morning?",
+   "timestamp": "2024-01-18T07:07:33.738",
+   "value": 20.331
+  },
+  "happiest_message": {
+   "message_id": "13c3af93-8601-5438-83cb-c5490e37f6c0",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "Friend birthday pizza this the wow awesome that train party and",
+   "timestamp": "2024-02-25T07:32:44.674",
+   "value": 0.93
+  },
+  "late_night_message": null,
+  "longest_message": {
+   "message_id": "07dff0e2-b71f-5b65-ae15-ee7cd0896ae7",
+   "sender_display_name": "Carol Chen",
+   "sender_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+   "text": "Yesterday flight tomorrow see this tomorrow dinner really he of that tired great? \ud83d\udc4d",
+   "timestamp": "2024-03-03T07:07:18.846",
+   "value": 83.0
+  },
+  "most_aggressive_message": null,
+  "most_argued_message": {
+   "message_id": "1ce3d0ba-146c-5c6a-8f5a-ff2abe78c74c",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "That week train I we yes yes traffic it was have",
+   "timestamp": "2024-03-17T07:54:08.184",
+   "value": 2.0
+  },
+  "most_disliked_message": null,
+  "most_emoji_message": {
+   "message_id": "8dd3ea8f-89f8-5ec6-b24a-3fbbec88e49b",
+   "sender_display_name": "Carol Chen",
+   "sender_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+   "text": "And this you photo busy watch running song meeting birthday they! \ud83d\ude2d",
+   "timestamp": "2024-02-03T08:28:39.328",
+   "value": 1.0
+  },
+  "most_laughed_message": null,
+  "most_loved_message": null,
+  "most_reacted_message": {
+   "message_id": "b2d093d3-6cbf-52b1-bed0-0613d1bbce55",
+   "sender_display_name": "Carol Chen",
+   "sender_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+   "text": "Thank really weekend dad for love morning friend",
+   "timestamp": "2024-01-05T20:12:38.770",
+   "value": 1.0
+  },
+  "most_revolving_door": null,
+  "top_photo_changer": null,
+  "top_renamer": null,
+  "top_unsender": null
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-email-leaderboard",
+  "path": "/api/conversations/{conv:#3}/leaderboard"
+ },
+ "status": 200
+}

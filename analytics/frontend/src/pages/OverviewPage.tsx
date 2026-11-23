@@ -7,7 +7,9 @@ import {
   type TopConversationOut,
   type VolumePoint,
 } from "../api/client";
+import { scopeRequests } from "../engine/engineClient";
 import { Heatmap } from "../components/Heatmap";
+import { useDataVersion } from "../hooks/useLiveQuery";
 import { StatCard, StatCardSkeleton } from "../components/StatCard";
 import { TopConversationsChart } from "../components/TopConversationsChart";
 import { VolumeChart } from "../components/VolumeChart";
@@ -26,12 +28,15 @@ export function OverviewPage() {
   const [statsError, setStatsError] = useState<string | null>(null);
   const [topError, setTopError] = useState<string | null>(null);
   const [volumeError, setVolumeError] = useState<string | null>(null);
+  const dataVersion = useDataVersion(); // bumps on data-changed during ingest
 
   useEffect(() => {
+    const stopRequests = scopeRequests();
     api.overviewStats().then(setStats).catch((e) => setStatsError(String(e)));
     api.topConversations(10).then((r) => setTop(r.items)).catch((e) => setTopError(String(e)));
     api.overviewHeatmap().then((r) => setHeatmap(r.grid)).catch(() => {});
-  }, []);
+    return stopRequests;
+  }, [dataVersion]);
 
   useEffect(() => {
     // Ignore-stale-response guard: rapidly toggling granularity fires a new
@@ -49,7 +54,7 @@ export function OverviewPage() {
     return () => {
       cancelled = true;
     };
-  }, [granularity]);
+  }, [granularity, dataVersion]);
 
   return (
     <div className={styles.page}>

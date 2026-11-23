@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { FiInfo } from "react-icons/fi";
-import { useParams } from "react-router-dom";
+import { useDataVersion } from "../hooks/useLiveQuery";
+import { FiArrowLeft, FiInfo } from "react-icons/fi";
+import { Link, useParams } from "react-router-dom";
 
 import {
   api,
@@ -17,6 +18,7 @@ import {
   type ReplyGraphEdge,
   type VolumePoint,
 } from "../api/client";
+import { scopeRequests } from "../engine/engineClient";
 import { ChatBubbleList } from "../components/ChatBubbleList";
 import { Heatmap } from "../components/Heatmap";
 import { LoadingSpinner } from "../components/LoadingSpinner";
@@ -270,6 +272,7 @@ export function ConversationDetailPage() {
     setStatsError(null);
     setJoinLeaveError(null);
     setLeaderboardError(null);
+    const stopRequests = scopeRequests();
     api.conversation(id).then(setDetail).catch((e) => setDetailError(String(e)));
     api
       .participantStats(id)
@@ -287,7 +290,25 @@ export function ConversationDetailPage() {
       .conversationLeaderboard(id)
       .then(setLeaderboard)
       .catch((e) => setLeaderboardError(String(e)));
+    return stopRequests;
   }, [id]);
+
+  // While an import is running (or after a merge) refresh the analytics quietly: no state reset,
+  // so the open tab and scroll position are kept.
+  const dataVersion = useDataVersion();
+  useEffect(() => {
+    if (!id || dataVersion === 0) return;
+    const stopRequests = scopeRequests();
+    api.conversation(id).then(setDetail).catch(() => {});
+    api.participantStats(id).then((r) => setStats(r.participants)).catch(() => {});
+    api.conversationHeatmap(id).then((r) => setHeatmap(r.grid)).catch(() => {});
+    api.conversationStreakSilence(id).then(setStreakSilence).catch(() => {});
+    api.conversationReplyGraph(id).then((r) => setReplyGraph(r.edges)).catch(() => {});
+    api.conversationJoinLeave(id).then((r) => setJoinLeaveEvents(r.items)).catch(() => {});
+    api.conversationLeaderboard(id).then(setLeaderboard).catch(() => {});
+    return stopRequests;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataVersion]);
 
   useEffect(() => {
     // Ignore-stale-response guard: rapidly toggling granularity fires a new
@@ -319,6 +340,9 @@ export function ConversationDetailPage() {
 
   return (
     <div className={styles.page}>
+      <Link to="/conversations" className={styles.backLink}>
+        <FiArrowLeft aria-hidden /> Conversations
+      </Link>
       <div className={styles.headingRow}>
         <h1 className={styles.heading}>{buildTitle(detail)}</h1>
         <select

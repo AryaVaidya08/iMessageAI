@@ -1,12 +1,39 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%232f7df6%27/%3E%3Cpath d=%27M7 9h18v11H15l-5 4v-4H7z%27 fill=%27white%27/%3E%3C/svg%3E" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>iMessage Analytics</title>
+    <meta name="description" content="Private, in-browser analytics for your iMessage history. Your data never leaves your device." />
+    <meta name="referrer" content="no-referrer" />
+    <style>
+      #unsupported { display: none; font-family: system-ui, sans-serif; max-width: 520px; margin: 15vh auto; padding: 0 16px; line-height: 1.5; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <div id="unsupported" role="alert"></div>
+    <noscript>
+      <p style="font-family:system-ui,sans-serif;max-width:520px;margin:15vh auto;padding:0 16px">
+        iMessage Analytics needs JavaScript. All processing happens locally in your browser.
+      </p>
+    </noscript>
+    <script>
+      (function () {
+        var missing = [];
+        if (typeof Worker === "undefined") missing.push("Web Workers");
+        if (typeof WebAssembly === "undefined") missing.push("WebAssembly");
+        if (!(navigator.storage && navigator.storage.getDirectory)) missing.push("the Origin Private File System (OPFS)");
+        if (missing.length) {
+          var el = document.getElementById("unsupported");
+          el.style.display = "block";
+          el.innerHTML = "<h1>Browser not supported</h1><p>This app needs " + missing.join(", ") +
+            ". Please use a recent Chromium-based browser (Chrome, Edge, Brave) on desktop.</p>";
+          document.getElementById("root").style.display = "none";
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

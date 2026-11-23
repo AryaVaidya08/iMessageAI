@@ -1,77 +1,99 @@
-# iMessage Analytics
+# iMessage Analytics (static, in-browser)
 
-A read-only local web app for visualizing the iMessage data parsed by `backend/` into `backend/storage/data/imessages.db`.
+Explore your Messages history: volume, relationships, reply times, sentiment, leaderboards, shareable summaries.
+**Everything runs inside your browser tab. There is no server: your files are never uploaded anywhere.**
 
-## Quick start
-
-```bash
-cd analytics
-./start_analysis.sh
-```
-
-Starts both the backend and frontend together (installing dependencies on first run if needed). Backend at `http://localhost:8000`, frontend at `http://localhost:5173`. Ctrl+C stops both. See below for running each half manually.
-
-### Shutting down
-
-Press **Ctrl+C** in the terminal running `start_analysis.sh` — it stops both servers.
-
-If a server was left running in the background (e.g. the terminal was closed instead), kill it by port or by name:
-
-```bash
-lsof -ti:8000,5173 | xargs kill
-# or
-pkill -f "uvicorn main:app"
-pkill -f vite
-```
-
-## Backend (FastAPI)
-
-```bash
-cd analytics/backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-```
-
-Runs at `http://localhost:8000` (interactive docs at `/docs`). Reads `backend/storage/data/imessages.db` read-only by default; override the path with `IMESSAGE_DB_PATH=/path/to/imessages.db`.
-
-Contact name resolution uses `ContactResolver` (macOS AddressBook) and requires Full Disk Access for the terminal/IDE running the backend. Without it, the app falls back to showing raw phone numbers/emails — no error, no crash.
-
-Run tests:
-
-```bash
-cd analytics/backend
-source .venv/bin/activate
-python3 -m pytest tests/ -v
-```
-
-## Frontend (React + Vite)
+## Run it
 
 ```bash
 cd analytics/frontend
 npm install
-npm run dev
+npm run dev          # http://localhost:5173
+# or a static build you can host anywhere (GitHub Pages, Netlify, S3, ...)
+npm run build        # -> dist/   (npm run preview to serve it)
 ```
 
-Runs at `http://localhost:5173`. Expects the backend to be running at `http://localhost:8000` (CORS is pre-configured for this pairing).
+Use a recent **Chromium-based browser** (Chrome, Edge, Brave). It needs Web Workers, WebAssembly and the origin-private file system (OPFS). Only Chrome was tested.
 
-## Notes
+## What to upload
 
-- Read-only: nothing in this app writes to the database.
-- Single-user, local tool: no authentication.
-- `backend/` (top-level) is reference-only — this app never imports its Python code, only reads the SQLite file it produces.
+On the home page drop:
 
-## Known limitations
+1. **chat.db** (required): `~/Library/Messages/chat.db`.
+   Messages keeps recent messages in a write-ahead log, so for a complete import **quit Messages and copy
+   `chat.db`, `chat.db-wal` and `chat.db-shm` together** and drop all three. Without the `-wal` the page warns you and you
+   can still import (the newest messages are missing until you sync again with the `-wal`).
+2. **Contacts** (optional, shows names instead of numbers): `~/Library/Application Support/AddressBook/AddressBook-v22.abcddb`
+   plus every `Sources/*/AddressBook-v22.abcddb` (iCloud, Google, ...). Or choose the whole AddressBook folder.
 
-Minor, non-blocking items surfaced during code review and QA. None affect the golden path against real data (verified against the full 607,700-message / 904-conversation database, including the largest 187,111-message conversation); all are deliberate scope calls, not oversights.
+macOS protects those folders: use Finder > Go to Folder (Cmd+Shift+G), or grant your browser Full Disk Access, or copy the
+files to the Desktop first. The app only reads the files you choose.
 
-- **No composite index for the largest conversations.** `get_messages_page` and `get_conversation_messages_for_stats` (`analytics/backend/services/queries.py`) aren't covered by an index on `(conversation_id, timestamp, id)` — the top-level `backend/storage/schema.py` only indexes `conversation_id` alone. `EXPLAIN QUERY PLAN` confirms an in-memory sort of the full conversation on every call for the two queries that matter most on the biggest threads. Fixing this means modifying `backend/`, which this project treats as reference-only and never edits — flagged here instead.
-- **Stale/invalid pagination cursor silently resets to the newest page**, and **an empty `participants` list is used as an implicit not-found signal** rather than a distinct error, in `analytics/backend/routers/conversations.py`. Both are narrow edge cases (a hand-crafted or expired `before` cursor) that a well-behaved frontend never triggers.
-- **`StatCardSkeleton` has no `aria-busy`/`role="status"`.** The loading-state signal lives one level up, on `OverviewPage`'s stat grid container (`aria-busy={stats === null}`), which is the correct boundary for a screen reader — but the skeleton itself doesn't independently announce "loading."
-- **140px fixed name column** in the conversations list truncates long generated names (e.g. `"You, Person0, Person1 +3 more"`) before the `"+N more"` suffix is visible at 13px. Prescribed verbatim by the approved design spec.
-- **`TapbackBreakdown` uses div-based layout, not `<table>`/`role="table"` semantics**, for what is tabular data (action + count). Matches the approved spec exactly; a screen reader still reads the content, just not with table navigation.
-- **~16px scroll-jitter band on infinite scroll.** `ChatBubbleList`'s "at the top, load more" check has a 16px `padding-top`, so the trigger fires across a small range near `scrollTop = 0` rather than at an exact pixel — a minor, bounded jitter, not a functional failure.
-- **No debounce or request-cancellation on conversation search.** `ConversationsListPage`'s search fetches on every keystroke with no `AbortController`; if an earlier keystroke's request resolves after a later one's (possible under network/DB jitter), the stale response can briefly overwrite newer results until the next keystroke corrects it. Consistent with the rest of the codebase, which uses no debouncing anywhere.
-- **`ContactResolver.resolve()` has a narrow, pre-existing lazy-reload race** (`analytics/backend/contacts.py`) unrelated to the concurrency fix in this build — not exercised by normal usage since `resolver.load()` completes fully at startup before requests are served.
-- **`ConversationDetailPage`'s volume chart flickers empty on granularity toggle; `OverviewPage`'s does not.** Both effects share the same stale-response guard, but `ConversationDetailPage` also resets `volume`/`volumeError` on every effect run (needed to clear stale data when navigating between conversations), which incidentally clears the chart on a granularity change too. Cosmetic only.
+### Try it with synthetic data (no personal files)
+
+```bash
+cd analytics/frontend
+npm run make-fixtures                    # writes tests/.cache/ (git-ignored)
+```
+
+Then upload `tests/.cache/chat-small.db` (600 messages) or `tests/.cache/chat-100mb.db` (220k messages), and all
+`.abcddb` files under `tests/.cache/addressbook/` (the main file and `Sources/*`).
+`tests/.cache/chat-small-appended.db` is the same database plus 50 new messages, an edit and an unsend: use it to try
+"Sync new messages".
+
+## How it works
+
+- **Direct SQLite read.** `chat.db` is read page by page straight from the file you picked (a read-only SQLite VFS over
+  `File.slice` with a 32 MB cache), never loaded into memory. A copied `-wal` is replayed (committed frames only,
+  checksums validated).
+- **Streaming import, viewable while it runs.** An ingest worker parses chat by chat in ROWID order, one transaction per
+  batch, into a SQLite database (wa-sqlite) stored in the browser's origin-private file system (OPFS). The same worker serves
+  the analytics between batches, so you can open Overview / Conversations / People while the import is still running; pages refresh as chats finish.
+- **Debug console.** The dock at the bottom shows the phase, the chat being parsed, per-chat and overall progress with ETA
+  and throughput, and a log. `/debug` keeps it open.
+- **Incremental sync.** Dropping a newer `chat.db` again processes only new messages (per-chat ROWID watermark), re-checks
+  edited/unsent messages, and skips an unchanged file entirely.
+- **Merges** (contacts and conversations) are alias rows applied at read time, so they survive later syncs.
+- **Analytics** (the old FastAPI routes) are TypeScript route handlers in `src/engine/query/`, SQL-first with cached
+  summary tables. They are checked against the legacy Python output (`npm run test:parity`, 92 cases).
+- Data stays in your browser until you press **Delete all data** (or clear site data).
+
+## Commands
+
+| | |
+|---|---|
+| `npm test` | unit tests (vitest) |
+| `PARITY_ENGINE=1 npx vitest run tests/parity.spec.ts` (`npm run test:parity`) | real pipeline vs the legacy Python goldens |
+| `npm run test:e2e` | real-browser tests (system Chrome): upload, browse during import, all pages, sync, merge, WAL, delete |
+| `MEMORY_SIZE=100mb npm run test:e2e -- tests/e2e/memory.spec.ts` | resident memory of the whole test browser during an import |
+
+## Memory: measured, and what is NOT solved
+
+Measured as the **physical footprint** (what macOS Activity Monitor / memory pressure use) of every process of a headless
+Chrome test browser, as growth above an empty app (an empty app is 215 MB). `MEMORY_SIZE=100mb npm run test:e2e -- tests/e2e/memory.spec.ts`.
+
+| import | peak growth | settles at | time |
+|---|---|---|---|
+| 100 MB chat.db (220k messages) | **+470 MB** | +305 MB | 27 s |
+| 1 GB chat.db (2.19M messages) | **not met**: stopped by the 3 GB safety cap at 1.84M messages (84%): +2.7 GB (browser process 1.9 GB, renderer 0.9 GB) | n/a | 8 min to 84% |
+
+**The target (flat memory, well under 500 MB growth at 1 GB, and a completed 1 GB import) is not met.**
+Memory grows roughly linearly with the data written (about 0.9 MB per 1,000 messages in Chrome's browser process).
+
+What the investigation established:
+- Not the JS heap (a few MB) and not the workers' JS+wasm (about 40 MB, `measureUserAgentSpecificMemory`).
+- Not reading chat.db: reading 613 MB through `FileReaderSync` slices leaves the browser process flat (+10 MB).
+- IndexedDB was worse (browser process about 1.5x the data, and a 1 GB import stalled at 65%); the OPFS storage now used
+  completes much further and is faster. In-memory journal + `synchronous=OFF` cut the 100 MB peak from +619 to +470 MB.
+- Not fixed by: smaller pages/indexes (helped IndexedDB only), staging chat.db into OPFS (no gain), flushing on commit (no gain).
+- An attempt to periodically close and reopen the OPFS handles to release the browser's memory hung in Chrome (disabled).
+- RSS (shown by `ps`) overstates real memory by about 2x because it counts reclaimable file-backed pages.
+
+Storage is one engine worker that owns the OPFS database (wa-sqlite `AccessHandlePoolVFS`, exclusive) and interleaves ingest
+batches with query requests, so pages stay browsable during an import. Multi-connection VFSes (`OPFSCoopSyncVFS`) are not in
+wa-sqlite 1.0.0. Realistic use today: databases up to a few hundred MB / ~1M messages.
+
+## Legacy
+
+`backend/` (imessage-exporter HTML scraping) and `analytics/backend/` (FastAPI) are the old single-user pipeline. They are
+kept as the reference for the parity goldens and are no longer needed to run the site.

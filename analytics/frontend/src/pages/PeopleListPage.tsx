@@ -1,28 +1,46 @@
 import { useEffect, useState } from "react";
+import { useDataVersion } from "../hooks/useLiveQuery";
 import { Link } from "react-router-dom";
 
+import { scopeRequests } from "../engine/engineClient";
 import { api, type PeopleListResponse } from "../api/client";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import styles from "./PeopleListPage.module.css";
 
+type Sort = "count" | "recent" | "conversations";
+type Order = "asc" | "desc";
+
 export function PeopleListPage() {
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<"count" | "recent">("recent");
+  const [sort, setSort] = useState<Sort>("recent");
+  const [order, setOrder] = useState<Order>("desc");
   const [page, setPage] = useState(1);
   const [data, setData] = useState<PeopleListResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const toggleSort = (nextSort: Sort) => {
+    if (sort === nextSort) {
+      setOrder((o) => (o === "desc" ? "asc" : "desc"));
+    } else {
+      setSort(nextSort);
+      setOrder("desc");
+    }
+  };
+
+  const dataVersion = useDataVersion(); // bumps on data-changed (ingest, merges)
+
   useEffect(() => {
     setPage(1);
-  }, [search, sort]);
+  }, [search, sort, order]);
 
   useEffect(() => {
     // Ignore-stale-response guard: mirrors ConversationsListPage -- changing
     // search/sort while on page > 1 can fire an extra fetch for the old page
     // number, and fast typing can make responses arrive out of order.
     let cancelled = false;
+    const stopRequests = scopeRequests(); // abort the query if the search/page changes or we navigate away
     api
-      .people({ search, sort, page, page_size: 25 })
+      .people({ search, sort, order, page, page_size: 25 })
       .then((r) => {
         if (!cancelled) setData(r);
       })
@@ -31,8 +49,9 @@ export function PeopleListPage() {
       });
     return () => {
       cancelled = true;
+      stopRequests();
     };
-  }, [search, sort, page]);
+  }, [search, sort, order, page, dataVersion]);
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.page_size)) : 1;
 
@@ -50,16 +69,32 @@ export function PeopleListPage() {
           <button
             type="button"
             className={sort === "recent" ? styles.segmentActive : styles.segment}
-            onClick={() => setSort("recent")}
+            onClick={() => {
+              setSort("recent");
+              setOrder("desc");
+            }}
           >
             Recent
           </button>
           <button
             type="button"
             className={sort === "count" ? styles.segmentActive : styles.segment}
-            onClick={() => setSort("count")}
+            onClick={() => toggleSort("count")}
           >
-            Most messages
+            Messages
+            {sort === "count" && (
+              <span className={`${styles.sortArrow} ${order === "asc" ? styles.sortArrowAsc : ""}`}>▼</span>
+            )}
+          </button>
+          <button
+            type="button"
+            className={sort === "conversations" ? styles.segmentActive : styles.segment}
+            onClick={() => toggleSort("conversations")}
+          >
+            Conversations
+            {sort === "conversations" && (
+              <span className={`${styles.sortArrow} ${order === "asc" ? styles.sortArrowAsc : ""}`}>▼</span>
+            )}
           </button>
         </div>
       </div>

@@ -1,0 +1,71 @@
+{
+ "body": {
+  "items": [
+   {
+    "display_name": "Weekend Crew 2",
+    "id": "1e30fd2e-d07d-5e4a-88f3-98d014aa0fb1",
+    "is_group_chat": true,
+    "last_activity": "2024-04-04T10:43:55.547",
+    "message_count": 91,
+    "relationship_type": "other"
+   },
+   {
+    "display_name": "Bob Baker",
+    "id": "05c399e3-a03e-57de-b4d4-1783ff99b459",
+    "is_group_chat": false,
+    "last_activity": "2024-04-04T10:00:47.911",
+    "message_count": 75,
+    "relationship_type": "other"
+   },
+   {
+    "display_name": "Dev Dhillon",
+    "id": "a315f903-1929-5e49-9ed4-bba2741587c0",
+    "is_group_chat": false,
+    "last_activity": "2024-04-03T07:45:33.290",
+    "message_count": 58,
+    "relationship_type": "other"
+   },
+   {
+    "display_name": "Alice Anders",
+    "id": "1aeea4d7-3d30-56c1-84aa-de7616c2bdae",
+    "is_group_chat": false,
+    "last_activity": "2024-04-02T23:53:19.473",
+    "message_count": 184,
+    "relationship_type": "other"
+   },
+   {
+    "display_name": "Erin Evans",
+    "id": "88ac2ab9-0681-5a24-99ad-ef3036097645",
+    "is_group_chat": false,
+    "last_activity": "2024-03-31T03:03:01.910",
+    "message_count": 10,
+    "relationship_type": "other"
+   },
+   {
+    "display_name": "Erin Evans, Dev Dhillon, +15551110007",
+    "id": "d887ae7f-82d0-5bef-8a40-ced899495851",
+    "is_group_chat": true,
+    "last_activity": "2024-03-28T21:00:58.177",
+    "message_count": 69,
+    "relationship_type": "other"
+   },
+   {
+    "display_name": "Carol Chen",
+    "id": "c85a21fd-8310-59af-87d4-c616d40a64a2",
+    "is_group_chat": false,
+    "last_activity": "2024-03-17T07:57:13.316",
+    "message_count": 67,
+    "relationship_type": "other"
+   }
+  ],
+  "page": 1,
+  "page_size": 25,
+  "total": 7
+ },
+ "case": {
+  "method": "GET",
+  "name": "conversations-recent",
+  "path": "/api/conversations?sort=recent&page=1&page_size=25"
+ },
+ "status": 200
+}

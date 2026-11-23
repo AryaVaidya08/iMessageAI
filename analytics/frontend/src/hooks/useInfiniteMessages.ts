@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { api, type MessageOut } from "../api/client";
 
+/** Max messages kept in state/DOM; the far end of the window is evicted when pages are added. */
+export const MAX_WINDOW = 500;
+
 export function useInfiniteMessages(
   conversationId: string,
   initialJump?: { messageId: string; nonce: number } | null
@@ -26,6 +29,7 @@ export function useInfiniteMessages(
   // -> A navigation produces two distinct "for A" attempts, and a jump
   // invalidates any load already in flight); only a per-attempt token can
   // tell them apart and discard the stale one's response.
+  const messagesRef = useRef<MessageOut[]>([]);
   const loadingOlderRef = useRef(false);
   const loadingNewerRef = useRef(false);
   const generationRef = useRef(0);
@@ -41,6 +45,24 @@ export function useInfiniteMessages(
   // consistent instead of racing each other.
   const initialLoadStartedRef = useRef(false);
 
+  // Evicts from the far end so at most MAX_WINDOW messages stay mounted. The
+  // cursor on the evicted side is re-pointed at the last kept message so
+  // scrolling back reloads exactly what was dropped (cursors are message ids).
+  const applyWindow = (next: MessageOut[], evict: "tail" | "head") => {
+    let kept = next;
+    if (next.length > MAX_WINDOW) {
+      if (evict === "tail") {
+        kept = next.slice(0, MAX_WINDOW);
+        setNewerCursor(kept[kept.length - 1].id);
+      } else {
+        kept = next.slice(next.length - MAX_WINDOW);
+        setOlderCursor(kept[0].id);
+      }
+    }
+    messagesRef.current = kept;
+    setMessages(kept);
+  };
+
   const loadOlder = useCallback(async () => {
     if (!conversationId) return;
     if (loadingOlderRef.current) return;
@@ -52,7 +74,7 @@ export function useInfiniteMessages(
     try {
       const page = await api.messages(conversationId, hasLoadedOnce ? olderCursor ?? undefined : undefined);
       if (generationRef.current !== requestGeneration) return;
-      setMessages((prev) => [...page.items, ...prev]);
+      applyWindow([...page.items, ...messagesRef.current], "tail");
       setOlderCursor(page.older_cursor);
       if (!hasLoadedOnce) setNewerCursor(page.newer_cursor);
       setHasLoadedOnce(true);
@@ -79,7 +101,7 @@ export function useInfiniteMessages(
     try {
       const page = await api.messagesAfter(conversationId, newerCursor);
       if (generationRef.current !== requestGeneration) return;
-      setMessages((prev) => [...prev, ...page.items]);
+      applyWindow([...messagesRef.current, ...page.items], "head");
       setNewerCursor(page.items.length > 0 ? page.newer_cursor : null);
     } catch (e) {
       if (generationRef.current !== requestGeneration) return;
@@ -98,6 +120,7 @@ export function useInfiniteMessages(
     loadingOlderRef.current = false;
     loadingNewerRef.current = false;
     initialLoadStartedRef.current = false;
+    messagesRef.current = [];
     setMessages([]);
     setOlderCursor(null);
     setNewerCursor(null);
@@ -124,6 +147,7 @@ export function useInfiniteMessages(
       const requestGeneration = generationRef.current;
       loadingOlderRef.current = true;
       loadingNewerRef.current = true;
+      messagesRef.current = [];
       setMessages([]);
       setOlderCursor(null);
       setNewerCursor(null);
@@ -133,6 +157,7 @@ export function useInfiniteMessages(
       try {
         const page = await fetcher();
         if (generationRef.current !== requestGeneration) return;
+        messagesRef.current = page.items;
         setMessages(page.items);
         setOlderCursor(page.older_cursor);
         setNewerCursor(page.newer_cursor);

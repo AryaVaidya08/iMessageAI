@@ -10,13 +10,14 @@ router = APIRouter(prefix="/api/people", tags=["people"])
 @router.get("", response_model=PeopleListResponse)
 def list_people(
     search: str | None = None,
-    sort: str = Query("count", pattern="^(recent|count)$"),
+    sort: str = Query("count", pattern="^(recent|count|conversations)$"),
+    order: str = Query("desc", pattern="^(asc|desc)$"),
     page: int = Query(1, ge=1),
     page_size: int = Query(25, ge=1, le=100),
     conn=Depends(get_db),
     resolver=Depends(get_resolver),
 ):
-    result = queries.list_people(conn, resolver, search, sort, page, page_size)
+    result = queries.list_people(conn, resolver, search, sort, page, page_size, order)
     return PeopleListResponse(**result)
 
 

@@ -1,0 +1,61 @@
+{
+ "body": {
+  "conversations": [
+   {
+    "display_name": "Alice Anders",
+    "id": "1aeea4d7-3d30-56c1-84aa-de7616c2bdae",
+    "is_group_chat": false,
+    "message_count": 184,
+    "subtext": "+15551110001"
+   },
+   {
+    "display_name": "Bob Baker",
+    "id": "05c399e3-a03e-57de-b4d4-1783ff99b459",
+    "is_group_chat": false,
+    "message_count": 75,
+    "subtext": "+15551110002"
+   },
+   {
+    "display_name": "Carol Chen",
+    "id": "c85a21fd-8310-59af-87d4-c616d40a64a2",
+    "is_group_chat": false,
+    "message_count": 67,
+    "subtext": "carol@example.com"
+   },
+   {
+    "display_name": "Dev Dhillon",
+    "id": "a315f903-1929-5e49-9ed4-bba2741587c0",
+    "is_group_chat": false,
+    "message_count": 58,
+    "subtext": "+447911123456"
+   },
+   {
+    "display_name": "Erin Evans",
+    "id": "88ac2ab9-0681-5a24-99ad-ef3036097645",
+    "is_group_chat": false,
+    "message_count": 10,
+    "subtext": "+15551110005"
+   },
+   {
+    "display_name": "Erin Evans, Dev Dhillon, +15551110007",
+    "id": "d887ae7f-82d0-5bef-8a40-ced899495851",
+    "is_group_chat": true,
+    "message_count": 69,
+    "subtext": "+15551110005, +447911123456, +15551110007"
+   },
+   {
+    "display_name": "Weekend Crew 2",
+    "id": "1e30fd2e-d07d-5e4a-88f3-98d014aa0fb1",
+    "is_group_chat": true,
+    "message_count": 91,
+    "subtext": "+15551110005, +15551110002, +15551110001, carol@example.com"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "merge-conversations-list",
+  "path": "/api/conversations-for-merge"
+ },
+ "status": 200
+}

@@ -275,17 +275,16 @@ def test_overview_fastest_reply_relationship_none_when_no_replies(conn, resolver
 # --- People ----------------------------------------------------------------
 
 
-def test_list_people_includes_me_and_stats(conn, resolver):
+def test_list_people_excludes_me_and_has_stats(conn, resolver):
     client = make_client(conn, resolver)
     response = client.get("/api/people")
     assert response.status_code == 200
     body = response.json()
-    assert body["total"] == 2
+    assert body["total"] == 1
     by_id = {i["id"]: i for i in body["items"]}
     assert by_id["them"]["message_count"] == 1
     assert by_id["them"]["conversation_count"] == 1
-    assert by_id["me"]["display_name"] == "You"
-    assert by_id["me"]["message_count"] == 2
+    assert "me" not in by_id
 
 
 def test_list_people_search_filters(conn, resolver):

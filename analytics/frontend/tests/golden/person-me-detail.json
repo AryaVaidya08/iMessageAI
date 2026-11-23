@@ -1,0 +1,620 @@
+{
+ "body": {
+  "conversation_count": 7,
+  "conversations": [
+   {
+    "conversation_id": "1aeea4d7-3d30-56c1-84aa-de7616c2bdae",
+    "display_name": "Alice Anders",
+    "is_group_chat": false,
+    "message_count": 184,
+    "relationship_type": "other"
+   },
+   {
+    "conversation_id": "1e30fd2e-d07d-5e4a-88f3-98d014aa0fb1",
+    "display_name": "Weekend Crew 2",
+    "is_group_chat": true,
+    "message_count": 91,
+    "relationship_type": "other"
+   },
+   {
+    "conversation_id": "05c399e3-a03e-57de-b4d4-1783ff99b459",
+    "display_name": "Bob Baker",
+    "is_group_chat": false,
+    "message_count": 75,
+    "relationship_type": "other"
+   },
+   {
+    "conversation_id": "d887ae7f-82d0-5bef-8a40-ced899495851",
+    "display_name": "Erin Evans, Dev Dhillon, +15551110007",
+    "is_group_chat": true,
+    "message_count": 69,
+    "relationship_type": "other"
+   },
+   {
+    "conversation_id": "c85a21fd-8310-59af-87d4-c616d40a64a2",
+    "display_name": "Carol Chen",
+    "is_group_chat": false,
+    "message_count": 67,
+    "relationship_type": "other"
+   },
+   {
+    "conversation_id": "a315f903-1929-5e49-9ed4-bba2741587c0",
+    "display_name": "Dev Dhillon",
+    "is_group_chat": false,
+    "message_count": 58,
+    "relationship_type": "other"
+   },
+   {
+    "conversation_id": "88ac2ab9-0681-5a24-99ad-ef3036097645",
+    "display_name": "Erin Evans",
+    "is_group_chat": false,
+    "message_count": 10,
+    "relationship_type": "other"
+   }
+  ],
+  "display_name": "You",
+  "first_message_at": "2024-01-01T19:25:41.616",
+  "handle": "",
+  "heatmap": {
+   "grid": [
+    [
+     0,
+     0,
+     0,
+     9,
+     0,
+     0,
+     0,
+     12,
+     2,
+     4,
+     3,
+     2,
+     5,
+     0,
+     9,
+     1,
+     1,
+     0,
+     3,
+     8,
+     5,
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     18,
+     3,
+     0,
+     4,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     5,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     20,
+     1,
+     7,
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     0,
+     8,
+     4,
+     0,
+     2,
+     4,
+     1,
+     3
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     12,
+     3,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     0,
+     14,
+     1,
+     6,
+     6,
+     0,
+     6,
+     0,
+     1,
+     0,
+     5,
+     0,
+     0,
+     2,
+     5,
+     2,
+     5,
+     2
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     10,
+     0,
+     17,
+     0,
+     6,
+     0,
+     1,
+     0,
+     3,
+     0,
+     6,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     10,
+     3,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     7,
+     0,
+     0,
+     0,
+     0
+    ]
+   ]
+  },
+  "id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+  "last_message_at": "2024-04-04T10:40:58.492",
+  "leaderboard": {
+   "fastest_reply_message": {
+    "message_id": "1ce3d0ba-146c-5c6a-8f5a-ff2abe78c74c",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "That week train I we yes yes traffic it was have",
+    "timestamp": "2024-03-17T07:54:08.184",
+    "value": 27.974
+   },
+   "happiest_message": {
+    "message_id": "c1a4f0c3-6d72-545c-a828-33d959a1f649",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "Over wanna text wow really the morning thank love thanks weekend party friend we",
+    "timestamp": "2024-02-26T07:56:32.111",
+    "value": 0.9616
+   },
+   "late_night_message": {
+    "message_id": "eff25454-35cf-5a92-a5e7-ed1a353e5b38",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "Free free busy but song \ud83d\udd25",
+    "timestamp": "2024-03-31T03:01:10.027",
+    "value": 720.0
+   },
+   "longest_message": {
+    "message_id": "1deb787f-0cad-59cc-b364-efd92ba04585",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "Awesome tomorrow flight yesterday wanna night running tired come today weekend hungry yes tickets https://example.com/c7ff22",
+    "timestamp": "2024-01-16T17:00:11.718",
+    "value": 124.0
+   },
+   "most_aggressive_message": null,
+   "most_argued_message": {
+    "message_id": "1ce3d0ba-146c-5c6a-8f5a-ff2abe78c74c",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "That week train I we yes yes traffic it was have",
+    "timestamp": "2024-03-17T07:54:08.184",
+    "value": 2.0
+   },
+   "most_disliked_message": {
+    "message_id": "dd4740e9-2a57-52ae-83bc-291afeb4773e",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "That love night dad!",
+    "timestamp": "2024-01-26T07:03:36.141",
+    "value": 1.0
+   },
+   "most_emoji_message": {
+    "message_id": "b258116b-857a-544a-96cc-c6acd578c4d5",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "Tomorrow friend yesterday \u2764\ufe0f",
+    "timestamp": "2024-01-15T07:17:30.794",
+    "value": 1.0
+   },
+   "most_laughed_message": {
+    "message_id": "aab511e5-faf6-53a4-b2d1-d438fae604d8",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "To coffee thanks miss train wanna movie wanna okay they what!",
+    "timestamp": "2024-01-05T11:29:31.007",
+    "value": 1.0
+   },
+   "most_loved_message": {
+    "message_id": "1aedc92f-1c31-5422-a618-0b02f77d116f",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "",
+    "timestamp": "2024-01-23T21:40:43.790",
+    "value": 1.0
+   },
+   "most_reacted_message": {
+    "message_id": "509ad90a-8157-50c4-8616-53c16151a37c",
+    "sender_display_name": "You",
+    "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "text": "Pizza show night",
+    "timestamp": "2024-01-01T19:31:40.765",
+    "value": 1.0
+   },
+   "most_revolving_door": null,
+   "top_photo_changer": null,
+   "top_renamer": null,
+   "top_unsender": null
+  },
+  "message_count": 295,
+  "stats": {
+   "display_name": "You",
+   "gap_initiator_count": 46,
+   "handle": "",
+   "late_night_ratio": 0.061016949152542375,
+   "median_reply_seconds": 31.606,
+   "message_count": 295,
+   "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "personality": [
+    {
+     "percentage": 0.0,
+     "trait": "Aggressive"
+    },
+    {
+     "percentage": 1.1,
+     "trait": "Chaotic"
+    },
+    {
+     "percentage": 0.0,
+     "trait": "Dramatic"
+    },
+    {
+     "percentage": 24.0,
+     "trait": "Sarcastic"
+    },
+    {
+     "percentage": 0.0,
+     "trait": "Chill"
+    },
+    {
+     "percentage": 32.3,
+     "trait": "Wholesome"
+    }
+   ],
+   "reply_histogram": [
+    {
+     "count": 110,
+     "label": "<1m"
+    },
+    {
+     "count": 35,
+     "label": "1-5m"
+    },
+    {
+     "count": 1,
+     "label": "5-30m"
+    },
+    {
+     "count": 1,
+     "label": "30m-2h"
+    },
+    {
+     "count": 4,
+     "label": "2-12h"
+    },
+    {
+     "count": 0,
+     "label": "12-24h"
+    },
+    {
+     "count": 15,
+     "label": ">24h"
+    }
+   ],
+   "sentiment_series": [
+    {
+     "bucket": "2024-01-01",
+     "score": 0.25047941176470584
+    },
+    {
+     "bucket": "2024-01-08",
+     "score": 0.19073571428571426
+    },
+    {
+     "bucket": "2024-01-15",
+     "score": 0.3215818181818182
+    },
+    {
+     "bucket": "2024-01-22",
+     "score": 0.31429999999999997
+    },
+    {
+     "bucket": "2024-01-29",
+     "score": 0.4964
+    },
+    {
+     "bucket": "2024-02-05",
+     "score": 0.2301
+    },
+    {
+     "bucket": "2024-02-12",
+     "score": 0.3720434782608696
+    },
+    {
+     "bucket": "2024-02-19",
+     "score": 0.37632
+    },
+    {
+     "bucket": "2024-02-26",
+     "score": 0.4649642857142857
+    },
+    {
+     "bucket": "2024-03-04",
+     "score": 0.37583846153846157
+    },
+    {
+     "bucket": "2024-03-11",
+     "score": 0.37295625
+    },
+    {
+     "bucket": "2024-03-18",
+     "score": 0.2227272727272727
+    },
+    {
+     "bucket": "2024-03-25",
+     "score": 0.37999285714285713
+    },
+    {
+     "bucket": "2024-04-01",
+     "score": 0.3195090909090909
+    }
+   ],
+   "tapbacks_given": [
+    {
+     "action": "Questioned",
+     "count": 9
+    },
+    {
+     "action": "Loved",
+     "count": 3
+    },
+    {
+     "action": "Emphasized",
+     "count": 3
+    },
+    {
+     "action": "Disliked",
+     "count": 2
+    },
+    {
+     "action": "Liked",
+     "count": 2
+    },
+    {
+     "action": "Laughed",
+     "count": 2
+    }
+   ],
+   "tapbacks_received": [
+    {
+     "action": "Questioned",
+     "count": 7
+    },
+    {
+     "action": "Loved",
+     "count": 6
+    },
+    {
+     "action": "Laughed",
+     "count": 4
+    },
+    {
+     "action": "Disliked",
+     "count": 2
+    },
+    {
+     "action": "Emphasized",
+     "count": 2
+    },
+    {
+     "action": "Liked",
+     "count": 1
+    }
+   ],
+   "top_emojis": [
+    {
+     "count": 8,
+     "emoji": "\u2764"
+    },
+    {
+     "count": 6,
+     "emoji": "\ud83d\udd25"
+    },
+    {
+     "count": 6,
+     "emoji": "\ud83d\ude05"
+    },
+    {
+     "count": 4,
+     "emoji": "\ud83d\ude02"
+    },
+    {
+     "count": 3,
+     "emoji": "\ud83d\ude2d"
+    },
+    {
+     "count": 3,
+     "emoji": "\ud83e\udd14"
+    },
+    {
+     "count": 2,
+     "emoji": "\ud83d\ude0a"
+    },
+    {
+     "count": 2,
+     "emoji": "\ud83d\udc4d"
+    },
+    {
+     "count": 2,
+     "emoji": "\ud83c\udf89"
+    },
+    {
+     "count": 1,
+     "emoji": "\ud83d\ude4f"
+    }
+   ],
+   "top_words": [
+    {
+     "count": 36,
+     "word": "text"
+    },
+    {
+     "count": 36,
+     "word": "wow"
+    },
+    {
+     "count": 33,
+     "word": "come"
+    },
+    {
+     "count": 33,
+     "word": "free"
+    },
+    {
+     "count": 31,
+     "word": "thank"
+    },
+    {
+     "count": 31,
+     "word": "weather"
+    },
+    {
+     "count": 31,
+     "word": "weekend"
+    },
+    {
+     "count": 30,
+     "word": "photo"
+    },
+    {
+     "count": 30,
+     "word": "call"
+    },
+    {
+     "count": 30,
+     "word": "tired"
+    },
+    {
+     "count": 30,
+     "word": "pizza"
+    },
+    {
+     "count": 29,
+     "word": "friend"
+    },
+    {
+     "count": 29,
+     "word": "soon"
+    },
+    {
+     "count": 28,
+     "word": "flight"
+    },
+    {
+     "count": 28,
+     "word": "plan"
+    }
+   ]
+  }
+ },
+ "case": {
+  "method": "GET",
+  "name": "person-me-detail",
+  "path": "/api/people/{person:me}/detail"
+ },
+ "status": 200
+}

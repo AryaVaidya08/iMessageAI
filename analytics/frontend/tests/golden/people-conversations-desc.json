@@ -1,0 +1,87 @@
+{
+ "body": {
+  "items": [
+   {
+    "conversation_count": 7,
+    "display_name": "You",
+    "handle": "",
+    "id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "last_message_at": "2024-04-04T10:40:58.492",
+    "message_count": 295
+   },
+   {
+    "conversation_count": 3,
+    "display_name": "Erin Evans",
+    "handle": "+15551110005",
+    "id": "17433b20-0e08-595b-86e1-636251353758",
+    "last_message_at": "2024-04-04T10:42:09.834",
+    "message_count": 20
+   },
+   {
+    "conversation_count": 2,
+    "display_name": "Alice Anders",
+    "handle": "+15551110001",
+    "id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+    "last_message_at": "2024-04-04T10:43:55.547",
+    "message_count": 113
+   },
+   {
+    "conversation_count": 2,
+    "display_name": "Bob Baker",
+    "handle": "+15551110002",
+    "id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "last_message_at": "2024-04-04T10:00:22.395",
+    "message_count": 42
+   },
+   {
+    "conversation_count": 2,
+    "display_name": "Dev Dhillon",
+    "handle": "+447911123456",
+    "id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "last_message_at": "2024-04-03T07:45:33.290",
+    "message_count": 39
+   },
+   {
+    "conversation_count": 2,
+    "display_name": "Carol Chen",
+    "handle": "carol@example.com",
+    "id": "fb293335-2fa0-5a69-b335-9179962680ef",
+    "last_message_at": "2024-03-17T07:55:34.489",
+    "message_count": 39
+   },
+   {
+    "conversation_count": 1,
+    "display_name": "+15551110007",
+    "handle": "+15551110007",
+    "id": "e0eec7fa-f3fd-5639-b8b0-80d6c4ded53c",
+    "last_message_at": "2024-03-28T21:00:29.786",
+    "message_count": 6
+   },
+   {
+    "conversation_count": 0,
+    "display_name": "Pizza Palace",
+    "handle": "+15551110006",
+    "id": "56a3247a-f259-550e-9c56-95fd1c6192a5",
+    "last_message_at": null,
+    "message_count": 0
+   },
+   {
+    "conversation_count": 0,
+    "display_name": "grace@example.org",
+    "handle": "grace@example.org",
+    "id": "28bb9032-39af-51c6-8355-32dd3f03930e",
+    "last_message_at": null,
+    "message_count": 0
+   }
+  ],
+  "page": 1,
+  "page_size": 25,
+  "total": 9
+ },
+ "case": {
+  "method": "GET",
+  "name": "people-conversations-desc",
+  "path": "/api/people?sort=conversations&order=desc&page=1&page_size=25"
+ },
+ "status": 200
+}

@@ -10,6 +10,13 @@
 - Generate replies that imitate my texting style
 - Adapt to the conversation (significant other, parents, friends, etc.)
 
+## Using the analytics app
+The analytics app is a fully static site: upload your `chat.db` (and optionally AddressBook databases) and everything is parsed and analyzed in your browser. Nothing leaves your device. See [analytics/README.md](analytics/README.md) for finding your files on macOS, supported browsers, storage, incremental sync, deployment and the LEGACY FastAPI + imessage-exporter flow.
+
+```bash
+cd analytics/frontend && npm install && npm run dev   # http://localhost:5173
+```
+
 ## Project History
 - 8/2/26 - Setup project goals and structure repository
 - 8/3/26 - Started message & annoucement parsing
@@ -20,3 +27,6 @@
 ## Notes
 - all .gitkeep files are temporary placeholders to retain the structure of the codebase
 - Remove sharing locations thing due to a lot of breaking in my phone
+## Legacy code
+
+`analytics/backend/` (FastAPI) and `backend/` (imessage-exporter HTML parser) are LEGACY reference implementations. The app is moving to a fully static in-browser engine (`analytics/frontend/src/engine/`); the Python code is kept only to generate golden outputs. `PERSONAL_NUMBER` / `.env.local` and the extract scripts apply to the legacy parser only and are not needed by the browser app.

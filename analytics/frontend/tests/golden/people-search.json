@@ -1,0 +1,23 @@
+{
+ "body": {
+  "items": [
+   {
+    "conversation_count": 2,
+    "display_name": "Bob Baker",
+    "handle": "+15551110002",
+    "id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "last_message_at": "2024-04-04T10:00:22.395",
+    "message_count": 42
+   }
+  ],
+  "page": 1,
+  "page_size": 25,
+  "total": 1
+ },
+ "case": {
+  "method": "GET",
+  "name": "people-search",
+  "path": "/api/people?search=bob"
+ },
+ "status": 200
+}

@@ -1,0 +1,43 @@
+{
+ "body": {
+  "display_name": "Erin Evans, Dev Dhillon, +15551110007",
+  "first_message_at": "2024-01-05T11:28:31.882",
+  "id": "d887ae7f-82d0-5bef-8a40-ced899495851",
+  "is_group_chat": true,
+  "last_message_at": "2024-03-28T21:00:58.177",
+  "message_count": 69,
+  "participants": [
+   {
+    "display_name": "Erin Evans",
+    "handle": "+15551110005",
+    "id": "17433b20-0e08-595b-86e1-636251353758",
+    "is_me": false
+   },
+   {
+    "display_name": "Dev Dhillon",
+    "handle": "+447911123456",
+    "id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "is_me": false
+   },
+   {
+    "display_name": "You",
+    "handle": "",
+    "id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "is_me": true
+   },
+   {
+    "display_name": "+15551110007",
+    "handle": "+15551110007",
+    "id": "e0eec7fa-f3fd-5639-b8b0-80d6c4ded53c",
+    "is_me": false
+   }
+  ],
+  "relationship_type": "other"
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-groupnoname-detail",
+  "path": "/api/conversations/{conv:#7}"
+ },
+ "status": 200
+}

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useDataVersion } from "../hooks/useLiveQuery";
 import { Link } from "react-router-dom";
 
+import { scopeRequests } from "../engine/engineClient";
 import { api, type ConversationListResponse } from "../api/client";
 import styles from "./ConversationsListPage.module.css";
 
@@ -10,6 +12,7 @@ export function ConversationsListPage() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState<ConversationListResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const dataVersion = useDataVersion(); // bumps on data-changed (ingest, merges)
 
   useEffect(() => {
     setPage(1);
@@ -23,6 +26,7 @@ export function ConversationsListPage() {
     // can make responses arrive out of order. Either way, only the most recent
     // effect instance's response should ever reach setData.
     let cancelled = false;
+    const stopRequests = scopeRequests(); // abort the query if the search/page changes or we navigate away
     api
       .conversations({ search, sort, page, page_size: 25 })
       .then((r) => {
@@ -33,8 +37,9 @@ export function ConversationsListPage() {
       });
     return () => {
       cancelled = true;
+      stopRequests();
     };
-  }, [search, sort, page]);
+  }, [search, sort, page, dataVersion]);
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.page_size)) : 1;
 

@@ -1,0 +1,620 @@
+{
+ "body": {
+  "participants": [
+   {
+    "display_name": "Erin Evans",
+    "gap_initiator_count": 1,
+    "handle": "+15551110005",
+    "late_night_ratio": 0.0,
+    "median_reply_seconds": 41.727,
+    "message_count": 6,
+    "participant_id": "17433b20-0e08-595b-86e1-636251353758",
+    "personality": [],
+    "reply_histogram": [
+     {
+      "count": 3,
+      "label": "<1m"
+     },
+     {
+      "count": 1,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 0,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 1,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-01",
+      "score": -0.20775
+     },
+     {
+      "bucket": "2024-01-22",
+      "score": 0.4019
+     },
+     {
+      "bucket": "2024-03-18",
+      "score": 0.4569
+     },
+     {
+      "bucket": "2024-03-25",
+      "score": 0.5267
+     }
+    ],
+    "tapbacks_given": [],
+    "tapbacks_received": [
+     {
+      "action": "Emphasized",
+      "count": 1
+     }
+    ],
+    "top_emojis": [
+     {
+      "count": 1,
+      "emoji": "\ud83c\udf89"
+     },
+     {
+      "count": 1,
+      "emoji": "\u2764"
+     }
+    ],
+    "top_words": [
+     {
+      "count": 2,
+      "word": "weekend"
+     },
+     {
+      "count": 2,
+      "word": "friend"
+     },
+     {
+      "count": 2,
+      "word": "today"
+     },
+     {
+      "count": 2,
+      "word": "birthday"
+     },
+     {
+      "count": 2,
+      "word": "home"
+     },
+     {
+      "count": 2,
+      "word": "game"
+     },
+     {
+      "count": 2,
+      "word": "food"
+     },
+     {
+      "count": 2,
+      "word": "thank"
+     },
+     {
+      "count": 2,
+      "word": "dinner"
+     },
+     {
+      "count": 1,
+      "word": "sure"
+     },
+     {
+      "count": 1,
+      "word": "running"
+     },
+     {
+      "count": 1,
+      "word": "soon"
+     },
+     {
+      "count": 1,
+      "word": "morning"
+     },
+     {
+      "count": 1,
+      "word": "tired"
+     },
+     {
+      "count": 1,
+      "word": "party"
+     }
+    ]
+   },
+   {
+    "display_name": "Dev Dhillon",
+    "gap_initiator_count": 2,
+    "handle": "+447911123456",
+    "late_night_ratio": 0.0,
+    "median_reply_seconds": 45.76,
+    "message_count": 10,
+    "participant_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "personality": [],
+    "reply_histogram": [
+     {
+      "count": 6,
+      "label": "<1m"
+     },
+     {
+      "count": 2,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 0,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 2,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-01",
+      "score": 0.0386
+     },
+     {
+      "bucket": "2024-01-15",
+      "score": 0.8402
+     },
+     {
+      "bucket": "2024-01-22",
+      "score": 0.3601
+     },
+     {
+      "bucket": "2024-03-11",
+      "score": 0.34
+     },
+     {
+      "bucket": "2024-03-18",
+      "score": 0.2756333333333333
+     }
+    ],
+    "tapbacks_given": [
+     {
+      "action": "Loved",
+      "count": 1
+     }
+    ],
+    "tapbacks_received": [
+     {
+      "action": "Loved",
+      "count": 1
+     }
+    ],
+    "top_emojis": [],
+    "top_words": [
+     {
+      "count": 3,
+      "word": "late"
+     },
+     {
+      "count": 2,
+      "word": "come"
+     },
+     {
+      "count": 2,
+      "word": "friend"
+     },
+     {
+      "count": 2,
+      "word": "later"
+     },
+     {
+      "count": 2,
+      "word": "today"
+     },
+     {
+      "count": 2,
+      "word": "sorry"
+     },
+     {
+      "count": 2,
+      "word": "movie"
+     },
+     {
+      "count": 1,
+      "word": "miss"
+     },
+     {
+      "count": 1,
+      "word": "game"
+     },
+     {
+      "count": 1,
+      "word": "cat"
+     },
+     {
+      "count": 1,
+      "word": "work"
+     },
+     {
+      "count": 1,
+      "word": "haha"
+     },
+     {
+      "count": 1,
+      "word": "week"
+     },
+     {
+      "count": 1,
+      "word": "running"
+     },
+     {
+      "count": 1,
+      "word": "busy"
+     }
+    ]
+   },
+   {
+    "display_name": "You",
+    "gap_initiator_count": 8,
+    "handle": "",
+    "late_night_ratio": 0.0,
+    "median_reply_seconds": 26.238,
+    "message_count": 47,
+    "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "personality": [
+     {
+      "percentage": 0.0,
+      "trait": "Aggressive"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Chaotic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Dramatic"
+     },
+     {
+      "percentage": 17.4,
+      "trait": "Sarcastic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Chill"
+     },
+     {
+      "percentage": 34.8,
+      "trait": "Wholesome"
+     }
+    ],
+    "reply_histogram": [
+     {
+      "count": 12,
+      "label": "<1m"
+     },
+     {
+      "count": 3,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 0,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 0,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-01",
+      "score": 0.1763846153846154
+     },
+     {
+      "bucket": "2024-01-08",
+      "score": -0.0772
+     },
+     {
+      "bucket": "2024-01-15",
+      "score": -0.0129
+     },
+     {
+      "bucket": "2024-01-22",
+      "score": 0.3432
+     },
+     {
+      "bucket": "2024-01-29",
+      "score": 0.6288333333333334
+     },
+     {
+      "bucket": "2024-02-19",
+      "score": 0.22765000000000002
+     },
+     {
+      "bucket": "2024-03-11",
+      "score": -0.4404
+     },
+     {
+      "bucket": "2024-03-18",
+      "score": 0.16382500000000003
+     },
+     {
+      "bucket": "2024-03-25",
+      "score": 0.27882857142857137
+     }
+    ],
+    "tapbacks_given": [
+     {
+      "action": "Loved",
+      "count": 2
+     },
+     {
+      "action": "Emphasized",
+      "count": 1
+     },
+     {
+      "action": "Laughed",
+      "count": 1
+     },
+     {
+      "action": "Disliked",
+      "count": 1
+     }
+    ],
+    "tapbacks_received": [
+     {
+      "action": "Loved",
+      "count": 2
+     },
+     {
+      "action": "Laughed",
+      "count": 1
+     },
+     {
+      "action": "Disliked",
+      "count": 1
+     }
+    ],
+    "top_emojis": [
+     {
+      "count": 2,
+      "emoji": "\ud83d\ude05"
+     },
+     {
+      "count": 2,
+      "emoji": "\ud83d\udd25"
+     },
+     {
+      "count": 2,
+      "emoji": "\u2764"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83e\udd14"
+     }
+    ],
+    "top_words": [
+     {
+      "count": 9,
+      "word": "photo"
+     },
+     {
+      "count": 8,
+      "word": "tonight"
+     },
+     {
+      "count": 7,
+      "word": "food"
+     },
+     {
+      "count": 7,
+      "word": "tired"
+     },
+     {
+      "count": 6,
+      "word": "text"
+     },
+     {
+      "count": 6,
+      "word": "miss"
+     },
+     {
+      "count": 6,
+      "word": "night"
+     },
+     {
+      "count": 6,
+      "word": "plan"
+     },
+     {
+      "count": 6,
+      "word": "free"
+     },
+     {
+      "count": 6,
+      "word": "weekend"
+     },
+     {
+      "count": 5,
+      "word": "coffee"
+     },
+     {
+      "count": 5,
+      "word": "thanks"
+     },
+     {
+      "count": 5,
+      "word": "movie"
+     },
+     {
+      "count": 5,
+      "word": "soon"
+     },
+     {
+      "count": 5,
+      "word": "meeting"
+     }
+    ]
+   },
+   {
+    "display_name": "+15551110007",
+    "gap_initiator_count": 1,
+    "handle": "+15551110007",
+    "late_night_ratio": 0.0,
+    "median_reply_seconds": 41.6165,
+    "message_count": 6,
+    "participant_id": "e0eec7fa-f3fd-5639-b8b0-80d6c4ded53c",
+    "personality": [],
+    "reply_histogram": [
+     {
+      "count": 3,
+      "label": "<1m"
+     },
+     {
+      "count": 1,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 1,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 1,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-15",
+      "score": 0.8072
+     },
+     {
+      "bucket": "2024-03-18",
+      "score": 0.2626
+     },
+     {
+      "bucket": "2024-03-25",
+      "score": 0.3294
+     }
+    ],
+    "tapbacks_given": [],
+    "tapbacks_received": [],
+    "top_emojis": [],
+    "top_words": [
+     {
+      "count": 2,
+      "word": "photo"
+     },
+     {
+      "count": 2,
+      "word": "movie"
+     },
+     {
+      "count": 2,
+      "word": "morning"
+     },
+     {
+      "count": 2,
+      "word": "tonight"
+     },
+     {
+      "count": 2,
+      "word": "dog"
+     },
+     {
+      "count": 1,
+      "word": "yesterday"
+     },
+     {
+      "count": 1,
+      "word": "cat"
+     },
+     {
+      "count": 1,
+      "word": "coffee"
+     },
+     {
+      "count": 1,
+      "word": "thanks"
+     },
+     {
+      "count": 1,
+      "word": "haha"
+     },
+     {
+      "count": 1,
+      "word": "come"
+     },
+     {
+      "count": 1,
+      "word": "tomorrow"
+     },
+     {
+      "count": 1,
+      "word": "friend"
+     },
+     {
+      "count": 1,
+      "word": "thank"
+     },
+     {
+      "count": 1,
+      "word": "sure"
+     }
+    ]
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-groupnoname-participant-stats",
+  "path": "/api/conversations/{conv:#7}/participant-stats"
+ },
+ "status": 200
+}

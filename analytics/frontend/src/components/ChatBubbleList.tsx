@@ -59,7 +59,10 @@ export function ChatBubbleList({
   const scrollRef = useRef<HTMLDivElement>(null);
   const topSentinelRef = useRef<HTMLDivElement>(null);
   const bottomSentinelRef = useRef<HTMLDivElement>(null);
-  const prevScrollHeight = useRef(0);
+  // Scroll anchor captured before a page is added: the first visible message
+  // and its offset from the viewport top, restored after render. Robust to
+  // content being evicted from the opposite end (unlike a scrollHeight delta).
+  const scrollAnchor = useRef<{ id: string; offset: number; first: string | undefined; len: number } | null>(null);
   const stickToBottom = useRef(true);
   const prevJumpVersion = useRef(0);
 
@@ -76,6 +79,19 @@ export function ChatBubbleList({
   const meIds = useMemo(() => new Set(participants.filter((p) => p.is_me).map((p) => p.id)), [participants]);
   const colorFor = useMemo(() => buildParticipantColorMap(participants), [participants]);
 
+  const captureAnchor = (scrollEl: HTMLElement) => {
+    const top = scrollEl.getBoundingClientRect().top;
+    const nodes = scrollEl.querySelectorAll<HTMLElement>("[id^='message-']");
+    for (const el of nodes) {
+      const r = el.getBoundingClientRect();
+      if (r.bottom > top) {
+        scrollAnchor.current = { id: el.id, offset: r.top - top, first: messages[0]?.id, len: messages.length };
+        return;
+      }
+    }
+    scrollAnchor.current = null;
+  };
+
   const handleJumpToDate = () => {
     if (!dateInput) return;
     setViewingAnchor(true);
@@ -84,14 +100,14 @@ export function ChatBubbleList({
     // loadOlder/loadNewer call that was in flight when the jump fired --
     // it refers to the pre-jump DOM and would otherwise scroll the newly
     // jumped-to window to a bogus offset.
-    prevScrollHeight.current = 0;
+    scrollAnchor.current = null;
     jumpToDate(dateInput);
   };
 
   const handleSelectSearchResult = (messageId: string) => {
     setViewingAnchor(true);
     setSearchOpen(false);
-    prevScrollHeight.current = 0;
+    scrollAnchor.current = null;
     jumpToMessage(messageId);
   };
 
@@ -99,7 +115,7 @@ export function ChatBubbleList({
     setViewingAnchor(false);
     setDateInput("");
     stickToBottom.current = true;
-    prevScrollHeight.current = 0;
+    scrollAnchor.current = null;
     resetToLatest();
   };
 
@@ -146,7 +162,7 @@ export function ChatBubbleList({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasOlder && !loading) {
-          prevScrollHeight.current = scrollEl.scrollHeight;
+          captureAnchor(scrollEl);
           loadOlder();
         }
       },
@@ -165,6 +181,7 @@ export function ChatBubbleList({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasNewer && !loading) {
+          captureAnchor(scrollEl);
           loadNewer();
         }
       },
@@ -190,10 +207,15 @@ export function ChatBubbleList({
       return;
     }
 
-    if (prevScrollHeight.current) {
-      scrollEl.scrollTop = scrollEl.scrollHeight - prevScrollHeight.current;
-      prevScrollHeight.current = 0;
-    } else if (stickToBottom.current && messages.length > 0) {
+    const pending = scrollAnchor.current;
+    if (pending && (pending.first !== messages[0]?.id || pending.len !== messages.length)) {
+      const a = pending;
+      scrollAnchor.current = null;
+      const el = document.getElementById(a.id);
+      if (el) {
+        scrollEl.scrollTop += el.getBoundingClientRect().top - scrollEl.getBoundingClientRect().top - a.offset;
+      }
+    } else if (!pending && stickToBottom.current && messages.length > 0) {
       scrollEl.scrollTop = scrollEl.scrollHeight;
     }
   }, [messages, jumpVersion, anchorId]);

@@ -1,0 +1,95 @@
+{
+ "body": {
+  "fastest_reply_message": {
+   "message_id": "a0dd4951-a86e-5dd8-9a21-461aa64b0dc9",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "",
+   "timestamp": "2024-01-05T09:47:18.652",
+   "value": 83.204
+  },
+  "happiest_message": {
+   "message_id": "90b88ea4-44d9-5244-96b1-003e6478c821",
+   "sender_display_name": "Alice Anders",
+   "sender_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+   "text": "And train tomorrow sorry awesome call and free yes thank miss great wow!",
+   "timestamp": "2024-01-06T07:32:18.498",
+   "value": 0.9633
+  },
+  "late_night_message": {
+   "message_id": "38b77cfd-2740-5bda-a67c-1299f2e91d82",
+   "sender_display_name": "Alice Anders",
+   "sender_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+   "text": "Busy flight weather have what tomorrow I friend what we it friend of",
+   "timestamp": "2024-04-02T23:53:19.473",
+   "value": 534.0
+  },
+  "longest_message": {
+   "message_id": "a5f4ea98-008a-58d5-bcf3-2a55b6bdba79",
+   "sender_display_name": "Alice Anders",
+   "sender_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+   "text": "Running going lunch maybe home party flight on birthday not on that this https://example.com/0b3d84",
+   "timestamp": "2024-01-10T07:55:14.267",
+   "value": 99.0
+  },
+  "most_aggressive_message": null,
+  "most_argued_message": {
+   "message_id": "d062a4b6-545f-50d4-ac50-1ac3695a3524",
+   "sender_display_name": "Alice Anders",
+   "sender_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+   "text": "To so awesome \ud83d\ude2d",
+   "timestamp": "2024-01-05T09:45:13.158",
+   "value": 1.0
+  },
+  "most_disliked_message": {
+   "message_id": "9a737b18-4f8c-5dba-bbc0-79f49b5ac319",
+   "sender_display_name": "Alice Anders",
+   "sender_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+   "text": "He home the!",
+   "timestamp": "2024-01-24T10:53:48.622",
+   "value": 1.0
+  },
+  "most_emoji_message": {
+   "message_id": "9a837ddb-3a3e-5883-9d09-60759c721dd4",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "Call yesterday running this sorry pizza they photo come dinner thanks thanks photo sure \ud83d\ude4f",
+   "timestamp": "2024-01-05T09:44:57.879",
+   "value": 1.0
+  },
+  "most_laughed_message": {
+   "message_id": "13fb21e1-d2cf-5d05-805e-0d12011796fb",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "Friend movie train song song that was show the night tired",
+   "timestamp": "2024-01-21T08:23:53.773",
+   "value": 1.0
+  },
+  "most_loved_message": {
+   "message_id": "d33b0fec-4104-5144-acad-c5c3b11871dc",
+   "sender_display_name": "Alice Anders",
+   "sender_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+   "text": "Home he you lol see call coffee not!",
+   "timestamp": "2024-01-05T09:50:17.325",
+   "value": 1.0
+  },
+  "most_reacted_message": {
+   "message_id": "d33b0fec-4104-5144-acad-c5c3b11871dc",
+   "sender_display_name": "Alice Anders",
+   "sender_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+   "text": "Home he you lol see call coffee not!",
+   "timestamp": "2024-01-05T09:50:17.325",
+   "value": 1.0
+  },
+  "most_revolving_door": null,
+  "top_photo_changer": null,
+  "top_renamer": null,
+  "top_unsender": null
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-1to1-leaderboard",
+  "path": "/api/conversations/{conv:#1}/leaderboard"
+ },
+ "status": 200
+}

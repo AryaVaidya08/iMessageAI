@@ -1,0 +1,42 @@
+{
+ "body": {
+  "items": [
+   {
+    "conversation_id": "1aeea4d7-3d30-56c1-84aa-de7616c2bdae",
+    "display_name": "Alice Anders",
+    "is_group_chat": false,
+    "message_count": 184
+   },
+   {
+    "conversation_id": "1e30fd2e-d07d-5e4a-88f3-98d014aa0fb1",
+    "display_name": "Weekend Crew 2",
+    "is_group_chat": true,
+    "message_count": 91
+   },
+   {
+    "conversation_id": "05c399e3-a03e-57de-b4d4-1783ff99b459",
+    "display_name": "Bob Baker",
+    "is_group_chat": false,
+    "message_count": 75
+   },
+   {
+    "conversation_id": "d887ae7f-82d0-5bef-8a40-ced899495851",
+    "display_name": "Erin Evans, Dev Dhillon, +15551110007",
+    "is_group_chat": true,
+    "message_count": 69
+   },
+   {
+    "conversation_id": "c85a21fd-8310-59af-87d4-c616d40a64a2",
+    "display_name": "Carol Chen",
+    "is_group_chat": false,
+    "message_count": 67
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "overview-top-conversations",
+  "path": "/api/overview/top-conversations?limit=5"
+ },
+ "status": 200
+}

@@ -1,0 +1,13 @@
+{
+ "body": {
+  "display_name": "Dev Dhillon",
+  "handle": "+447911123456",
+  "id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6"
+ },
+ "case": {
+  "method": "GET",
+  "name": "person-dev",
+  "path": "/api/people/{person:+447911123456}"
+ },
+ "status": 200
+}

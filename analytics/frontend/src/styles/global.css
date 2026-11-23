@@ -33,3 +33,20 @@ a { color: var(--color-accent); text-decoration: none; }
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Scrollbars: transparent track, semi-transparent thumb tinted opposite to the background */
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--color-text-primary) 30%, transparent) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+*::-webkit-scrollbar-track, *::-webkit-scrollbar-corner { background: transparent; }
+*::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--color-text-primary) 30%, transparent); border-radius: 4px; }
+*::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--color-text-primary) 50%, transparent); }
+
+/* Root (page) scrollbar: make the track transparent over the page background */
+html {
+  background: var(--color-bg);
+  color-scheme: light dark;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-text-primary) 30%, transparent) transparent;
+}
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }

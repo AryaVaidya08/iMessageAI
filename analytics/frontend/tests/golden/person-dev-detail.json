@@ -1,0 +1,506 @@
+{
+ "body": {
+  "conversation_count": 2,
+  "conversations": [
+   {
+    "conversation_id": "d887ae7f-82d0-5bef-8a40-ced899495851",
+    "display_name": "Erin Evans, Dev Dhillon, +15551110007",
+    "is_group_chat": true,
+    "message_count": 69,
+    "relationship_type": "other"
+   },
+   {
+    "conversation_id": "a315f903-1929-5e49-9ed4-bba2741587c0",
+    "display_name": "Dev Dhillon",
+    "is_group_chat": false,
+    "message_count": 58,
+    "relationship_type": "other"
+   }
+  ],
+  "display_name": "Dev Dhillon",
+  "first_message_at": "2024-01-01T19:29:27.706",
+  "handle": "+447911123456",
+  "heatmap": {
+   "grid": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0,
+     1,
+     0,
+     0,
+     1,
+     1,
+     2,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     5,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     6,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0
+    ]
+   ]
+  },
+  "id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+  "last_message_at": "2024-04-03T07:45:33.290",
+  "leaderboard": {
+   "fastest_reply_message": {
+    "message_id": "872f4202-a92a-516f-94f9-b42465230bd4",
+    "sender_display_name": "Dev Dhillon",
+    "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "text": "Dad soon can for lol",
+    "timestamp": "2024-01-08T12:36:35.671",
+    "value": 44.606
+   },
+   "happiest_message": {
+    "message_id": "2bcce6ba-9217-56ed-835e-c51a5cb70bbc",
+    "sender_display_name": "Dev Dhillon",
+    "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "text": "Sure haha miss week home dinner great was great tickets work morning late sure",
+    "timestamp": "2024-03-23T07:55:42.639",
+    "value": 0.9349
+   },
+   "late_night_message": {
+    "message_id": "d54b9663-cb18-57df-8e15-6a7f00b700d7",
+    "sender_display_name": "Dev Dhillon",
+    "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "text": "I of late he train show idea is",
+    "timestamp": "2024-02-01T02:37:21.403",
+    "value": 698.0
+   },
+   "longest_message": {
+    "message_id": "7d9e573d-6992-5c32-88b9-5f447f18f9c3",
+    "sender_display_name": "Dev Dhillon",
+    "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "text": "Train okay can later tonight today late traffic with cat really wanna free running",
+    "timestamp": "2024-03-31T21:57:39.623",
+    "value": 82.0
+   },
+   "most_aggressive_message": null,
+   "most_argued_message": {
+    "message_id": "86e0a983-e722-56ef-9880-900b6ff96d1c",
+    "sender_display_name": "Dev Dhillon",
+    "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "text": "Miss on okay",
+    "timestamp": "2024-01-05T11:29:49.397",
+    "value": 1.0
+   },
+   "most_disliked_message": {
+    "message_id": "5d4849d1-0c59-5902-8a73-cae5cb35f125",
+    "sender_display_name": "Dev Dhillon",
+    "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "text": "Movie he on miss!",
+    "timestamp": "2024-01-14T14:51:48.856",
+    "value": 1.0
+   },
+   "most_emoji_message": {
+    "message_id": "901401e6-dff3-5f6b-91d6-67a1825cb812",
+    "sender_display_name": "Dev Dhillon",
+    "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "text": "Haha song see he love work but maybe sure she sorry on morning what \ud83c\udf89",
+    "timestamp": "2024-01-08T12:37:20.277",
+    "value": 1.0
+   },
+   "most_laughed_message": null,
+   "most_loved_message": {
+    "message_id": "86e0a983-e722-56ef-9880-900b6ff96d1c",
+    "sender_display_name": "Dev Dhillon",
+    "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "text": "Miss on okay",
+    "timestamp": "2024-01-05T11:29:49.397",
+    "value": 1.0
+   },
+   "most_reacted_message": {
+    "message_id": "86e0a983-e722-56ef-9880-900b6ff96d1c",
+    "sender_display_name": "Dev Dhillon",
+    "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "text": "Miss on okay",
+    "timestamp": "2024-01-05T11:29:49.397",
+    "value": 1.0
+   },
+   "most_revolving_door": null,
+   "top_photo_changer": null,
+   "top_renamer": null,
+   "top_unsender": null
+  },
+  "message_count": 39,
+  "stats": {
+   "display_name": "Dev Dhillon",
+   "gap_initiator_count": 6,
+   "handle": "+447911123456",
+   "late_night_ratio": 0.10256410256410256,
+   "median_reply_seconds": 49.6005,
+   "message_count": 39,
+   "participant_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+   "personality": [
+    {
+     "percentage": 0.0,
+     "trait": "Aggressive"
+    },
+    {
+     "percentage": 0.0,
+     "trait": "Chaotic"
+    },
+    {
+     "percentage": 0.0,
+     "trait": "Dramatic"
+    },
+    {
+     "percentage": 27.0,
+     "trait": "Sarcastic"
+    },
+    {
+     "percentage": 0.0,
+     "trait": "Chill"
+    },
+    {
+     "percentage": 48.6,
+     "trait": "Wholesome"
+    }
+   ],
+   "reply_histogram": [
+    {
+     "count": 16,
+     "label": "<1m"
+    },
+    {
+     "count": 9,
+     "label": "1-5m"
+    },
+    {
+     "count": 0,
+     "label": "5-30m"
+    },
+    {
+     "count": 0,
+     "label": "30m-2h"
+    },
+    {
+     "count": 0,
+     "label": "2-12h"
+    },
+    {
+     "count": 0,
+     "label": "12-24h"
+    },
+    {
+     "count": 5,
+     "label": ">24h"
+    }
+   ],
+   "sentiment_series": [
+    {
+     "bucket": "2024-01-01",
+     "score": 0.18592857142857142
+    },
+    {
+     "bucket": "2024-01-08",
+     "score": 0.5637833333333334
+    },
+    {
+     "bucket": "2024-01-15",
+     "score": 0.8402
+    },
+    {
+     "bucket": "2024-01-22",
+     "score": 0.3601
+    },
+    {
+     "bucket": "2024-01-29",
+     "score": 0.2168
+    },
+    {
+     "bucket": "2024-02-05",
+     "score": 0.7959
+    },
+    {
+     "bucket": "2024-02-26",
+     "score": 0.7814
+    },
+    {
+     "bucket": "2024-03-11",
+     "score": 0.34
+    },
+    {
+     "bucket": "2024-03-18",
+     "score": 0.1990857142857143
+    },
+    {
+     "bucket": "2024-03-25",
+     "score": 0.58875
+    },
+    {
+     "bucket": "2024-04-01",
+     "score": 0.43360000000000004
+    }
+   ],
+   "tapbacks_given": [
+    {
+     "action": "Disliked",
+     "count": 1
+    },
+    {
+     "action": "Loved",
+     "count": 1
+    }
+   ],
+   "tapbacks_received": [
+    {
+     "action": "Disliked",
+     "count": 1
+    },
+    {
+     "action": "Loved",
+     "count": 1
+    }
+   ],
+   "top_emojis": [
+    {
+     "count": 1,
+     "emoji": "\ud83c\udf89"
+    },
+    {
+     "count": 1,
+     "emoji": "\u2764"
+    },
+    {
+     "count": 1,
+     "emoji": "\ud83d\udd25"
+    }
+   ],
+   "top_words": [
+    {
+     "count": 10,
+     "word": "late"
+    },
+    {
+     "count": 7,
+     "word": "sure"
+    },
+    {
+     "count": 7,
+     "word": "come"
+    },
+    {
+     "count": 6,
+     "word": "later"
+    },
+    {
+     "count": 6,
+     "word": "love"
+    },
+    {
+     "count": 6,
+     "word": "tickets"
+    },
+    {
+     "count": 6,
+     "word": "haha"
+    },
+    {
+     "count": 6,
+     "word": "sorry"
+    },
+    {
+     "count": 6,
+     "word": "today"
+    },
+    {
+     "count": 5,
+     "word": "traffic"
+    },
+    {
+     "count": 5,
+     "word": "tomorrow"
+    },
+    {
+     "count": 5,
+     "word": "pizza"
+    },
+    {
+     "count": 5,
+     "word": "movie"
+    },
+    {
+     "count": 5,
+     "word": "miss"
+    },
+    {
+     "count": 4,
+     "word": "morning"
+    }
+   ]
+  }
+ },
+ "case": {
+  "method": "GET",
+  "name": "person-dev-detail",
+  "path": "/api/people/{person:+447911123456}/detail"
+ },
+ "status": 200
+}
