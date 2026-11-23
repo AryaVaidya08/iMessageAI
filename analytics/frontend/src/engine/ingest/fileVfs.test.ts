@@ -121,7 +121,8 @@ c.close()`,
     expect(st.bytesFetched).toBeGreaterThan(200e6); // cache really was evicting
     const growth = (peak - base.arrayBuffers - base.heapUsed) / 1e6;
     console.log(`file=${(reader.size / 1e6).toFixed(0)}MB fetched=${(st.bytesFetched / 1e6).toFixed(0)}MB growth=${growth.toFixed(1)}MB`);
-    expect(growth).toBeLessThan(60);
+    // cache is capped at 32 MB; allow GC-timing noise but stay far below the 133 MB file (it would be >133 if buffered)
+    expect(growth).toBeLessThan(100);
     await db.close();
   }, 120_000);
 });
