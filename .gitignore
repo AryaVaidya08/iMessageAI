@@ -20,3 +20,12 @@ analytics/frontend/dist/
 !backend/parser/storage/.gitkeep
 # test fixtures (generated)
 analytics/frontend/tests/.cache/
+
+# legacy_backend (renamed from backend/): personal iMessage data, never commit
+legacy_backend/parser/raw_export/*
+legacy_backend/parser/storage/*
+legacy_backend/parser/data/
+legacy_backend/storage/data/
+legacy_backend/parser/scripts/extract_specific_convo.sh
+!legacy_backend/parser/raw_export/.gitkeep
+!legacy_backend/parser/storage/.gitkeep
