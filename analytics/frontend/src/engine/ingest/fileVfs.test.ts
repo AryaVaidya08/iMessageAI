@@ -105,7 +105,7 @@ c.close()`,
     const reader = nodeReader(join(dir, "big.db"));
     expect(reader.size).toBeGreaterThan(100e6);
     const db = await openChatDb(new Blob([]), { reader, wasmUrl, wasmBinary, cacheBytes: 8 * 1024 * 1024 });
-    global.gc?.();
+    (globalThis as any).gc?.();
     const base = process.memoryUsage();
     let peak = 0;
     // full table scan twice => touches ~260MB of reads through an 8MB cache

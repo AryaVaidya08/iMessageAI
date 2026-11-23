@@ -112,6 +112,9 @@ class LruChunks {
   get size() {
     return this.map.size;
   }
+  clear() {
+    this.map.clear();
+  }
 }
 
 /** Read-only VFS exposing one file under `dbName`. */
@@ -131,6 +134,12 @@ export class FileVFS extends (VFS.Base as new () => any) {
     super();
     this.name = name;
     this.cache = new LruChunks(Math.max(4, Math.floor(cacheBytes / CHUNK_BYTES)));
+  }
+
+  /** Drop cached pages and the reader so the File can be released. */
+  release() {
+    this.cache.clear();
+    this.reader = { size: this.reader.size, read: () => new Uint8Array(0) };
   }
 
   get cachedChunks() {
@@ -293,6 +302,7 @@ export async function openChatDb(file: Blob, opts: OpenOptions = {}): Promise<Ch
     await each("SELECT count(*) FROM sqlite_master", undefined, () => {});
   } catch (e) {
     try { await sqlite3.close(db); } catch { /* ignore */ }
+    vfs.release();
     throw e;
   }
 
@@ -310,7 +320,11 @@ export async function openChatDb(file: Blob, opts: OpenOptions = {}): Promise<Ch
     },
     stats: () => ({ reads: vfs.reads, bytesFetched: vfs.bytesFetched, cachedChunks: vfs.cachedChunks }),
     async close() {
-      await sqlite3.close(db);
+      try {
+        await sqlite3.close(db);
+      } finally {
+        vfs.release();
+      }
     },
   };
   return handle;
@@ -323,5 +337,10 @@ function friendly(e: unknown): Error {
     return new ChatDbError("encrypted", "SQLite could not read this file. It may be encrypted or damaged.");
   if (/malformed|corrupt|disk image/i.test(msg))
     return new ChatDbError("corrupt", "The database appears to be corrupt or incomplete (was the copy interrupted?).");
+  if (/unable to open|cantopen/i.test(msg))
+    return new ChatDbError(
+      "unsupported",
+      "Could not open this database. If it is a WAL-mode chat.db, close Messages and re-copy chat.db (and chat.db-wal) before uploading.",
+    );
   return e as Error; // ordinary SQL errors (bad query, missing table) pass through
 }
