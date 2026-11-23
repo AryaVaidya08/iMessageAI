@@ -39,6 +39,8 @@ export interface RunArgs {
 
 class Cancelled extends Error {}
 
+/** Release the storage handles this often (see AppDb.recycle): keeps the browser process's memory flat. */
+const RECYCLE_EVERY_MESSAGES = Number.POSITIVE_INFINITY; // disabled: reopening the OPFS handles hung in Chrome
 const KEY_FP = "chat_db_fingerprint";
 const KEY_LAST = "last_rowid";
 
@@ -143,6 +145,7 @@ export async function runIngest(args: RunArgs): Promise<void> {
 
     emit({ type: "phase", phase: "chats" });
     let idx = 0;
+    let lastRecycle = 0;
     for (const { chat, after, expected } of plan) {
       check();
       idx++;
@@ -168,6 +171,10 @@ export async function runIngest(args: RunArgs): Promise<void> {
         });
         emitOverall();
         if (++nb % 5 === 0) mem();
+        if (overall.messagesDone - lastRecycle >= RECYCLE_EVERY_MESSAGES) {
+          lastRecycle = overall.messagesDone;
+          await writer.recycle?.();
+        }
         // yield so a queued cancel message can be handled between batches
         await new Promise((r) => setTimeout(r, 0));
       }

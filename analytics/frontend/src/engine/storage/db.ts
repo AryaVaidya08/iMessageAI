@@ -12,6 +12,10 @@ import type { Queryable, SqlValue } from "./helpers";
 import { OPFS_DIR_NAME, markSaved } from "./marker";
 
 const OPFS_DIR = `/${OPFS_DIR_NAME}`;
+// journal_mode=MEMORY + synchronous=OFF: no rollback-journal file and no fsyncs, which cut the import's memory peak
+// (+619 -> +470 MB on the 100 MB fixture) and time. Measured: flushing on commit (NORMAL) did not reduce memory. An
+// interrupted import resumes from per-chat watermarks.
+const PRAGMAS = "PRAGMA foreign_keys = ON; PRAGMA journal_mode = MEMORY; PRAGMA synchronous = OFF; PRAGMA cache_size = -8192;";
 const DB_FILE = "app.db";
 
 type SQLiteAPI = ReturnType<typeof SQLite.Factory>;
@@ -51,6 +55,9 @@ class TxLock {
   }
 }
 
+const isBusy = (e: unknown) =>
+  /NoModificationAllowed|Access Handles cannot be created|already in use|locked/i.test(`${(e as { name?: string })?.name} ${(e as Error)?.message}`);
+
 let wasmBytes = () => 0;
 /** Bytes currently reserved by the SQLite wasm heap(s) in this worker (a real, if partial, memory figure). */
 export function sqliteWasmBytes(): number {
@@ -66,6 +73,36 @@ export class AppDb implements Queryable {
     private db: number,
     private vfs: AccessHandlePoolVFS,
   ) {}
+
+  /**
+   * Closes the connection and the OPFS file handles, then reopens them. Chrome's browser process keeps buffering data
+   * written through long-lived sync access handles (its memory grew with the amount written and was only released
+   * when the handles closed), so the import recycles periodically. Call between transactions.
+   */
+  recycle(): Promise<void> {
+    return this.mutex.run(async () => {
+      await this.sqlite3.close(this.db);
+      await this.vfs.close();
+      // the closed handles can take a moment to be released: retry while OPFS reports them busy
+      let lastErr: unknown;
+      for (let attempt = 0; attempt < 100; attempt++) {
+        try {
+          const vfs = new AccessHandlePoolVFS(OPFS_DIR);
+          await vfs.isReady;
+          this.sqlite3.vfs_register(vfs as never, true);
+          this.vfs = vfs;
+          this.db = await this.sqlite3.open_v2(DB_FILE);
+          await this.sqlite3.exec(this.db, PRAGMAS);
+          return;
+        } catch (e) {
+          lastErr = e;
+          if (!isBusy(e)) throw e;
+          await new Promise((r) => setTimeout(r, 100));
+        }
+      }
+      throw lastErr;
+    });
+  }
 
   /** BEGIN waits for any other transaction; COMMIT/ROLLBACK release. Plain statements never wait. */
   private async guard<T>(sql: string, fn: () => Promise<T>): Promise<T> {
@@ -149,9 +186,6 @@ export class AppDb implements Queryable {
   }
 }
 
-const isBusy = (e: unknown) =>
-  /NoModificationAllowed|Access Handles cannot be created|already in use|locked/i.test(`${(e as { name?: string })?.name} ${(e as Error)?.message}`);
-
 /**
  * Opens (creating if needed) and migrates the app DB. Call once per worker. After a page reload the previous page's
  * worker may still hold the exclusive OPFS handles for a moment, so a busy error is retried for up to ~15 s.
@@ -184,9 +218,7 @@ async function openAppDbOnce(): Promise<AppDb> {
     try {
       // 16 KB pages (only effective when the file is created); modest page cache keeps the wasm heap small.
       await app.exec("PRAGMA page_size = 16384;");
-      // journal_mode=MEMORY + synchronous=OFF: no rollback-journal file and no fsyncs, which roughly halves the bytes
-      // written to OPFS (the browser process grew in step with them). An interrupted import resumes from per-chat watermarks.
-      await app.exec("PRAGMA foreign_keys = ON; PRAGMA journal_mode = MEMORY; PRAGMA synchronous = OFF; PRAGMA cache_size = -8192;");
+      await app.exec(PRAGMAS);
       await migrate({
         exec: (s) => app.exec(s),
         getUserVersion: async () => Number((await app.all<{ user_version: number }>("PRAGMA user_version"))[0].user_version),

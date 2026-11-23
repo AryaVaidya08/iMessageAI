@@ -391,6 +391,10 @@ class AppWriter implements AppDbWriter {
     }
   }
 
+  recycle(): Promise<void> {
+    return (this.app as unknown as { recycle?: () => Promise<void> }).recycle?.() ?? Promise.resolve();
+  }
+
   close(): Promise<void> {
     return this.app.close();
   }

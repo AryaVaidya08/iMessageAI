@@ -13,7 +13,7 @@ npm run dev          # http://localhost:5173
 npm run build        # -> dist/   (npm run preview to serve it)
 ```
 
-Use a recent **Chromium-based browser** (Chrome, Edge, Brave). It needs Web Workers, WebAssembly and IndexedDB.
+Use a recent **Chromium-based browser** (Chrome, Edge, Brave). It needs Web Workers, WebAssembly and the origin-private file system (OPFS). Only Chrome was tested.
 
 ## What to upload
 
@@ -47,8 +47,8 @@ Then upload `tests/.cache/chat-small.db` (600 messages) or `tests/.cache/chat-10
   `File.slice` with a 32 MB cache), never loaded into memory. A copied `-wal` is replayed (committed frames only,
   checksums validated).
 - **Streaming import, viewable while it runs.** An ingest worker parses chat by chat in ROWID order, one transaction per
-  batch, into a SQLite database (wa-sqlite) stored in the browser's IndexedDB. A second worker serves the analytics, so you
-  can open Overview / Conversations / People while the import is still running; pages refresh as chats finish.
+  batch, into a SQLite database (wa-sqlite) stored in the browser's origin-private file system (OPFS). The same worker serves
+  the analytics between batches, so you can open Overview / Conversations / People while the import is still running; pages refresh as chats finish.
 - **Debug console.** The dock at the bottom shows the phase, the chat being parsed, per-chat and overall progress with ETA
   and throughput, and a log. `/debug` keeps it open.
 - **Incremental sync.** Dropping a newer `chat.db` again processes only new messages (per-chat ROWID watermark), re-checks
@@ -67,21 +67,31 @@ Then upload `tests/.cache/chat-small.db` (600 messages) or `tests/.cache/chat-10
 | `npm run test:e2e` | real-browser tests (system Chrome): upload, browse during import, all pages, sync, merge, WAL, delete |
 | `MEMORY_SIZE=100mb npm run test:e2e -- tests/e2e/memory.spec.ts` | resident memory of the whole test browser during an import |
 
-## Memory: measured, and what is not solved
+## Memory: measured, and what is NOT solved
 
-Measured as the resident memory (RSS) of every process of a headless Chrome test browser (an empty app already uses ~720 MB):
+Measured as the **physical footprint** (what macOS Activity Monitor / memory pressure use) of every process of a headless
+Chrome test browser, as growth above an empty app (an empty app is 215 MB). `MEMORY_SIZE=100mb npm run test:e2e -- tests/e2e/memory.spec.ts`.
 
-| import | peak above empty app | notes |
-|---|---|---|
-| 100 MB chat.db (220k messages) | about +730 MB (renderer +560, browser/IndexedDB +160) | imports in ~20-35 s |
-| 1 GB chat.db (2.19M messages) | **did not finish**: stalled at 1.43M messages with ~3.4 GB total (renderer ~0.9, browser/IndexedDB ~2.3) | cause not diagnosed |
+| import | peak growth | settles at | time |
+|---|---|---|---|
+| 100 MB chat.db (220k messages) | **+470 MB** | +305 MB | 27 s |
+| 1 GB chat.db (2.19M messages) | **not met**: stopped by the 3 GB safety cap at 1.84M messages (84%): +2.7 GB (browser process 1.9 GB, renderer 0.9 GB) | n/a | 8 min to 84% |
 
-The JS heap itself stays at a few MB and the workers' own JS+wasm memory is ~40 MB (Chrome `measureUserAgentSpecificMemory`);
-the remainder is browser-internal (IndexedDB backing store, renderer allocations). **This does not meet the original
-500 MB budget**, and large imports (1 GB chat.db, ~2.2M messages) use several GB of browser memory in this design. Memory
-grows with the amount of imported data (the browser process that hosts IndexedDB). A real Messages database of a few hundred
-thousand messages is in the 100 MB class above; a multi-GB one is not supported yet. Known next steps: find why the 1 GB
-import stalls, and move storage off IndexedDB (OPFS) once a multi-connection VFS is available.
+**The target (flat memory, well under 500 MB growth at 1 GB, and a completed 1 GB import) is not met.**
+Memory grows roughly linearly with the data written (about 0.9 MB per 1,000 messages in Chrome's browser process).
+
+What the investigation established:
+- Not the JS heap (a few MB) and not the workers' JS+wasm (about 40 MB, `measureUserAgentSpecificMemory`).
+- Not reading chat.db: reading 613 MB through `FileReaderSync` slices leaves the browser process flat (+10 MB).
+- IndexedDB was worse (browser process about 1.5x the data, and a 1 GB import stalled at 65%); the OPFS storage now used
+  completes much further and is faster. In-memory journal + `synchronous=OFF` cut the 100 MB peak from +619 to +470 MB.
+- Not fixed by: smaller pages/indexes (helped IndexedDB only), staging chat.db into OPFS (no gain), flushing on commit (no gain).
+- An attempt to periodically close and reopen the OPFS handles to release the browser's memory hung in Chrome (disabled).
+- RSS (shown by `ps`) overstates real memory by about 2x because it counts reclaimable file-backed pages.
+
+Storage is one engine worker that owns the OPFS database (wa-sqlite `AccessHandlePoolVFS`, exclusive) and interleaves ingest
+batches with query requests, so pages stay browsable during an import. Multi-connection VFSes (`OPFSCoopSyncVFS`) are not in
+wa-sqlite 1.0.0. Realistic use today: databases up to a few hundred MB / ~1M messages.
 
 ## Legacy
 

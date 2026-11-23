@@ -85,6 +85,8 @@ export interface AppDbWriter {
   ): Promise<Map<string, { dateEdited: string | null; dateRetracted: string | null }>>;
   /** Update date_edited/date_retracted/text of existing messages. One transaction. */
   applyEdits(chat: ChatInfo, batch: MessageBatch): Promise<number>;
+  /** Optional: release long-lived storage handles between batches (see AppDb.recycle). */
+  recycle?(): Promise<void>;
   close?(): Promise<void>;
 }
 
