@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head><meta charset="utf-8" /><title>storage harness (dev only)</title></head>
+  <body>
+    <pre id="out">ready</pre>
+    <script type="module">
+      const w = new Worker(new URL("/src/engine/storage/harness.worker.ts", import.meta.url), { type: "module" });
+      let n = 0;
+      window.run = (cmd) => new Promise((res) => {
+        const id = ++n;
+        const h = (e) => { if (e.data.id === id) { w.removeEventListener("message", h); document.getElementById("out").textContent += "\n" + cmd + ": " + JSON.stringify(e.data); res(e.data); } };
+        w.addEventListener("message", h);
+        w.postMessage({ id, cmd });
+      });
+    </script>
+  </body>
+</html>
