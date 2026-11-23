@@ -36,6 +36,7 @@ export function useLiveQuery<T>(fn: () => Promise<T>, deps: unknown[]) {
         },
       );
     };
+    setData(null);
     setLoading(true);
     run();
     const off = onDataChanged(() => {

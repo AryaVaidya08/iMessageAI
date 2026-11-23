@@ -26,7 +26,7 @@ export function hasRoute(name: string): boolean {
   return routes.has(name);
 }
 
-/** `db` may be null only when the route is unregistered (error is thrown first). */
+/** The DB is only opened (via getDb) once the route is known to exist. */
 export async function dispatch(
   getDb: () => Promise<QueryDb>,
   route: string,

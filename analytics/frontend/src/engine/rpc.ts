@@ -26,6 +26,11 @@ export function createRpcClient(transport: RpcTransport): RpcCall {
     if (msg.ok) p.resolve(msg.result);
     else p.reject(Object.assign(new Error(msg.detail), { status: msg.status, detail: msg.detail }));
   });
+  // Lets the owner of the worker reject everything in flight if it crashes.
+  (transport as RpcTransport & { rejectAll?: (m: string) => void }).rejectAll = (m) => {
+    for (const p of pending.values()) p.reject(Object.assign(new Error(m), { status: 500, detail: m }));
+    pending.clear();
+  };
   return function call<T>(route: string, params: Record<string, unknown> = {}): Promise<T> {
     const id = next++;
     return new Promise<T>((resolve, reject) => {
