@@ -53,7 +53,10 @@ describe("schema", () => {
     expect(db.prepare("SELECT sender_id FROM v_messages WHERE id='m3'").get()).toEqual({ sender_id: "+15551234567" });
     db.exec("DELETE FROM conversations WHERE id='c1'");
     expect(db.prepare("SELECT count(*) n FROM messages").get()).toEqual({ n: 0 });
-    expect(db.prepare("SELECT count(*) n FROM tapbacks").get()).toEqual({ n: 0 });
+    // tapbacks have no FK to messages (a reaction can arrive before its target), so deleting
+    // messages is done explicitly by the ingest writer (see AppWriter.deleteMessages)
+    expect(db.prepare("SELECT count(*) n FROM tapbacks").get()).toEqual({ n: 1 });
+    expect(() => db.exec("INSERT INTO tapbacks(message_id,reactor_id,action) VALUES('not-yet-ingested','me','liked')")).not.toThrow();
   });
 
   it("uses the conversation/timestamp index for paging", async () => {

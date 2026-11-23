@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDataVersion } from "../hooks/useLiveQuery";
 import { Link } from "react-router-dom";
 
 import { api, type ConversationListResponse } from "../api/client";
@@ -10,6 +11,7 @@ export function ConversationsListPage() {
   const [page, setPage] = useState(1);
   const [data, setData] = useState<ConversationListResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const dataVersion = useDataVersion(); // bumps on data-changed (ingest, merges)
 
   useEffect(() => {
     setPage(1);
@@ -34,7 +36,7 @@ export function ConversationsListPage() {
     return () => {
       cancelled = true;
     };
-  }, [search, sort, page]);
+  }, [search, sort, page, dataVersion]);
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.page_size)) : 1;
 

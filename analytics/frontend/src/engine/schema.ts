@@ -55,7 +55,8 @@ CREATE TABLE IF NOT EXISTS messages (
 
 CREATE TABLE IF NOT EXISTS tapbacks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    message_id TEXT NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+    -- no FK on message_id: a reaction can arrive before (or without) its target message
+    message_id TEXT NOT NULL,
     reactor_id TEXT NOT NULL REFERENCES participants(id),
     action TEXT NOT NULL,
     UNIQUE(message_id, reactor_id, action)

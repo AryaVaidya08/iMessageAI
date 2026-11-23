@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDataVersion } from "../hooks/useLiveQuery";
 import { Link } from "react-router-dom";
 
 import { api, type PeopleListResponse } from "../api/client";
@@ -25,6 +26,8 @@ export function PeopleListPage() {
     }
   };
 
+  const dataVersion = useDataVersion(); // bumps on data-changed (ingest, merges)
+
   useEffect(() => {
     setPage(1);
   }, [search, sort, order]);
@@ -45,7 +48,7 @@ export function PeopleListPage() {
     return () => {
       cancelled = true;
     };
-  }, [search, sort, order, page]);
+  }, [search, sort, order, page, dataVersion]);
 
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.page_size)) : 1;
 

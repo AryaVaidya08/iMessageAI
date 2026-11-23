@@ -8,6 +8,8 @@ import {
 } from "./names";
 
 import { MERGE_VIEWS_MIGRATION } from "../ddl";
+import { publishDataChanged } from "../events";
+import { refreshOverviewSummary } from "./overview";
 export { MERGE_VIEWS_MIGRATION };
 
 export async function applyMergeMigration(db: SqlDb): Promise<void> {
@@ -132,6 +134,23 @@ export async function mergeConversations(db: SqlDb, keepId: string, removeId: st
   });
 }
 
+/** Cached aggregates depend on who is merged with whom: refresh the affected chats, then tell the UI. */
+async function afterMerge(db: SqlDb, convIds: string[]): Promise<void> {
+  try {
+    if (convIds.length) await refreshOverviewSummary(db as never, convIds);
+  } finally {
+    publishDataChanged();
+  }
+}
+
+async function conversationsOf(db: SqlDb, participantIds: string[]): Promise<string[]> {
+  const rows = await db.all<{ c: string }>(
+    `SELECT DISTINCT conversation_id AS c FROM conversation_participants WHERE participant_id IN (${participantIds.map(() => "?").join(",")})`,
+    participantIds,
+  );
+  return rows.map((r) => r.c);
+}
+
 async function badRequest<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await fn();
@@ -146,12 +165,14 @@ export function registerMergeRoutes(): void {
   registerRoute("GET /api/merge-history", async ({ db }) => ({ items: await listMergeHistory(db) }));
   registerRoute("POST /api/merge", async ({ db, params }) => {
     await badRequest(() => mergeParticipants(db, String(params.keep_id), String(params.remove_id)));
+    await afterMerge(db, await conversationsOf(db, [String(params.keep_id), String(params.remove_id)]));
     return { ok: true, keep_id: params.keep_id, removed_id: params.remove_id };
   });
   registerRoute("GET /api/conversations-for-merge", async ({ db }) => ({ conversations: await listConversationsForMerge(db) }));
   registerRoute("GET /api/merge-conversation-history", async ({ db }) => ({ items: await listConversationMergeHistory(db) }));
   registerRoute("POST /api/merge-conversation", async ({ db, params }) => {
     await badRequest(() => mergeConversations(db, String(params.keep_id), String(params.remove_id)));
+    await afterMerge(db, [String(params.keep_id), String(params.remove_id)]);
     return { ok: true, keep_id: params.keep_id, removed_id: params.remove_id };
   });
 }

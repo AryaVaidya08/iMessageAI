@@ -239,6 +239,8 @@ export interface OpenOptions {
   /** Inject a reader (tests). Defaults to FileReaderSync over the File. */
   reader?: SyncReader;
   cacheBytes?: number;
+  /** The chat.db-wal copied next to chat.db: committed frames are overlaid on the database pages. */
+  walFile?: Blob;
 }
 
 export interface ChatDbHandle {

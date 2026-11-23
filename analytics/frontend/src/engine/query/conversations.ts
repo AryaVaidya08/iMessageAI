@@ -765,8 +765,8 @@ export async function searchMessages(db: QueryDb, id: string, q: string, limit: 
 // --- streaming text ------------------------------------------------------------------------------------------
 
 /** Yields non-empty message rows in (timestamp, id) order, STREAM_CHUNK at a time (keyset paging). */
-async function* textChunks(db: QueryDb, ids: string[]): AsyncGenerator<R[]> {
-  const w = convIn(ids);
+async function* textChunks(db: QueryDb, idsOrPred: string[] | { sql: string; params: SqlValue[] }): AsyncGenerator<R[]> {
+  const w = Array.isArray(idsOrPred) ? convIn(idsOrPred) : idsOrPred;
   let last: { timestamp: string; id: string } | null = null;
   for (;;) {
     const rows: R[] = await db.all<R>(
@@ -962,11 +962,11 @@ function hydrate(row: R | undefined, value: number, participants: Map<string, Re
 
 async function announcementLeader(
   db: QueryDb,
-  ids: string[],
+  scope: LeaderboardScope,
   actions: string[],
   field: "announcer_id" | "affected_id",
 ): Promise<LeaderboardParticipantEntry | null> {
-  const w = convIn(ids, "conversation_id");
+  const w = scope.announcements(field);
   const rows = await db.all<R>(
     `SELECT ${canon(field)} AS subject, COUNT(*) AS c FROM announcements
      WHERE ${w.sql} AND action IN (${actions.map(() => "?").join(",")}) AND ${field} IS NOT NULL
@@ -979,10 +979,47 @@ async function announcementLeader(
   return { participant_id: pid, display_name: p ? p.display_name : "Unknown", count: num(rows[0].c) };
 }
 
+/** Which messages/replies/announcements a leaderboard ranks (a conversation, or one person across all chats). */
+interface LeaderboardScope {
+  participants: Map<string, Resolved>;
+  /** predicate over messages aliased `m` */
+  messages: { sql: string; params: SqlValue[] };
+  /** predicate over reply messages aliased `rep` */
+  replies: { sql: string; params: SqlValue[] };
+  /** predicate over target messages aliased `t` (fastest reply) */
+  fastest: { sql: string; params: SqlValue[] };
+  announcements(field: "announcer_id" | "affected_id"): { sql: string; params: SqlValue[] };
+}
+
 export async function getLeaderboard(db: QueryDb, id: string): Promise<ConversationLeaderboard> {
   const { group, participants } = await requireGroup(db, id);
   const ids = group.ids;
-  const w = convIn(ids);
+  return computeLeaderboard(db, {
+    participants,
+    messages: convIn(ids),
+    replies: convIn(ids, "rep.conversation_id"),
+    fastest: convIn(ids, "t.conversation_id"),
+    announcements: () => convIn(ids, "conversation_id"),
+  });
+}
+
+/** Leaderboard for one person: their own messages (and announcements they did / were affected by) in every chat. */
+export async function personLeaderboard(db: QueryDb, personId: string): Promise<ConversationLeaderboard> {
+  const mine = `SELECT ? UNION SELECT from_id FROM participant_alias WHERE to_id = ?`;
+  const p = [personId, personId] as SqlValue[];
+  const participants = await loadParticipants(db, [personId]);
+  return computeLeaderboard(db, {
+    participants,
+    messages: { sql: `m.sender_id IN (${mine})`, params: p },
+    replies: { sql: "1 = 1", params: [] },
+    fastest: { sql: `t.sender_id IN (${mine})`, params: p },
+    announcements: (field) => ({ sql: `${field} IN (${mine})`, params: p }),
+  });
+}
+
+async function computeLeaderboard(db: QueryDb, scope: LeaderboardScope): Promise<ConversationLeaderboard> {
+  const { participants } = scope;
+  const w = scope.messages;
   const sel = `m.id AS id, ${canon("m.sender_id")} AS sender, m.timestamp AS timestamp, m.text AS text`;
 
   const one = async (sql: string, params: SqlValue[]): Promise<R | undefined> => (await db.all<R>(sql, params))[0];
@@ -1005,9 +1042,9 @@ export async function getLeaderboard(db: QueryDb, id: string): Promise<Conversat
   };
   const argued = await one(
     `SELECT ${sel}, COUNT(*) AS score FROM messages rep JOIN messages m ON m.id = rep.reply_to
-     WHERE ${convIn(ids, "rep.conversation_id").sql} AND ${w.sql} GROUP BY m.id
+     WHERE ${scope.replies.sql} AND ${w.sql} GROUP BY m.id
      ORDER BY score DESC, m.timestamp, m.id LIMIT 1`,
-    [...ids, ...w.params],
+    [...scope.replies.params, ...w.params],
   );
 
   // Late-night: closest to 3:00am among messages whose hour is in the late-night window.
@@ -1022,7 +1059,7 @@ export async function getLeaderboard(db: QueryDb, id: string): Promise<Conversat
   // Text-scored metrics stream through the stats implementation (strictly-greater wins => earliest).
   let aggressive: R | undefined, happiest: R | undefined, emoji: R | undefined;
   let aggressiveScore = 0, happiestScore = 0, emojiScore = 0;
-  for await (const chunk of textChunks(db, ids)) {
+  for await (const chunk of textChunks(db, w)) {
     for (const r of chunk) {
       const s = stats.messageScores(String(r.text));
       if (s.aggressive > aggressiveScore) [aggressive, aggressiveScore] = [r, s.aggressive];
@@ -1031,7 +1068,7 @@ export async function getLeaderboard(db: QueryDb, id: string): Promise<Conversat
     }
   }
 
-  const fw = convIn(ids, "t.conversation_id");
+  const fw = scope.fastest;
   const fastestRow = await one(
     `SELECT t.id AS id, ${canon("t.sender_id")} AS sender, t.timestamp AS timestamp, t.text AS text,
             ROUND((julianday(MIN(rep.timestamp)) - julianday(t.timestamp)) * 86400.0, 3) AS delta
@@ -1054,10 +1091,10 @@ export async function getLeaderboard(db: QueryDb, id: string): Promise<Conversat
     most_emoji_message: hydrate(emoji, emojiScore, participants),
     late_night_message: late ? hydrate(late, 721 - num(late.dist), participants) : null,
     fastest_reply_message: fastestRow ? hydrate(fastestRow, num(fastestRow.delta), participants) : null,
-    top_renamer: await announcementLeader(db, ids, ["renamed convo"], "announcer_id"),
-    top_photo_changer: await announcementLeader(db, ids, PHOTO_ACTIONS, "announcer_id"),
-    top_unsender: await announcementLeader(db, ids, ["unsent message"], "announcer_id"),
-    most_revolving_door: await announcementLeader(db, ids, MEMBERSHIP_ACTIONS, "affected_id"),
+    top_renamer: await announcementLeader(db, scope, ["renamed convo"], "announcer_id"),
+    top_photo_changer: await announcementLeader(db, scope, PHOTO_ACTIONS, "announcer_id"),
+    top_unsender: await announcementLeader(db, scope, ["unsent message"], "announcer_id"),
+    most_revolving_door: await announcementLeader(db, scope, MEMBERSHIP_ACTIONS, "affected_id"),
   };
 }
 

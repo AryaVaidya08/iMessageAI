@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useDataVersion } from "../hooks/useLiveQuery";
 import { FiInfo } from "react-icons/fi";
 import { useParams } from "react-router-dom";
 
@@ -288,6 +289,21 @@ export function ConversationDetailPage() {
       .then(setLeaderboard)
       .catch((e) => setLeaderboardError(String(e)));
   }, [id]);
+
+  // While an import is running (or after a merge) refresh the analytics quietly: no state reset,
+  // so the open tab and scroll position are kept.
+  const dataVersion = useDataVersion();
+  useEffect(() => {
+    if (!id || dataVersion === 0) return;
+    api.conversation(id).then(setDetail).catch(() => {});
+    api.participantStats(id).then((r) => setStats(r.participants)).catch(() => {});
+    api.conversationHeatmap(id).then((r) => setHeatmap(r.grid)).catch(() => {});
+    api.conversationStreakSilence(id).then(setStreakSilence).catch(() => {});
+    api.conversationReplyGraph(id).then((r) => setReplyGraph(r.edges)).catch(() => {});
+    api.conversationJoinLeave(id).then((r) => setJoinLeaveEvents(r.items)).catch(() => {});
+    api.conversationLeaderboard(id).then(setLeaderboard).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataVersion]);
 
   useEffect(() => {
     // Ignore-stale-response guard: rapidly toggling granularity fires a new

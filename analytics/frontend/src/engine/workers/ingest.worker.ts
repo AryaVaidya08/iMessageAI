@@ -40,6 +40,7 @@ self.onmessage = async (ev: MessageEvent<IngestCommand>) => {
   } catch (e) {
     post({ type: "error", fatal: true, message: (e as Error).message ?? String(e) });
   } finally {
+    try { (deps as { dispose?: () => void } | null)?.dispose?.(); } catch { /* ignore */ }
     try { await deps?.reader.close(); } catch { /* ignore */ }
     try { await deps?.writer.close?.(); } catch { /* ignore */ }
     abort = null;

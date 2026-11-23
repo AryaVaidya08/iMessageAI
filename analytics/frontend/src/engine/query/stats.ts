@@ -10,6 +10,7 @@
  */
 import emojiRegex from "emoji-regex";
 import { polarityScores } from "./vader";
+import { registerRoute as registerOnRouter } from "./router";
 
 // ---------------------------------------------------------------------------------------------
 // DB abstraction (sync or async; the real engine DB handle is adapted by the query worker)
@@ -478,7 +479,7 @@ export function buildReplyGraph(edges: [string, string][]): [string, string, num
 // Streaming accumulator
 // ---------------------------------------------------------------------------------------------
 
-class SenderAcc {
+export class SenderAcc {
   count = 0;
   textCount = 0;
   deltas: number[] = [];
@@ -520,7 +521,7 @@ export interface RawParticipantStats {
 
 /** `emptyHistogram`: for a participant with no messages, return zero buckets (person stats)
  * rather than [] (conversation participant-stats, matching the Python routers). */
-function finalize(acc: SenderAcc | undefined, emptyHistogram: boolean): RawParticipantStats {
+export function finalize(acc: SenderAcc | undefined, emptyHistogram: boolean): RawParticipantStats {
   if (!acc) {
     return {
       message_count: 0,
@@ -885,3 +886,10 @@ export function registerStatsRoutes(register: RegisterRoute = registerRoute): vo
   register("/api/conversations/:id/personality-leaderboard", (p, db) => getPersonalityLeaderboard(db, p.id));
 }
 registerStatsRoutes();
+
+/** Registers the stats routes on the real router (flat params from the client; db is the app DB adapter). */
+export function registerStatsRoutesOnRouter(): void {
+  registerStatsRoutes((pattern, handler) =>
+    registerOnRouter(`GET ${pattern}`, (db, params) => handler({ id: String(params.id) }, db as unknown as StatsDb)),
+  );
+}

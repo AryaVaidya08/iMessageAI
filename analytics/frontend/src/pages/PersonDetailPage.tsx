@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDataVersion } from "../hooks/useLiveQuery";
 import { Link, useParams } from "react-router-dom";
 
 import { RELATIONSHIP_TYPE_LABELS, api, type ConversationLeaderboard, type LeaderboardMessageEntry, type PersonDetail, type RelationshipType } from "../api/client";
@@ -123,6 +124,13 @@ export function PersonDetailPage() {
   const [loadingName, setLoadingName] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("overview");
   const [error, setError] = useState<string | null>(null);
+
+  const dataVersion = useDataVersion();
+  useEffect(() => {
+    if (!id || dataVersion === 0) return;
+    api.personDetail(id).then(setDetail).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataVersion]);
 
   useEffect(() => {
     if (!id) return;
