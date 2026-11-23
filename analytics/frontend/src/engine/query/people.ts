@@ -109,6 +109,8 @@ export async function listPeople(
         LEFT JOIN contacts c ON c.handle = p.handle
         LEFT JOIN msg ON msg.pid = p.id
         LEFT JOIN conv ON conv.pid = p.id
+       WHERE p.is_me = 0
+         AND COALESCE(NULLIF(c.display_name, ''), NULLIF(p.handle, '')) IS NOT NULL -- hide "nknown" people
     )`;
   const where: string[] = [];
   const params: unknown[] = [];

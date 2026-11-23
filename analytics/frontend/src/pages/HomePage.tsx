@@ -226,6 +226,11 @@ export function HomePage() {
       <h1 className={styles.title}>iMessage Analytics</h1>
       <p className={styles.lead}>Explore your message history: volume, relationships, reply times and more.</p>
 
+      <p className={styles.warn} role="alert">
+        <b>Warning: do not reload the page!</b> Your data lives in this browser tab, so reloading can interrupt an
+        import or lose progress.
+      </p>
+
       <p className={styles.privacy}>
         Privacy: everything runs inside this browser tab. Your files are never uploaded or sent to any server.
       </p>

@@ -294,3 +294,21 @@
   font-size: 12px;
 }
 
+
+.backLink {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: -8px;
+  padding: 6px 12px 6px 8px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary, var(--color-text-primary));
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  background: var(--color-border);
+  color: var(--color-text-primary);
+}

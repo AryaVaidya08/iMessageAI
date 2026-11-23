@@ -7,6 +7,7 @@ import {
   type TopConversationOut,
   type VolumePoint,
 } from "../api/client";
+import { scopeRequests } from "../engine/engineClient";
 import { Heatmap } from "../components/Heatmap";
 import { useDataVersion } from "../hooks/useLiveQuery";
 import { StatCard, StatCardSkeleton } from "../components/StatCard";
@@ -30,9 +31,11 @@ export function OverviewPage() {
   const dataVersion = useDataVersion(); // bumps on data-changed during ingest
 
   useEffect(() => {
+    const stopRequests = scopeRequests();
     api.overviewStats().then(setStats).catch((e) => setStatsError(String(e)));
     api.topConversations(10).then((r) => setTop(r.items)).catch((e) => setTopError(String(e)));
     api.overviewHeatmap().then((r) => setHeatmap(r.grid)).catch(() => {});
+    return stopRequests;
   }, [dataVersion]);
 
   useEffect(() => {

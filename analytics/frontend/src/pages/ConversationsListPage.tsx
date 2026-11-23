@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDataVersion } from "../hooks/useLiveQuery";
 import { Link } from "react-router-dom";
 
+import { scopeRequests } from "../engine/engineClient";
 import { api, type ConversationListResponse } from "../api/client";
 import styles from "./ConversationsListPage.module.css";
 
@@ -25,6 +26,7 @@ export function ConversationsListPage() {
     // can make responses arrive out of order. Either way, only the most recent
     // effect instance's response should ever reach setData.
     let cancelled = false;
+    const stopRequests = scopeRequests(); // abort the query if the search/page changes or we navigate away
     api
       .conversations({ search, sort, page, page_size: 25 })
       .then((r) => {
@@ -35,6 +37,7 @@ export function ConversationsListPage() {
       });
     return () => {
       cancelled = true;
+      stopRequests();
     };
   }, [search, sort, page, dataVersion]);
 

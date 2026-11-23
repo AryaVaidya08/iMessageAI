@@ -81,13 +81,13 @@ describe("names", () => {
 describe("people list", () => {
   it("sorts and paginates in SQL", async () => {
     const byCount = (await listPeople(db, { sort: "count", order: "desc" }));
-    expect(byCount.total).toBe(4);
+    expect(byCount.total).toBe(3);
     expect(byCount.items[0]).toMatchObject({ id: "alice@x.com", message_count: 3, conversation_count: 2 });
     expect((await listPeople(db, { sort: "count", order: "asc", page: 1, page_size: 2 })).items.length).toBe(2);
     const recent = (await listPeople(db, { sort: "recent", order: "desc" })).items;
     expect(recent[0].id).toBe("alice@x.com");
     expect(recent[0].last_message_at).toBe("2024-03-02T12:00:00.000Z");
-    expect((await listPeople(db, { sort: "conversations", order: "desc" })).items[0].conversation_count).toBe(3);
+    expect((await listPeople(db, { sort: "conversations", order: "desc" })).items[0].conversation_count).toBe(2);
     expect((await listPeople(db, { sort: "conversations", order: "asc" })).items[0].conversation_count).toBe(1);
   });
   it("searches display name case-insensitively", async () => {
@@ -95,7 +95,7 @@ describe("people list", () => {
     expect(r.items.map((i) => i.id)).toEqual(["alice@x.com", "+15551110001"]);
     expect(r.total).toBe(2);
     expect((await listPeople(db, { search: "100%" })).total).toBe(0);
-    expect((await listPeople(db, { page: 2, page_size: 3 })).items.length).toBe(1);
+    expect((await listPeople(db, { page: 2, page_size: 2 })).items.length).toBe(1);
   });
 });
 
@@ -103,7 +103,7 @@ describe("participant merge", () => {
   it("rolls up counts and hides removed id", async () => {
     (await mergeParticipants(db, "+15551110001", "alice@x.com"));
     const people = (await listPeople(db, { sort: "count", order: "desc" }));
-    expect(people.total).toBe(3);
+    expect(people.total).toBe(2);
     expect(people.items[0]).toMatchObject({ id: "+15551110001", display_name: "Alice Phone", message_count: 4, conversation_count: 3 });
     const d = (await getPersonDetail(db, "+15551110001"))!;
     expect(d.message_count).toBe(4);
@@ -119,7 +119,7 @@ describe("participant merge", () => {
     (await msg("c2", "alice@x.com", "2024-05-01T00:00:00.000Z"));
     (await db.run(`INSERT OR IGNORE INTO participants (id, handle, is_me) VALUES ('alice@x.com','alice@x.com',0)`));
     expect((await listPeople(db, {})).items.find((i) => i.id === "+15551110001")!.message_count).toBe(5);
-    expect((await listPeople(db, {})).total).toBe(3);
+    expect((await listPeople(db, {})).total).toBe(2);
     expect((await db.all(`SELECT COUNT(*) AS c FROM v_messages WHERE sender_id='+15551110001'`))[0]).toEqual({ c: 5 });
   });
   it("flattens chains", async () => {

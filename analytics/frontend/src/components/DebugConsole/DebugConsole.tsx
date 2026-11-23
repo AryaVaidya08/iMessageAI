@@ -170,21 +170,6 @@ export function DebugConsole({
       {open && (
         <div className={styles.body}>
           <div className={`${styles.grid} ${s.currentChat ? "" : styles.gridNoCurrent}`}>
-            <section className={styles.memory}>
-              <div className={styles.label}>Memory</div>
-              {mem ? (
-                <>
-                  <div className={styles.row}>
-                    <span className={styles.num}>
-                      {Math.round(mem.usedMB)} / {Math.round(mem.limitMB)} MB
-                    </span>
-                  </div>
-                  <Bar value={mem.usedMB} total={mem.limitMB} error={mem.limitMB > 0 && mem.usedMB / mem.limitMB > 0.85} />
-                </>
-              ) : (
-                <div className={styles.muted}>n/a</div>
-              )}
-            </section>
             {s.currentChat && (
               <section className={styles.current}>
                 <div className={styles.label}>Current chat</div>
@@ -214,6 +199,21 @@ export function DebugConsole({
                 <span className={styles.muted}>{Math.round(s.throughput).toLocaleString()} msgs/s</span>
                 <span className={styles.muted}>ETA {s.running ? formatDuration(s.etaSeconds) : "--"}</span>
               </div>
+            </section>
+            <section className={styles.memory}>
+              <div className={styles.label}>Memory</div>
+              {mem ? (
+                <>
+                  <div className={styles.row}>
+                    <span className={styles.num}>
+                      {Math.round(mem.usedMB)} / {Math.round(mem.limitMB)} MB
+                    </span>
+                  </div>
+                  <Bar value={mem.usedMB} total={mem.limitMB} error={mem.limitMB > 0 && mem.usedMB / mem.limitMB > 0.85} />
+                </>
+              ) : (
+                <div className={styles.muted}>n/a</div>
+              )}
             </section>
           </div>
           {s.lastError && <div className={styles.errorBox}>Last error: {s.lastError}</div>}

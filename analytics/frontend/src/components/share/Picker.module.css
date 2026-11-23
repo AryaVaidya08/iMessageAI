@@ -34,6 +34,12 @@
   gap: 2px;
 }
 
+.resultsList { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--color-text-primary) 30%, transparent) transparent; }
+.resultsList::-webkit-scrollbar { width: 8px; background: transparent; }
+.resultsList::-webkit-scrollbar-track { background: transparent; }
+.resultsList::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--color-text-primary) 30%, transparent); border-radius: 4px; }
+.resultsList::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--color-text-primary) 50%, transparent); }
+
 .resultRow {
   width: 100%;
   display: flex;

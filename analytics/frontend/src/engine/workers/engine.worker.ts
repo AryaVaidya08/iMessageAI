@@ -24,17 +24,49 @@ let queryDb: QueryDb | null = null;
 const getQueryDb = async () => (queryDb ??= adaptAppDb(await getApp()));
 
 // ---- queries --------------------------------------------------------------------------------------------------
+class RequestCancelled extends Error {}
+const activeRpc = new Set<number>(); // received, not finished
+const cancelledRpc = new Set<number>(); // subset the client no longer wants
+
+/** A view of the DB that refuses new statements once the request was cancelled, so a long handler stops early. */
+function guardDb(db: QueryDb, id: number): QueryDb {
+  return new Proxy(db, {
+    get(target, prop, receiver) {
+      const v = Reflect.get(target, prop, receiver);
+      if (typeof v !== "function") return v;
+      return (...args: unknown[]) => {
+        if (cancelledRpc.has(id)) throw new RequestCancelled();
+        return v.apply(target, args);
+      };
+    },
+  });
+}
+
 async function handleRpc(req: RpcRequest) {
+  activeRpc.add(req.id);
   let res: RpcResponse;
   try {
-    res = { id: req.id, ok: true, result: await dispatch(getQueryDb, req.route, req.params) };
+    // Requests queued behind a slow one are dropped here if they were cancelled while waiting.
+    if (cancelledRpc.has(req.id)) throw new RequestCancelled();
+    res = {
+      id: req.id,
+      ok: true,
+      result: await dispatch(async () => guardDb(await getQueryDb(), req.id), req.route, req.params),
+    };
   } catch (err) {
+    if (err instanceof RequestCancelled) {
+      activeRpc.delete(req.id);
+      cancelledRpc.delete(req.id);
+      return; // the client already stopped listening
+    }
     res =
       err instanceof RouteError
         ? { id: req.id, ok: false, status: err.status, detail: err.detail }
         : { id: req.id, ok: false, status: 500, detail: err instanceof Error ? err.message : String(err) };
   }
-  post(res);
+  const wasCancelled = cancelledRpc.delete(req.id);
+  activeRpc.delete(req.id);
+  if (!wasCancelled) post(res);
 }
 
 // ---- ingest ---------------------------------------------------------------------------------------------------
@@ -75,9 +107,11 @@ async function handleIngest(cmd: Extract<IngestCommand, { type: "start" }>) {
   }
 }
 
-self.addEventListener("message", (e: MessageEvent<IngestCommand | RpcRequest>) => {
-  const d = e.data as { type?: string; id?: number };
-  if (d.type === "cancel") abort?.abort();
+self.addEventListener("message", (e: MessageEvent<IngestCommand | RpcRequest | { cancel: number }>) => {
+  const d = e.data as { type?: string; id?: number; cancel?: number };
+  if (typeof d.cancel === "number") {
+    if (activeRpc.has(d.cancel)) cancelledRpc.add(d.cancel);
+  } else if (d.type === "cancel") abort?.abort();
   else if (d.type === "start") void handleIngest(e.data as Extract<IngestCommand, { type: "start" }>);
   else if (typeof d.id === "number") void handleRpc(e.data as RpcRequest);
 });

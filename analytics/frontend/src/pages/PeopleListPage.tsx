@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDataVersion } from "../hooks/useLiveQuery";
 import { Link } from "react-router-dom";
 
+import { scopeRequests } from "../engine/engineClient";
 import { api, type PeopleListResponse } from "../api/client";
 import { LoadingSpinner } from "../components/LoadingSpinner";
 import styles from "./PeopleListPage.module.css";
@@ -37,6 +38,7 @@ export function PeopleListPage() {
     // search/sort while on page > 1 can fire an extra fetch for the old page
     // number, and fast typing can make responses arrive out of order.
     let cancelled = false;
+    const stopRequests = scopeRequests(); // abort the query if the search/page changes or we navigate away
     api
       .people({ search, sort, order, page, page_size: 25 })
       .then((r) => {
@@ -47,6 +49,7 @@ export function PeopleListPage() {
       });
     return () => {
       cancelled = true;
+      stopRequests();
     };
   }, [search, sort, order, page, dataVersion]);
 

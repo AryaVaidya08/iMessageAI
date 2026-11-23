@@ -4,6 +4,8 @@
   box-shadow: var(--shadow-card);
   padding: 20px;
   animation: card-in 300ms var(--ease-spring) both;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .label {
@@ -19,7 +21,7 @@
 
 .valueCompact {
   font-size: 20px;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .skeletonLine {

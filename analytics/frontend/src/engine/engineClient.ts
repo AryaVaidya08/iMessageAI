@@ -36,9 +36,43 @@ export function onIngestEvent(fn: (e: IngestEvent) => void): () => void {
   return () => ingestListeners.delete(fn);
 }
 
+// ---- cancellation ---------------------------------------------------------------------------------------------
+// Read queries (GET) are cancellable: the worker is single-threaded, so a slow query nobody is waiting for any more
+// would otherwise block every query behind it. Writes (POST) are never cancelled.
+const inflightReads = new Set<AbortController>();
+let ambientScope: AbortController | null = null;
+
+/**
+ * Call at the top of an effect: every read query started synchronously in the rest of that effect body is cancelled
+ * when the returned function is called (i.e. from the effect's cleanup: deps changed or the page unmounted).
+ */
+export function scopeRequests(): () => void {
+  const scope = new AbortController();
+  ambientScope = scope;
+  queueMicrotask(() => {
+    if (ambientScope === scope) ambientScope = null;
+  });
+  return () => scope.abort();
+}
+
+/** Cancel every read still in flight (used when the user navigates to another page). */
+export function cancelAllReads(): void {
+  for (const ac of [...inflightReads]) ac.abort();
+}
+
 export function query<T>(route: string, params: Record<string, unknown> = {}): Promise<T> {
   getEngineWorker();
-  return call!<T>(route, params);
+  if (!route.startsWith("GET ")) return call!<T>(route, params);
+  const ac = new AbortController();
+  const scope = ambientScope;
+  const onScopeAbort = () => ac.abort();
+  if (scope?.signal.aborted) ac.abort();
+  else scope?.signal.addEventListener("abort", onScopeAbort, { once: true });
+  inflightReads.add(ac);
+  return call!<T>(route, params, ac.signal).finally(() => {
+    inflightReads.delete(ac);
+    scope?.signal.removeEventListener("abort", onScopeAbort);
+  });
 }
 
 /** Terminate the worker (it releases its OPFS handles), e.g. before deleting the stored data. */
@@ -46,4 +80,5 @@ export function resetEngine(): void {
   worker?.terminate();
   worker = null;
   call = null;
+  inflightReads.clear();
 }

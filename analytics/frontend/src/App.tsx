@@ -1,9 +1,10 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 
 import { DebugConsole } from "./components/DebugConsole";
 import { ImportBanner } from "./components/ImportBanner";
 import { subscribeIngest } from "./engine/appState";
+import { cancelAllReads } from "./engine/engineClient";
 import { TopNav } from "./components/TopNav";
 import { ConversationDetailPage } from "./pages/ConversationDetailPage";
 import { ConversationsListPage } from "./pages/ConversationsListPage";
@@ -33,6 +34,10 @@ const DebugConsoleDemoPage = import.meta.env.DEV
 
 export default function App() {
   const { pathname } = useLocation();
+  // Leaving a page cancels whatever read queries it still has in flight, so the single engine worker isn't kept busy
+  // (and every later query kept waiting) on results nobody will look at. React runs all cleanups of a commit before
+  // any new effect, so the new page's own queries (started in its effects) are not affected.
+  useEffect(() => cancelAllReads, [pathname]);
   return (
     <>
       <TopNav />

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDataVersion } from "../hooks/useLiveQuery";
+import { FiArrowLeft } from "react-icons/fi";
 import { Link, useParams } from "react-router-dom";
 
 import { RELATIONSHIP_TYPE_LABELS, api, type ConversationLeaderboard, type LeaderboardMessageEntry, type PersonDetail, type RelationshipType } from "../api/client";
+import { scopeRequests } from "../engine/engineClient";
 import { Heatmap } from "../components/Heatmap";
-import { LoadingSpinner } from "../components/LoadingSpinner";
+import { LoadingProgress } from "../components/LoadingProgress";
 import { ParticipantStatsCard } from "../components/ParticipantStatsCard";
 import { RecordCard, RecordCardEmpty } from "../components/RecordCard";
 import { StatCard } from "../components/StatCard";
@@ -128,7 +130,9 @@ export function PersonDetailPage() {
   const dataVersion = useDataVersion();
   useEffect(() => {
     if (!id || dataVersion === 0) return;
+    const stopRequests = scopeRequests();
     api.personDetail(id).then(setDetail).catch(() => {});
+    return stopRequests;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataVersion]);
 
@@ -138,8 +142,10 @@ export function PersonDetailPage() {
     setLoadingName(null);
     setTab("overview");
     setError(null);
+    const stopRequests = scopeRequests();
     api.person(id).then((p) => setLoadingName(p.display_name)).catch(() => {});
     api.personDetail(id).then(setDetail).catch((e) => setError(String(e)));
+    return stopRequests;
   }, [id]);
 
   if (error) {
@@ -148,15 +154,18 @@ export function PersonDetailPage() {
   if (!detail || !id) {
     return (
       <div className={styles.page}>
-        <LoadingSpinner label={loadingName ? `Loading ${loadingName}'s profile…` : "Loading…"} />
+        <LoadingProgress label={loadingName ? `Loading ${loadingName}'s profile…` : "Loading…"} />
       </div>
     );
   }
 
   return (
     <div className={styles.page}>
+      <Link to="/people" className={styles.backLink}>
+        <FiArrowLeft aria-hidden /> People
+      </Link>
       <div className={styles.headingRow}>
-        <div>
+        <div className={styles.headingGroup}>
           <h1 className={styles.heading}>{detail.display_name}</h1>
           {detail.handle !== detail.display_name && <div className={styles.handle}>{detail.handle}</div>}
         </div>

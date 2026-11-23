@@ -8,6 +8,8 @@
   gap: 8px;
   animation: card-in 300ms var(--ease-spring) both;
   min-height: 140px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .title {
@@ -23,12 +25,14 @@
   font-size: 22px;
   font-weight: 600;
   line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .subtext {
   color: var(--color-text-secondary);
   font-size: 13px;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .list {

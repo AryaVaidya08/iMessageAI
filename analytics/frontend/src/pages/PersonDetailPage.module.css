@@ -19,10 +19,16 @@
   margin: 0;
 }
 
+.headingGroup {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
 .handle {
   color: var(--color-text-secondary);
   font-size: 14px;
-  margin-top: 2px;
 }
 
 .statRow {
@@ -142,4 +148,22 @@
 .error {
   padding: 24px;
   color: var(--color-text-secondary);
+}
+
+.backLink {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: -8px;
+  padding: 6px 12px 6px 8px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary, var(--color-text-primary));
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  background: var(--color-border);
+  color: var(--color-text-primary);
 }
