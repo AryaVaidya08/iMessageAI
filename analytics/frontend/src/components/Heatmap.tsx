@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useMemo, useState } from "react";
 import styles from "./Heatmap.module.css";
 
 const DOW_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -50,9 +50,9 @@ function computeExtremes(grid: number[][]): { max: number; min: number } | null 
   return { max: Math.max(...values), min: Math.min(...values) };
 }
 
-export function Heatmap({ grid, title }: { grid: number[][]; title?: string }) {
-  const levels = computeLevels(grid);
-  const extremes = computeExtremes(grid);
+export const Heatmap = memo(function Heatmap({ grid, title }: { grid: number[][]; title?: string }) {
+  const levels = useMemo(() => computeLevels(grid), [grid]);
+  const extremes = useMemo(() => computeExtremes(grid), [grid]);
   const [showNumbers, setShowNumbers] = useState(true);
 
   return (
@@ -121,4 +121,4 @@ export function Heatmap({ grid, title }: { grid: number[][]; title?: string }) {
       </div>
     </div>
   );
-}
+});
