@@ -1,77 +1,90 @@
-# iMessage Analytics
+# iMessage Analytics (static, in-browser)
 
-A read-only local web app for visualizing the iMessage data parsed by `backend/` into `backend/storage/data/imessages.db`.
+A fully static web app that analyzes your iMessage history. There is no server: you upload your `chat.db` (and optionally your AddressBook databases), and everything is parsed, stored and queried inside your browser.
 
-## Quick start
+> Status: this README describes the architecture from the approved plan (`src/engine/`). Engine pieces (SQLite WASM worker, ingest, query worker) are being built in parallel units; sections marked **status** note what may not have landed yet. The legacy FastAPI flow is documented at the bottom.
 
-```bash
-cd analytics
-./start_analysis.sh
-```
+## Privacy
 
-Starts both the backend and frontend together (installing dependencies on first run if needed). Backend at `http://localhost:8000`, frontend at `http://localhost:5173`. Ctrl+C stops both. See below for running each half manually.
+Nothing leaves your browser. There is no backend, no analytics beacon and no upload. Your files are read locally via the File API, parsed in Web Workers, and stored in the browser's Origin Private File System (OPFS) for this site's origin only. Hosting the site on a static host only serves the app code.
 
-### Shutting down
+## Using it
 
-Press **Ctrl+C** in the terminal running `start_analysis.sh` — it stops both servers.
+1. Open the site (Chromium-based browser on desktop recommended).
+2. On the home page, choose your `chat.db`, and optionally the AddressBook `.abcddb` files (for contact names).
+3. Watch the debug console: current phase, current chat, per-chat progress and overall progress. Pages (Overview, Conversations, People, Merge, Share) are usable while parsing continues and refresh as data lands.
 
-If a server was left running in the background (e.g. the terminal was closed instead), kill it by port or by name:
+### Finding the files on macOS
 
-```bash
-lsof -ti:8000,5173 | xargs kill
-# or
-pkill -f "uvicorn main:app"
-pkill -f vite
-```
+- Messages: `~/Library/Messages/chat.db` (macOS hides `~/Library`; in the file picker press Cmd+Shift+G and paste the path, or copy the file to your Desktop first).
+- Contacts: `~/Library/Application Support/AddressBook/AddressBook-v22.abcddb` plus any `~/Library/Application Support/AddressBook/Sources/*/AddressBook-v22.abcddb`.
+- These folders are protected. Copying or reading them requires **Full Disk Access** for the app doing it (System Settings > Privacy & Security > Full Disk Access, enable Terminal/Finder-launching app). Copying the files first and uploading the copies is the simplest route.
+- Work on a copy; the app only reads the file you pick and never modifies it.
 
-## Backend (FastAPI)
+## Supported browsers
 
-```bash
-cd analytics/backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-```
+Requires Web Workers, WebAssembly and OPFS (`navigator.storage.getDirectory`). Recent Chrome, Edge and Brave are recommended. Safari/Firefox support for the OPFS features used is partial; `index.html` shows an "unsupported browser" message when a prerequisite is missing.
 
-Runs at `http://localhost:8000` (interactive docs at `/docs`). Reads `backend/storage/data/imessages.db` read-only by default; override the path with `IMESSAGE_DB_PATH=/path/to/imessages.db`.
+## Storage, quotas and clearing data
 
-Contact name resolution uses `ContactResolver` (macOS AddressBook) and requires Full Disk Access for the terminal/IDE running the backend. Without it, the app falls back to showing raw phone numbers/emails — no error, no crash.
+Parsed data is stored as a SQLite database in OPFS, typically a fraction of the size of `chat.db`. The app checks `navigator.storage.estimate()` before ingest and warns if space looks insufficient. To clear data: use the in-app reset (if present in your build) or your browser's site settings (Chrome: Settings > Privacy > Site settings > View permissions and data stored across sites > this site > Delete data). Clearing site data removes all parsed data, merges and relationship edits.
 
-Run tests:
+## Incremental sync
 
-```bash
-cd analytics/backend
-source .venv/bin/activate
-python3 -m pytest tests/ -v
-```
+The app records `last_rowid` and a fingerprint of the source `chat.db` in a `sync_state` table. On re-upload, only messages whose `ROWID` is new, or whose `date_edited` / `date_retracted` changed, are processed. Message identity is the stable chat.db `guid`; conversation ids are the chat guid and participant ids are normalized handles (E.164 phone numbers, else lowercase email), so ids are stable across syncs. Merges are stored as alias rows (`participant_alias`, `conversation_alias`) applied at read time, so they survive re-syncs.
 
-## Frontend (React + Vite)
+## Architecture and memory design
+
+- `src/engine/` holds the engine: SQLite WASM, an ingest worker that reads `chat.db` directly (no HTML export), and a query worker that serves the same routes as the former FastAPI API.
+- `chat.db` is never loaded into memory: a custom VFS serves SQLite reads through `File.slice` with a small (<= 32 MB) LRU page cache.
+- Ingest runs chat by chat in ROWID order, in batches of 2,000-5,000 messages, one transaction per batch.
+- Analytics use SQL (`GROUP BY`, indexes, `LIMIT/OFFSET`), cache expensive aggregates in `summary_*` tables, virtualize long lists and downsample charts to about 1,000 points.
+- Target: under about 500 MB heap on a 1 GB `chat.db`.
+
+## Development
 
 ```bash
 cd analytics/frontend
 npm install
-npm run dev
+npm run dev       # http://localhost:5173
+npm run build     # type-check + static build into dist/
+npm run preview   # serve dist/ at http://localhost:4173
+npm run test      # vitest (once the engine units add it)
 ```
 
-Runs at `http://localhost:5173`. Expects the backend to be running at `http://localhost:8000` (CORS is pre-configured for this pairing).
+Dev and preview servers send `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`. These make the page cross-origin isolated, which is **only required if the chosen SQLite VFS uses `SharedArrayBuffer`**. The OPFS sync-access-handle VFS in a dedicated worker does not need them. We send them regardless so either VFS works; if you rely on them, do not embed cross-origin resources that lack CORP/CORS headers.
 
-## Notes
+The router is a `HashRouter`, so deep links (`/#/conversations/...`) work on any static host with no rewrite rules.
 
-- Read-only: nothing in this app writes to the database.
-- Single-user, local tool: no authentication.
-- `backend/` (top-level) is reference-only — this app never imports its Python code, only reads the SQLite file it produces.
+## Deploying as a static site
 
-## Known limitations
+`npm run build` produces `analytics/frontend/dist/`; upload it anywhere.
 
-Minor, non-blocking items surfaced during code review and QA. None affect the golden path against real data (verified against the full 607,700-message / 904-conversation database, including the largest 187,111-message conversation); all are deliberate scope calls, not oversights.
+- Base path: the build uses a relative base (`./`), so it works from subpaths such as GitHub Pages project sites. Set `VITE_BASE=/repo/` at build time for absolute URLs if you prefer.
+- Headers (if you want cross-origin isolation in production): `public/_headers` (Netlify, Cloudflare Pages) is copied into `dist/`; `vercel.json` in `analytics/frontend` configures Vercel. GitHub Pages cannot set custom headers; this is fine unless the VFS requires `SharedArrayBuffer` (a service-worker shim such as coi-serviceworker is the usual workaround).
+- Netlify: build `npm run build`, publish `dist`, base dir `analytics/frontend`. Vercel: root directory `analytics/frontend`. Serve over HTTPS (OPFS and workers need a secure context; `localhost` also qualifies).
 
-- **No composite index for the largest conversations.** `get_messages_page` and `get_conversation_messages_for_stats` (`analytics/backend/services/queries.py`) aren't covered by an index on `(conversation_id, timestamp, id)` — the top-level `backend/storage/schema.py` only indexes `conversation_id` alone. `EXPLAIN QUERY PLAN` confirms an in-memory sort of the full conversation on every call for the two queries that matter most on the biggest threads. Fixing this means modifying `backend/`, which this project treats as reference-only and never edits — flagged here instead.
-- **Stale/invalid pagination cursor silently resets to the newest page**, and **an empty `participants` list is used as an implicit not-found signal** rather than a distinct error, in `analytics/backend/routers/conversations.py`. Both are narrow edge cases (a hand-crafted or expired `before` cursor) that a well-behaved frontend never triggers.
-- **`StatCardSkeleton` has no `aria-busy`/`role="status"`.** The loading-state signal lives one level up, on `OverviewPage`'s stat grid container (`aria-busy={stats === null}`), which is the correct boundary for a screen reader — but the skeleton itself doesn't independently announce "loading."
-- **140px fixed name column** in the conversations list truncates long generated names (e.g. `"You, Person0, Person1 +3 more"`) before the `"+N more"` suffix is visible at 13px. Prescribed verbatim by the approved design spec.
-- **`TapbackBreakdown` uses div-based layout, not `<table>`/`role="table"` semantics**, for what is tabular data (action + count). Matches the approved spec exactly; a screen reader still reads the content, just not with table navigation.
-- **~16px scroll-jitter band on infinite scroll.** `ChatBubbleList`'s "at the top, load more" check has a 16px `padding-top`, so the trigger fires across a small range near `scrollTop = 0` rather than at an exact pixel — a minor, bounded jitter, not a functional failure.
-- **No debounce or request-cancellation on conversation search.** `ConversationsListPage`'s search fetches on every keystroke with no `AbortController`; if an earlier keystroke's request resolves after a later one's (possible under network/DB jitter), the stale response can briefly overwrite newer results until the next keystroke corrects it. Consistent with the rest of the codebase, which uses no debouncing anywhere.
-- **`ContactResolver.resolve()` has a narrow, pre-existing lazy-reload race** (`analytics/backend/contacts.py`) unrelated to the concurrency fix in this build — not exercised by normal usage since `resolver.load()` completes fully at startup before requests are served.
-- **`ConversationDetailPage`'s volume chart flickers empty on granularity toggle; `OverviewPage`'s does not.** Both effects share the same stale-response guard, but `ConversationDetailPage` also resets `volume`/`volumeError` on every effect run (needed to clear stale data when navigating between conversations), which incidentally clears the chart on a granularity change too. Cosmetic only.
+---
+
+# LEGACY: FastAPI + imessage-exporter flow
+
+The original proof of concept still exists in the repo and is no longer the supported path. It reads `backend/storage/data/imessages.db`, produced by the Python parser in `backend/` from `imessage-exporter` HTML output.
+
+```bash
+cd analytics
+./start_analysis.sh   # backend http://localhost:8000, legacy dev frontend http://localhost:5173
+```
+
+Backend by hand:
+
+```bash
+cd analytics/backend
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+python3 -m pytest tests/ -v
+```
+
+`IMESSAGE_DB_PATH=/path/to/imessages.db` overrides the database path. Contact resolution (`ContactResolver`) needs Full Disk Access for the terminal running the backend. The backend CORS configuration is specific to this legacy pairing and does not apply to the static app. Note that the frontend in this branch targets the in-browser engine, not the FastAPI API.
+
+Known limitations of the legacy flow are tracked in git history of this file.
