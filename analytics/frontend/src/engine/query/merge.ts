@@ -91,8 +91,8 @@ CREATE VIEW IF NOT EXISTS v_announcements AS
     LEFT JOIN participant_alias pb ON pb.from_id = a.affected_id;
 `;
 
-export function applyMergeMigration(db: SqlDb): void {
-  db.exec(MERGE_VIEWS_MIGRATION);
+export async function applyMergeMigration(db: SqlDb): Promise<void> {
+  await db.exec(MERGE_VIEWS_MIGRATION);
 }
 
 export class MergeError extends Error {}
@@ -101,12 +101,12 @@ export class MergeError extends Error {}
 export const PARTICIPANT_IDS_SQL = `SELECT ? UNION SELECT from_id FROM participant_alias WHERE to_id = ?`;
 export const CONVERSATION_IDS_SQL = `SELECT ? UNION SELECT from_id FROM conversation_alias WHERE to_id = ?`;
 
-function count(db: SqlDb, sql: string, id: string): number {
-  return db.all<{ c: number }>(sql, [id, id])[0]?.c ?? 0;
+async function count(db: SqlDb, sql: string, id: string): Promise<number> {
+  return (await db.all<{ c: number }>(sql, [id, id]))[0]?.c ?? 0;
 }
 
-export function listParticipants(db: SqlDb) {
-  const rows = db.all<{ id: string; handle: string | null; is_me: number; name: string }>(
+export async function listParticipants(db: SqlDb) {
+  const rows = await db.all<{ id: string; handle: string | null; is_me: number; name: string }>(
     `SELECT p.id, p.handle, p.is_me, ${displayNameSql("p", "c")} AS name
        FROM v_participants p LEFT JOIN contacts c ON c.handle = p.handle
       ORDER BY LOWER(name), p.id`,
@@ -118,28 +118,28 @@ export function listParticipants(db: SqlDb) {
   });
 }
 
-export function listMergeHistory(db: SqlDb) {
-  return db.all(
+export async function listMergeHistory(db: SqlDb) {
+  return await db.all(
     `SELECT merged_at, keep_id, keep_display_name, keep_handle, keep_message_count,
             remove_id, remove_display_name, remove_handle, remove_message_count
        FROM merge_history ORDER BY merged_at DESC, id DESC`,
   );
 }
 
-export function mergeParticipants(db: SqlDb, keepId: string, removeId: string): void {
+export async function mergeParticipants(db: SqlDb, keepId: string, removeId: string): Promise<void> {
   if (keepId === removeId) throw new MergeError("Can't merge a contact into itself.");
-  const keep = getResolvedParticipant(db, keepId);
-  const remove = getResolvedParticipant(db, removeId);
+  const keep = await getResolvedParticipant(db, keepId);
+  const remove = await getResolvedParticipant(db, removeId);
   if (!keep || !remove) throw new MergeError("One or both contacts weren't found.");
   if (keep.is_me || remove.is_me) throw new MergeError("Can't merge yourself with another contact.");
   const q = `SELECT COUNT(*) AS c FROM messages WHERE sender_id IN (${PARTICIPANT_IDS_SQL})`;
-  const keepCount = count(db, q, keepId);
-  const removeCount = count(db, q, removeId);
-  inTransaction(db, () => {
+  const keepCount = await count(db, q, keepId);
+  const removeCount = await count(db, q, removeId);
+  await inTransaction(db, async () => {
     // Flatten: anything previously merged into remove now points at keep.
-    db.run(`UPDATE participant_alias SET to_id = ? WHERE to_id = ?`, [keepId, removeId]);
-    db.run(`INSERT OR REPLACE INTO participant_alias (from_id, to_id) VALUES (?, ?)`, [removeId, keepId]);
-    db.run(
+    await db.run(`UPDATE participant_alias SET to_id = ? WHERE to_id = ?`, [keepId, removeId]);
+    await db.run(`INSERT OR REPLACE INTO participant_alias (from_id, to_id) VALUES (?, ?)`, [removeId, keepId]);
+    await db.run(
       `INSERT INTO merge_history (merged_at, keep_id, keep_display_name, keep_handle, keep_message_count,
          remove_id, remove_display_name, remove_handle, remove_message_count) VALUES (?,?,?,?,?,?,?,?,?)`,
       [new Date().toISOString(), keepId, keep.display_name, keep.handle, keepCount,
@@ -148,23 +148,23 @@ export function mergeParticipants(db: SqlDb, keepId: string, removeId: string): 
   });
 }
 
-export function listConversationsForMerge(db: SqlDb) {
-  const convs = db.all<{ id: string; is_group_chat: number; convo_name: string | null }>(
+export async function listConversationsForMerge(db: SqlDb) {
+  const convs = await db.all<{ id: string; is_group_chat: number; convo_name: string | null }>(
     `SELECT id, is_group_chat, convo_name FROM v_conversations`,
   );
   const counts = new Map(
-    db
+    (await db
       .all<{ cid: string; c: number }>(
         `SELECT COALESCE(ca.to_id, mc.conversation_id) AS cid, SUM(mc.c) AS c
            FROM (SELECT conversation_id, COUNT(*) AS c FROM messages GROUP BY conversation_id) mc
            LEFT JOIN conversation_alias ca ON ca.from_id = mc.conversation_id
           GROUP BY cid`,
-      )
-      .map((r) => [r.cid, r.c]),
+      ))
+      .map((r) => [r.cid, r.c] as [string, number]),
   );
-  const names = conversationDisplayNames(db, convs.map((c) => c.id));
+  const names = await conversationDisplayNames(db, convs.map((c) => c.id));
   const handles = new Map<string, string[]>();
-  for (const r of db.all<{ cid: string; handle: string | null }>(
+  for (const r of await db.all<{ cid: string; handle: string | null }>(
     `SELECT cp.conversation_id AS cid, p.handle
        FROM v_conversation_participants cp JOIN v_participants p ON p.id = cp.participant_id
       WHERE p.is_me = 0 ORDER BY cp.conversation_id, p.id`,
@@ -185,26 +185,26 @@ export function listConversationsForMerge(db: SqlDb) {
     .sort((a, b) => a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase()));
 }
 
-export function listConversationMergeHistory(db: SqlDb) {
-  return db.all(
+export async function listConversationMergeHistory(db: SqlDb) {
+  return await db.all(
     `SELECT merged_at, keep_id, keep_display_name, keep_message_count,
             remove_id, remove_display_name, remove_message_count
        FROM conversation_merge_history ORDER BY merged_at DESC, id DESC`,
   );
 }
 
-export function mergeConversations(db: SqlDb, keepId: string, removeId: string): void {
+export async function mergeConversations(db: SqlDb, keepId: string, removeId: string): Promise<void> {
   if (keepId === removeId) throw new MergeError("Can't merge a conversation into itself.");
-  const exists = (id: string) => db.all(`SELECT 1 FROM v_conversations WHERE id = ?`, [id]).length > 0;
-  if (!exists(keepId) || !exists(removeId)) throw new MergeError("One or both conversations weren't found.");
-  const names = conversationDisplayNames(db, [keepId, removeId]);
+  const exists = async (id: string) => (await db.all(`SELECT 1 FROM v_conversations WHERE id = ?`, [id])).length > 0;
+  if (!(await exists(keepId)) || !(await exists(removeId))) throw new MergeError("One or both conversations weren't found.");
+  const names = await conversationDisplayNames(db, [keepId, removeId]);
   const q = `SELECT COUNT(*) AS c FROM messages WHERE conversation_id IN (${CONVERSATION_IDS_SQL})`;
-  const keepCount = count(db, q, keepId);
-  const removeCount = count(db, q, removeId);
-  inTransaction(db, () => {
-    db.run(`UPDATE conversation_alias SET to_id = ? WHERE to_id = ?`, [keepId, removeId]);
-    db.run(`INSERT OR REPLACE INTO conversation_alias (from_id, to_id) VALUES (?, ?)`, [removeId, keepId]);
-    db.run(
+  const keepCount = await count(db, q, keepId);
+  const removeCount = await count(db, q, removeId);
+  await inTransaction(db, async () => {
+    await db.run(`UPDATE conversation_alias SET to_id = ? WHERE to_id = ?`, [keepId, removeId]);
+    await db.run(`INSERT OR REPLACE INTO conversation_alias (from_id, to_id) VALUES (?, ?)`, [removeId, keepId]);
+    await db.run(
       `INSERT INTO conversation_merge_history (merged_at, keep_id, keep_display_name, keep_message_count,
          remove_id, remove_display_name, remove_message_count) VALUES (?,?,?,?,?,?,?)`,
       [new Date().toISOString(), keepId, names.get(keepId) ?? "Unknown", keepCount,
@@ -213,9 +213,9 @@ export function mergeConversations(db: SqlDb, keepId: string, removeId: string):
   });
 }
 
-function badRequest<T>(fn: () => T): T {
+async function badRequest<T>(fn: () => Promise<T>): Promise<T> {
   try {
-    return fn();
+    return await fn();
   } catch (e) {
     if (e instanceof MergeError) throw new RouteError(400, e.message);
     throw e;
@@ -223,16 +223,16 @@ function badRequest<T>(fn: () => T): T {
 }
 
 export function registerMergeRoutes(): void {
-  registerRoute("GET /api/participants", ({ db }) => ({ participants: listParticipants(db) }));
-  registerRoute("GET /api/merge-history", ({ db }) => ({ items: listMergeHistory(db) }));
-  registerRoute("POST /api/merge", ({ db, params }) => {
-    badRequest(() => mergeParticipants(db, String(params.keep_id), String(params.remove_id)));
+  registerRoute("GET /api/participants", async ({ db }) => ({ participants: await listParticipants(db) }));
+  registerRoute("GET /api/merge-history", async ({ db }) => ({ items: await listMergeHistory(db) }));
+  registerRoute("POST /api/merge", async ({ db, params }) => {
+    await badRequest(() => mergeParticipants(db, String(params.keep_id), String(params.remove_id)));
     return { ok: true, keep_id: params.keep_id, removed_id: params.remove_id };
   });
-  registerRoute("GET /api/conversations-for-merge", ({ db }) => ({ conversations: listConversationsForMerge(db) }));
-  registerRoute("GET /api/merge-conversation-history", ({ db }) => ({ items: listConversationMergeHistory(db) }));
-  registerRoute("POST /api/merge-conversation", ({ db, params }) => {
-    badRequest(() => mergeConversations(db, String(params.keep_id), String(params.remove_id)));
+  registerRoute("GET /api/conversations-for-merge", async ({ db }) => ({ conversations: await listConversationsForMerge(db) }));
+  registerRoute("GET /api/merge-conversation-history", async ({ db }) => ({ items: await listConversationMergeHistory(db) }));
+  registerRoute("POST /api/merge-conversation", async ({ db, params }) => {
+    await badRequest(() => mergeConversations(db, String(params.keep_id), String(params.remove_id)));
     return { ok: true, keep_id: params.keep_id, removed_id: params.remove_id };
   });
 }

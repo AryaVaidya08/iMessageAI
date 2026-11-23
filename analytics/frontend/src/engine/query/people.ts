@@ -22,8 +22,8 @@ export interface PersonSummary {
  * resolves to the person, for index-friendly `sender_id IN (...)` filters.
  */
 export interface PersonDetailExtras {
-  stats(db: SqlDb, person: { id: string; handle: string; display_name: string; message_count: number }): unknown;
-  leaderboard(db: SqlDb, person: { id: string; handle: string; display_name: string }): unknown;
+  stats(db: SqlDb, person: { id: string; handle: string; display_name: string; message_count: number }): unknown | Promise<unknown>;
+  leaderboard(db: SqlDb, person: { id: string; handle: string; display_name: string }): unknown | Promise<unknown>;
 }
 
 const EMPTY_LEADERBOARD = {
@@ -78,7 +78,7 @@ function escapeLike(s: string): string {
   return s.replace(/[\\%_]/g, (c) => "\\" + c);
 }
 
-export function listPeople(
+export async function listPeople(
   db: SqlDb,
   opts: { search?: string | null; sort?: string; order?: string; page?: number; page_size?: number },
 ) {
@@ -118,8 +118,8 @@ export function listPeople(
   }
   const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
   const total =
-    db.all<{ n: number }>(`${base} SELECT COUNT(*) AS n FROM people ${whereSql}`, params)[0]?.n ?? 0;
-  const items = db.all<PersonSummary>(
+    (await db.all<{ n: number }>(`${base} SELECT COUNT(*) AS n FROM people ${whereSql}`, params))[0]?.n ?? 0;
+  const items = await db.all<PersonSummary>(
     `${base} SELECT id, handle, display_name, message_count, conversation_count, last_message_at
        FROM people ${whereSql}
       ORDER BY ${SORT_COLUMN[sort]} ${order}, LOWER(display_name), id
@@ -129,15 +129,15 @@ export function listPeople(
   return { items, total, page, page_size: pageSize };
 }
 
-export function getPersonDetail(db: SqlDb, id: string) {
-  const person = getResolvedParticipant(db, id);
+export async function getPersonDetail(db: SqlDb, id: string) {
+  const person = await getResolvedParticipant(db, id);
   if (!person) return null;
-  const range = db.all<{ n: number; f: string | null; l: string | null }>(
+  const range = (await db.all<{ n: number; f: string | null; l: string | null }>(
     `SELECT COUNT(*) AS n, MIN(timestamp) AS f, MAX(timestamp) AS l
        FROM messages WHERE sender_id IN (${PARTICIPANT_IDS_SQL})`,
     [id, id],
-  )[0];
-  const cells = db.all<{ dow: number; hour: number; c: number }>(
+  ))[0];
+  const cells = await db.all<{ dow: number; hour: number; c: number }>(
     `SELECT CAST(strftime('%w', timestamp) AS INTEGER) AS dow,
             CAST(strftime('%H', timestamp) AS INTEGER) AS hour, COUNT(*) AS c
        FROM messages WHERE sender_id IN (${PARTICIPANT_IDS_SQL}) GROUP BY dow, hour`,
@@ -146,32 +146,36 @@ export function getPersonDetail(db: SqlDb, id: string) {
   const grid = Array.from({ length: 7 }, () => new Array<number>(24).fill(0));
   for (const c of cells) if (c.dow != null && c.hour != null) grid[c.dow][c.hour] = c.c;
 
-  const convIds = db
-    .all<{ cid: string }>(
-      `SELECT cp.conversation_id AS cid FROM v_conversation_participants cp
-         JOIN v_conversations c ON c.id = cp.conversation_id WHERE cp.participant_id = ?`,
-      [id],
-    )
-    .map((r) => r.cid);
-  const names = conversationDisplayNames(db, convIds);
-  const conversations: unknown[] = [];
-  for (const cid of convIds) {
-    const meta = db.all<{ relationship_type: string; is_group_chat: number }>(
-      `SELECT relationship_type, is_group_chat FROM conversations WHERE id = ?`,
-      [cid],
-    )[0];
-    const n = db.all<{ c: number }>(
-      `SELECT COUNT(*) AS c FROM messages WHERE conversation_id IN (${CONVERSATION_IDS_SQL})`,
-      [cid, cid],
-    )[0].c;
-    conversations.push({
-      conversation_id: cid,
-      display_name: names.get(cid) ?? "Unknown",
-      relationship_type: meta?.relationship_type ?? "",
-      is_group_chat: !!meta?.is_group_chat,
-      message_count: n,
-    });
-  }
+  // One aggregate for the person's conversations: metadata + alias-resolved message counts,
+  // instead of two queries per conversation.
+  const convRows = await db.all<{
+    cid: string;
+    relationship_type: string | null;
+    is_group_chat: number | null;
+    n: number | null;
+  }>(
+    `WITH mine AS (
+       SELECT DISTINCT cp.conversation_id AS cid FROM v_conversation_participants cp
+         JOIN v_conversations c ON c.id = cp.conversation_id WHERE cp.participant_id = ?
+     ), cnt AS (
+       SELECT COALESCE(ca.to_id, mc.conversation_id) AS cid, SUM(mc.c) AS n
+         FROM (SELECT conversation_id, COUNT(*) AS c FROM messages GROUP BY conversation_id) mc
+         LEFT JOIN conversation_alias ca ON ca.from_id = mc.conversation_id
+        GROUP BY 1
+     )
+     SELECT mine.cid AS cid, c.relationship_type, c.is_group_chat, COALESCE(cnt.n, 0) AS n
+       FROM mine JOIN conversations c ON c.id = mine.cid LEFT JOIN cnt ON cnt.cid = mine.cid`,
+    [id],
+  );
+  const convIds = convRows.map((r) => r.cid);
+  const names = await conversationDisplayNames(db, convIds);
+  const conversations: unknown[] = convRows.map((r) => ({
+    conversation_id: r.cid,
+    display_name: names.get(r.cid) ?? "Unknown",
+    relationship_type: r.relationship_type ?? "",
+    is_group_chat: !!r.is_group_chat,
+    message_count: r.n ?? 0,
+  }));
   (conversations as { message_count: number }[]).sort((a, b) => b.message_count - a.message_count);
 
   const base = { id, handle: person.handle, display_name: person.display_name };
@@ -182,14 +186,14 @@ export function getPersonDetail(db: SqlDb, id: string) {
     first_message_at: range.f,
     last_message_at: range.l,
     heatmap: { grid },
-    stats: extras.stats(db, { ...base, message_count: range.n }),
-    leaderboard: extras.leaderboard(db, base),
+    stats: await extras.stats(db, { ...base, message_count: range.n }),
+    leaderboard: await extras.leaderboard(db, base),
     conversations,
   };
 }
 
 export function registerPeopleRoutes(): void {
-  registerRoute("GET /api/people", ({ db, params }) =>
+  registerRoute("GET /api/people", async ({ db, params }) =>
     listPeople(db, {
       search: params.search,
       sort: params.sort,
@@ -198,13 +202,13 @@ export function registerPeopleRoutes(): void {
       page_size: params.page_size,
     }),
   );
-  registerRoute("GET /api/people/:id", ({ db, params }) => {
-    const p = getResolvedParticipant(db, String(params.id));
+  registerRoute("GET /api/people/:id", async ({ db, params }) => {
+    const p = await getResolvedParticipant(db, String(params.id));
     if (!p) throw new RouteError(404, "person not found");
     return { id: p.id, handle: p.handle, display_name: p.display_name };
   });
-  registerRoute("GET /api/people/:id/detail", ({ db, params }) => {
-    const d = getPersonDetail(db, String(params.id));
+  registerRoute("GET /api/people/:id/detail", async ({ db, params }) => {
+    const d = await getPersonDetail(db, String(params.id));
     if (!d) throw new RouteError(404, "person not found");
     return d;
   });

@@ -45,8 +45,8 @@ export function splitHandle(handle: string): { phone_num: string | null; email: 
 }
 
 /** Resolve one (post-alias) participant id; null if missing or merged away. */
-export function getResolvedParticipant(db: SqlDb, id: string): ResolvedParticipant | null {
-  const rows = db.all<{ id: string; handle: string | null; is_me: number; cname: string | null }>(
+export async function getResolvedParticipant(db: SqlDb, id: string): Promise<ResolvedParticipant | null> {
+  const rows = await db.all<{ id: string; handle: string | null; is_me: number; cname: string | null }>(
     `SELECT p.id, p.handle, p.is_me, c.display_name AS cname
        FROM v_participants p LEFT JOIN contacts c ON c.handle = p.handle WHERE p.id = ?`,
     [id],
@@ -58,16 +58,16 @@ export function getResolvedParticipant(db: SqlDb, id: string): ResolvedParticipa
  * Display names for a set of (post-alias) conversation ids, chunked. Participants come from
  * v_conversation_participants so merged conversations show the union.
  */
-export function conversationDisplayNames(db: SqlDb, ids: string[]): Map<string, string> {
+export async function conversationDisplayNames(db: SqlDb, ids: string[]): Promise<Map<string, string>> {
   const out = new Map<string, string>();
   for (let i = 0; i < ids.length; i += 500) {
     const chunk = ids.slice(i, i + 500);
     const ph = chunk.map(() => "?").join(",");
-    const convs = db.all<{ id: string; convo_name: string | null }>(
+    const convs = await db.all<{ id: string; convo_name: string | null }>(
       `SELECT id, convo_name FROM v_conversations WHERE id IN (${ph})`,
       chunk,
     );
-    const parts = db.all<{ cid: string; id: string; handle: string | null; is_me: number; cname: string | null }>(
+    const parts = await db.all<{ cid: string; id: string; handle: string | null; is_me: number; cname: string | null }>(
       `SELECT cp.conversation_id AS cid, p.id, p.handle, p.is_me, c.display_name AS cname
          FROM v_conversation_participants cp
          JOIN v_participants p ON p.id = cp.participant_id
