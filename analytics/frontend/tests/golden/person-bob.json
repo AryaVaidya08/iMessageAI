@@ -1,0 +1,13 @@
+{
+ "body": {
+  "display_name": "Bob Baker",
+  "handle": "+15551110002",
+  "id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba"
+ },
+ "case": {
+  "method": "GET",
+  "name": "person-bob",
+  "path": "/api/people/{person:+15551110002}"
+ },
+ "status": 200
+}

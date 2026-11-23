@@ -1,0 +1,75 @@
+{
+ "body": {
+  "traits": [
+   {
+    "entries": [],
+    "trait": "Aggressive"
+   },
+   {
+    "entries": [
+     {
+      "display_name": "Alice Anders",
+      "message_count": 1,
+      "participant_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+      "share": 4.8
+     },
+     {
+      "display_name": "You",
+      "message_count": 1,
+      "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+      "share": 2.1
+     }
+    ],
+    "trait": "Chaotic"
+   },
+   {
+    "entries": [],
+    "trait": "Dramatic"
+   },
+   {
+    "entries": [
+     {
+      "display_name": "You",
+      "message_count": 11,
+      "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+      "share": 23.4
+     },
+     {
+      "display_name": "Alice Anders",
+      "message_count": 2,
+      "participant_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+      "share": 9.5
+     }
+    ],
+    "trait": "Sarcastic"
+   },
+   {
+    "entries": [],
+    "trait": "Chill"
+   },
+   {
+    "entries": [
+     {
+      "display_name": "Alice Anders",
+      "message_count": 10,
+      "participant_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+      "share": 47.6
+     },
+     {
+      "display_name": "You",
+      "message_count": 9,
+      "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+      "share": 19.1
+     }
+    ],
+    "trait": "Wholesome"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-group-personality",
+  "path": "/api/conversations/{conv:#6}/personality-leaderboard"
+ },
+ "status": 200
+}

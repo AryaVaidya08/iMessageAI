@@ -1,0 +1,21 @@
+{
+ "body": {
+  "items": [
+   {
+    "keep_display_name": "Bob Baker",
+    "keep_id": "05c399e3-a03e-57de-b4d4-1783ff99b459",
+    "keep_message_count": 75,
+    "merged_at": "2026-11-23T04:27:53.870367+00:00",
+    "remove_display_name": "Erin Evans",
+    "remove_id": "88ac2ab9-0681-5a24-99ad-ef3036097645",
+    "remove_message_count": 10
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "post-merge-conv-history",
+  "path": "/api/merge-conversation-history"
+ },
+ "status": 200
+}

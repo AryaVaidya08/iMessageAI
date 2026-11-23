@@ -1,0 +1,17 @@
+{
+ "body": {
+  "keep_id": "56a3247a-f259-550e-9c56-95fd1c6192a5",
+  "ok": true,
+  "removed_id": "e0eec7fa-f3fd-5639-b8b0-80d6c4ded53c"
+ },
+ "case": {
+  "body": {
+   "keep_id": "{person:+15551110006}",
+   "remove_id": "{person:+15551110007}"
+  },
+  "method": "POST",
+  "name": "post-merge-participants",
+  "path": "/api/merge"
+ },
+ "status": 200
+}

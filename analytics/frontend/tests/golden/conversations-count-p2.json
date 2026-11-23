@@ -1,0 +1,39 @@
+{
+ "body": {
+  "items": [
+   {
+    "display_name": "Erin Evans, Dev Dhillon, +15551110007",
+    "id": "d887ae7f-82d0-5bef-8a40-ced899495851",
+    "is_group_chat": true,
+    "last_activity": "2024-03-28T21:00:58.177",
+    "message_count": 69,
+    "relationship_type": "other"
+   },
+   {
+    "display_name": "Carol Chen",
+    "id": "c85a21fd-8310-59af-87d4-c616d40a64a2",
+    "is_group_chat": false,
+    "last_activity": "2024-03-17T07:57:13.316",
+    "message_count": 67,
+    "relationship_type": "other"
+   },
+   {
+    "display_name": "Dev Dhillon",
+    "id": "a315f903-1929-5e49-9ed4-bba2741587c0",
+    "is_group_chat": false,
+    "last_activity": "2024-04-03T07:45:33.290",
+    "message_count": 58,
+    "relationship_type": "other"
+   }
+  ],
+  "page": 2,
+  "page_size": 3,
+  "total": 7
+ },
+ "case": {
+  "method": "GET",
+  "name": "conversations-count-p2",
+  "path": "/api/conversations?sort=count&page=2&page_size=3"
+ },
+ "status": 200
+}

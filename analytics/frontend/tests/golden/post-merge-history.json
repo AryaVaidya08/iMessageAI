@@ -1,0 +1,23 @@
+{
+ "body": {
+  "items": [
+   {
+    "keep_display_name": "Pizza Palace",
+    "keep_handle": "+15551110006",
+    "keep_id": "56a3247a-f259-550e-9c56-95fd1c6192a5",
+    "keep_message_count": 0,
+    "merged_at": "2026-11-23T04:27:53.865115+00:00",
+    "remove_display_name": "+15551110007",
+    "remove_handle": "+15551110007",
+    "remove_id": "e0eec7fa-f3fd-5639-b8b0-80d6c4ded53c",
+    "remove_message_count": 6
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "post-merge-history",
+  "path": "/api/merge-history"
+ },
+ "status": 200
+}

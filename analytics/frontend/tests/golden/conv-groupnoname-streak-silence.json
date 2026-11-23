@@ -1,0 +1,14 @@
+{
+ "body": {
+  "silence_after": "2024-02-24T07:24:23.704",
+  "silence_before": "2024-01-30T17:59:41.941",
+  "silence_gap_seconds": 2121881.763,
+  "streak_days": 2
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-groupnoname-streak-silence",
+  "path": "/api/conversations/{conv:#7}/streak-silence"
+ },
+ "status": 200
+}

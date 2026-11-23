@@ -1,0 +1,50 @@
+{
+ "body": {
+  "traits": [
+   {
+    "entries": [],
+    "trait": "Aggressive"
+   },
+   {
+    "entries": [],
+    "trait": "Chaotic"
+   },
+   {
+    "entries": [],
+    "trait": "Dramatic"
+   },
+   {
+    "entries": [
+     {
+      "display_name": "You",
+      "message_count": 8,
+      "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+      "share": 17.0
+     }
+    ],
+    "trait": "Sarcastic"
+   },
+   {
+    "entries": [],
+    "trait": "Chill"
+   },
+   {
+    "entries": [
+     {
+      "display_name": "You",
+      "message_count": 16,
+      "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+      "share": 34.0
+     }
+    ],
+    "trait": "Wholesome"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-groupnoname-personality",
+  "path": "/api/conversations/{conv:#7}/personality-leaderboard"
+ },
+ "status": 200
+}

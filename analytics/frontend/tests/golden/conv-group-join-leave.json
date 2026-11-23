@@ -1,0 +1,27 @@
+{
+ "body": {
+  "items": [
+   {
+    "datetime": "2024-01-17T07:10:32.132",
+    "display_name": "Erin Evans",
+    "kind": "joined"
+   },
+   {
+    "datetime": "2024-02-01T09:49:36.188",
+    "display_name": "Bob Baker",
+    "kind": "left"
+   },
+   {
+    "datetime": "2024-02-18T12:49:19.823",
+    "display_name": "Carol Chen",
+    "kind": "left"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-group-join-leave",
+  "path": "/api/conversations/{conv:#6}/join-leave"
+ },
+ "status": 200
+}

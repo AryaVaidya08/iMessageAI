@@ -1,0 +1,28 @@
+{
+ "body": {
+  "points": [
+   {
+    "bucket": "2024-01",
+    "count": 196
+   },
+   {
+    "bucket": "2024-02",
+    "count": 158
+   },
+   {
+    "bucket": "2024-03",
+    "count": 170
+   },
+   {
+    "bucket": "2024-04",
+    "count": 30
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "overview-volume-month",
+  "path": "/api/overview/volume?granularity=month"
+ },
+ "status": 200
+}

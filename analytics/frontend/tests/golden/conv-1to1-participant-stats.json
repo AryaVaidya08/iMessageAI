@@ -1,0 +1,498 @@
+{
+ "body": {
+  "participants": [
+   {
+    "display_name": "Alice Anders",
+    "gap_initiator_count": 19,
+    "handle": "+15551110001",
+    "late_night_ratio": 0.043478260869565216,
+    "median_reply_seconds": 46.957,
+    "message_count": 92,
+    "participant_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+    "personality": [
+     {
+      "percentage": 0.0,
+      "trait": "Aggressive"
+     },
+     {
+      "percentage": 1.1,
+      "trait": "Chaotic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Dramatic"
+     },
+     {
+      "percentage": 15.7,
+      "trait": "Sarcastic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Chill"
+     },
+     {
+      "percentage": 31.5,
+      "trait": "Wholesome"
+     }
+    ],
+    "reply_histogram": [
+     {
+      "count": 36,
+      "label": "<1m"
+     },
+     {
+      "count": 15,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 1,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 7,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-01",
+      "score": 0.5125833333333333
+     },
+     {
+      "bucket": "2024-01-08",
+      "score": 0.33916666666666667
+     },
+     {
+      "bucket": "2024-01-15",
+      "score": 0.6535
+     },
+     {
+      "bucket": "2024-01-22",
+      "score": 0.5321727272727274
+     },
+     {
+      "bucket": "2024-01-29",
+      "score": 0.5008666666666666
+     },
+     {
+      "bucket": "2024-02-05",
+      "score": 0.37558571428571424
+     },
+     {
+      "bucket": "2024-02-12",
+      "score": 0.1912583333333333
+     },
+     {
+      "bucket": "2024-02-19",
+      "score": 0.049553846153846164
+     },
+     {
+      "bucket": "2024-02-26",
+      "score": 0.4499714285714286
+     },
+     {
+      "bucket": "2024-03-11",
+      "score": 0.85355
+     },
+     {
+      "bucket": "2024-03-18",
+      "score": 0.3181
+     },
+     {
+      "bucket": "2024-03-25",
+      "score": 0.6072000000000001
+     },
+     {
+      "bucket": "2024-04-01",
+      "score": 0.48
+     }
+    ],
+    "tapbacks_given": [
+     {
+      "action": "Loved",
+      "count": 3
+     },
+     {
+      "action": "Disliked",
+      "count": 3
+     },
+     {
+      "action": "Laughed",
+      "count": 2
+     },
+     {
+      "action": "Emphasized",
+      "count": 1
+     }
+    ],
+    "tapbacks_received": [
+     {
+      "action": "Disliked",
+      "count": 3
+     },
+     {
+      "action": "Emphasized",
+      "count": 2
+     },
+     {
+      "action": "Loved",
+      "count": 1
+     },
+     {
+      "action": "Liked",
+      "count": 1
+     }
+    ],
+    "top_emojis": [
+     {
+      "count": 2,
+      "emoji": "\ud83d\ude4f"
+     },
+     {
+      "count": 2,
+      "emoji": "\ud83d\ude02"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\ude2d"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\udd25"
+     },
+     {
+      "count": 1,
+      "emoji": "\u2764"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\udc4d"
+     }
+    ],
+    "top_words": [
+     {
+      "count": 17,
+      "word": "tomorrow"
+     },
+     {
+      "count": 14,
+      "word": "awesome"
+     },
+     {
+      "count": 14,
+      "word": "maybe"
+     },
+     {
+      "count": 13,
+      "word": "sorry"
+     },
+     {
+      "count": 13,
+      "word": "night"
+     },
+     {
+      "count": 13,
+      "word": "friend"
+     },
+     {
+      "count": 13,
+      "word": "call"
+     },
+     {
+      "count": 13,
+      "word": "birthday"
+     },
+     {
+      "count": 12,
+      "word": "morning"
+     },
+     {
+      "count": 11,
+      "word": "week"
+     },
+     {
+      "count": 10,
+      "word": "watch"
+     },
+     {
+      "count": 10,
+      "word": "tonight"
+     },
+     {
+      "count": 10,
+      "word": "train"
+     },
+     {
+      "count": 10,
+      "word": "flight"
+     },
+     {
+      "count": 10,
+      "word": "song"
+     }
+    ]
+   },
+   {
+    "display_name": "You",
+    "gap_initiator_count": 11,
+    "handle": "",
+    "late_night_ratio": 0.05434782608695652,
+    "median_reply_seconds": 32.106,
+    "message_count": 92,
+    "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "personality": [
+     {
+      "percentage": 0.0,
+      "trait": "Aggressive"
+     },
+     {
+      "percentage": 1.1,
+      "trait": "Chaotic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Dramatic"
+     },
+     {
+      "percentage": 28.4,
+      "trait": "Sarcastic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Chill"
+     },
+     {
+      "percentage": 39.8,
+      "trait": "Wholesome"
+     }
+    ],
+    "reply_histogram": [
+     {
+      "count": 37,
+      "label": "<1m"
+     },
+     {
+      "count": 13,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 1,
+      "label": "30m-2h"
+     },
+     {
+      "count": 3,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 5,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-01",
+      "score": 0.4162142857142857
+     },
+     {
+      "bucket": "2024-01-08",
+      "score": 0.1417
+     },
+     {
+      "bucket": "2024-01-15",
+      "score": 0.0541
+     },
+     {
+      "bucket": "2024-01-22",
+      "score": 0.4279
+     },
+     {
+      "bucket": "2024-01-29",
+      "score": 0.5727
+     },
+     {
+      "bucket": "2024-02-05",
+      "score": 0.28709999999999997
+     },
+     {
+      "bucket": "2024-02-12",
+      "score": 0.35970666666666673
+     },
+     {
+      "bucket": "2024-02-19",
+      "score": 0.3820461538461538
+     },
+     {
+      "bucket": "2024-02-26",
+      "score": 0.5284888888888889
+     },
+     {
+      "bucket": "2024-03-11",
+      "score": 0.5859
+     },
+     {
+      "bucket": "2024-03-18",
+      "score": 0.06758
+     },
+     {
+      "bucket": "2024-03-25",
+      "score": 0.15383999999999998
+     },
+     {
+      "bucket": "2024-04-01",
+      "score": 0.03652499999999999
+     }
+    ],
+    "tapbacks_given": [
+     {
+      "action": "Questioned",
+      "count": 2
+     },
+     {
+      "action": "Loved",
+      "count": 1
+     },
+     {
+      "action": "Liked",
+      "count": 1
+     },
+     {
+      "action": "Emphasized",
+      "count": 1
+     }
+    ],
+    "tapbacks_received": [
+     {
+      "action": "Loved",
+      "count": 3
+     },
+     {
+      "action": "Laughed",
+      "count": 2
+     },
+     {
+      "action": "Questioned",
+      "count": 2
+     }
+    ],
+    "top_emojis": [
+     {
+      "count": 3,
+      "emoji": "\ud83d\ude05"
+     },
+     {
+      "count": 2,
+      "emoji": "\u2764"
+     },
+     {
+      "count": 2,
+      "emoji": "\ud83c\udf89"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\ude4f"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\ude2d"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\udc4d"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\ude02"
+     }
+    ],
+    "top_words": [
+     {
+      "count": 17,
+      "word": "thank"
+     },
+     {
+      "count": 15,
+      "word": "wow"
+     },
+     {
+      "count": 12,
+      "word": "call"
+     },
+     {
+      "count": 12,
+      "word": "photo"
+     },
+     {
+      "count": 12,
+      "word": "hungry"
+     },
+     {
+      "count": 12,
+      "word": "game"
+     },
+     {
+      "count": 11,
+      "word": "week"
+     },
+     {
+      "count": 11,
+      "word": "tired"
+     },
+     {
+      "count": 11,
+      "word": "text"
+     },
+     {
+      "count": 11,
+      "word": "friend"
+     },
+     {
+      "count": 10,
+      "word": "pizza"
+     },
+     {
+      "count": 10,
+      "word": "flight"
+     },
+     {
+      "count": 10,
+      "word": "birthday"
+     },
+     {
+      "count": 10,
+      "word": "later"
+     },
+     {
+      "count": 10,
+      "word": "idea"
+     }
+    ]
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-1to1-participant-stats",
+  "path": "/api/conversations/{conv:#1}/participant-stats"
+ },
+ "status": 200
+}
