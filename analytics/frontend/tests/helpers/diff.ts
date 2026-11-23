@@ -20,18 +20,51 @@ export function canonTimestamp(s: string): string {
  * Legacy side: uuids found in goldens/_idmap.json. New side: chat guids / handles / message guids are
  * themselves the ids, so the token map is identity-with-prefix and matches whole strings only.
  */
-export function normalize(value: unknown, tokens: Tokens): unknown {
+/** Keys whose arrays are compared as sets (keyed by id): legacy order follows random uuid order. */
+const ID_SORTED_KEYS = new Set(["participants", "conversations"]);
+/** display-name style strings that join member names with ", "; legacy member order is uuid order. */
+const NAME_LIST_KEYS = new Set(["display_name", "subtext"]);
+
+/** Top-N count lists: ties are listed in legacy random-uuid order, so canonicalize ties (count desc, then label). */
+const TIE_SORTED_KEYS = new Set(["top_words", "top_emojis", "tapbacks_given", "tapbacks_received"]);
+
+export function normalize(value: unknown, tokens: Tokens, key?: string): unknown {
   if (typeof value === "string") {
     const whole = tokens.get(value);
     if (whole) return whole;
-    return canonTimestamp(value.replace(UUID_RE, (u) => tokens.get(u) ?? u));
+    const s = canonTimestamp(value.replace(UUID_RE, (u) => tokens.get(u) ?? u));
+    if (key && NAME_LIST_KEYS.has(key) && s.includes(", ")) return s.split(", ").sort().join(", ");
+    return s;
   }
-  if (Array.isArray(value)) return value.map((v) => normalize(v, tokens));
+  if (Array.isArray(value)) {
+    const items = value.map((v) => normalize(v, tokens, key));
+    if (key && ID_SORTED_KEYS.has(key) && items.every((v) => v && typeof v === "object" && ("id" in (v as object) || "participant_id" in (v as object) || "conversation_id" in (v as object)))) {
+      const idOf = (v: Record<string, unknown>) => String(v.id ?? v.participant_id ?? v.conversation_id);
+      items.sort((a, b) => idOf(a as Record<string, unknown>).localeCompare(idOf(b as Record<string, unknown>)));
+    }
+    if (key && TIE_SORTED_KEYS.has(key) && items.every((v) => v && typeof v === "object" && "count" in (v as object))) {
+      const label = (v: Record<string, unknown>) => String(v.word ?? v.emoji ?? v.action ?? "");
+      items.sort((a, b) => {
+        const x = a as Record<string, number>;
+        const y = b as Record<string, number>;
+        return y.count - x.count || label(a as Record<string, unknown>).localeCompare(label(b as Record<string, unknown>));
+      });
+      // Which of several equal-count entries make the cut-off is arbitrary in legacy: mask the labels of the
+      // final tie group (counts are still compared).
+      const last = (items[items.length - 1] as Record<string, unknown> | undefined)?.count;
+      for (const it of items as Record<string, unknown>[]) {
+        if (it.count === last) {
+          for (const k of ["word", "emoji", "action"]) if (k in it) it[k] = "~tie";
+        }
+      }
+    }
+    return items;
+  }
   if (value && typeof value === "object") {
     const out: Record<string, unknown> = {};
     for (const k of Object.keys(value as object).sort()) {
       if (VOLATILE_KEYS.has(k)) continue;
-      out[k] = normalize((value as Record<string, unknown>)[k], tokens);
+      out[k] = normalize((value as Record<string, unknown>)[k], tokens, k);
     }
     return out;
   }

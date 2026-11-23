@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS conversation_merge_history (
 );
 
 CREATE VIEW IF NOT EXISTS v_participants AS
-  SELECT p.* FROM participants p WHERE p.id NOT IN (SELECT from_id FROM participant_alias);
+  SELECT p.*, p.rowid AS seq FROM participants p WHERE p.id NOT IN (SELECT from_id FROM participant_alias);
 
 CREATE VIEW IF NOT EXISTS v_conversations AS
   SELECT c.* FROM conversations c WHERE c.id NOT IN (SELECT from_id FROM conversation_alias);

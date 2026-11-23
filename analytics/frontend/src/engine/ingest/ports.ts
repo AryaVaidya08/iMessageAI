@@ -97,4 +97,6 @@ export interface IngestDeps {
   extractor: MessageExtractor;
   writer: AppDbWriter;
   contacts?: ContactsImporter;
+  /** Optional step run after contacts and before planning (e.g. register every handle as a participant). */
+  preflight?: () => Promise<void>;
 }

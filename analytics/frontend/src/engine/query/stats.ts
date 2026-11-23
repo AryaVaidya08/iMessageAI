@@ -600,11 +600,25 @@ async function resolveConversationScope(db: StatsDb, id: string): Promise<ConvSc
 async function participantInfo(db: StatsDb, ids: string[]): Promise<Map<string, { display_name: string; handle: string }>> {
   const out = new Map<string, { display_name: string; handle: string }>();
   if (!ids.length) return out;
-  const rows = await db.all(`SELECT id, handle, display_name, is_me FROM participants WHERE id IN (${ph(ids.length)})`, ids);
+  // names.resolve_participant: "You" for me, else the contact name, else the handle, else "Unknown"
+  let rows: Row[];
+  try {
+    rows = await db.all(
+      `SELECT p.id, p.handle, p.is_me, COALESCE(c.display_name, p.display_name) AS cname
+         FROM participants p LEFT JOIN contacts c ON c.handle = p.handle WHERE p.id IN (${ph(ids.length)})`,
+      ids,
+    );
+  } catch {
+    // no contacts table (older schema / tests): the participant's own display_name
+    rows = await db.all(
+      `SELECT id, handle, is_me, display_name AS cname FROM participants WHERE id IN (${ph(ids.length)})`,
+      ids,
+    );
+  }
   for (const id of ids) {
     const r = rows.find((x) => x.id === id);
     const handle: string = r?.handle || "";
-    out.set(id, { display_name: r?.is_me ? "You" : r?.display_name || handle || "Unknown", handle: r?.is_me ? "" : handle });
+    out.set(id, { display_name: r?.is_me ? "You" : r?.cname || handle || "Unknown", handle: r?.is_me ? "" : handle });
   }
   return out;
 }

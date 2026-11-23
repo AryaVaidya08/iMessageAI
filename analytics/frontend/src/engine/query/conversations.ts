@@ -1086,8 +1086,6 @@ async function computeLeaderboard(db: QueryDb, scope: LeaderboardScope): Promise
     most_reacted_message: await byTapback(),
     most_aggressive_message: hydrate(aggressive, aggressiveScore, participants),
     happiest_message: hydrate(happiest, happiestScore, participants),
-    // Present in the frontend type only (not in the Python API); no data source, so always null.
-    angriest_message: null,
     most_emoji_message: hydrate(emoji, emojiScore, participants),
     late_night_message: late ? hydrate(late, 721 - num(late.dist), participants) : null,
     fastest_reply_message: fastestRow ? hydrate(fastestRow, num(fastestRow.delta), participants) : null,

@@ -450,6 +450,7 @@ export class ChatDbExtractor {
         const action = announcementAction(itemType, Number(r.group_action_type) || 0, !!r.group_title);
         if (!action) continue;
         let affected: string | null = null;
+        if (action === "left convo") affected = sender; // the person who left is the one affected (counts toward "revolving door")
         if (action === "added person" || action === "removed person") {
           const h = r.other_handle ? this.handles.get(r.other_handle) : undefined;
           affected = h?.id || (r.other_handle === 0 && !r.is_from_me ? "me" : null);

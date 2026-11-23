@@ -83,9 +83,16 @@ function LogView({ log }: { log: IngestState["log"] }) {
   );
 }
 
-export function DebugConsole({ subscribe }: { subscribe: IngestSubscribe }) {
+export function DebugConsole({ subscribe, forceOpen = false }: { subscribe: IngestSubscribe; forceOpen?: boolean }) {
   const { state: s } = useIngestEvents(subscribe);
   const [collapsed, setCollapsed] = useState(readCollapsed);
+  const wasRunning = useRef(false);
+  // Expand automatically when an import starts so progress is visible without hunting for it.
+  useEffect(() => {
+    if (s.running && !wasRunning.current) setCollapsed(false);
+    wasRunning.current = s.running;
+  }, [s.running]);
+  const open = forceOpen || !collapsed;
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -108,12 +115,12 @@ export function DebugConsole({ subscribe }: { subscribe: IngestSubscribe }) {
 
   const o = s.overall;
   const pct = o.messagesTotal > 0 ? Math.round((o.messagesDone / o.messagesTotal) * 100) : 0;
-  const status = s.finished ? "Done" : s.running ? (s.phaseLabel ?? s.phase ?? "Working") : "Idle";
+  const status = s.finished ? "Done - ingest complete" : s.running ? (s.phaseLabel ?? s.phase ?? "Working") : "Idle";
   const mem = s.memory;
 
   return (
-    <aside className={styles.dock} aria-label="Ingest debug console">
-      <button type="button" className={styles.header} onClick={() => setCollapsed((c) => !c)} aria-expanded={!collapsed}>
+    <aside className={styles.dock} aria-label="Ingest debug console" data-testid="debug-console" data-state={s.finished ? "done" : s.running ? "running" : "idle"}>
+      <button type="button" className={styles.header} onClick={() => setCollapsed((c) => !c)} aria-expanded={open}>
         <span className={`${styles.dot} ${s.errorCount ? styles.dotError : s.running ? styles.dotRun : ""}`} />
         <span className={styles.title}>Import</span>
         <span className={styles.status}>
@@ -121,9 +128,9 @@ export function DebugConsole({ subscribe }: { subscribe: IngestSubscribe }) {
           {s.running || s.finished ? ` - ${pct}%` : ""}
         </span>
         {s.errorCount > 0 && <span className={styles.errBadge}>{s.errorCount} errors</span>}
-        <span className={styles.chev}>{collapsed ? "▲" : "▼"}</span>
+        <span className={styles.chev}>{open ? "▼" : "▲"}</span>
       </button>
-      {!collapsed && (
+      {open && (
         <div className={styles.body}>
           <div className={styles.grid}>
             <section>

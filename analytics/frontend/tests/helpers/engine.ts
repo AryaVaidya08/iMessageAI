@@ -40,7 +40,11 @@ export function newEngineTokens(chatDbPath: string): Tokens {
 export function legacyTokens(idmap: { conv: Record<string, string>; person: Record<string, string>; msg: Record<string, string> }): Tokens {
   const t: Tokens = new Map();
   for (const [k, v] of Object.entries(idmap.conv)) t.set(k, `conv:${v}`);
-  for (const [k, v] of Object.entries(idmap.person)) t.set(k, `person:${v}`);
+  for (const [k, v] of Object.entries(idmap.person)) {
+    t.set(k, `person:${v}`);
+    // legacy `handle` fields are the raw handle string; the new engine's ids ARE the handle, so tokenize both
+    if (v) t.set(v, `person:${v}`);
+  }
   for (const [k, v] of Object.entries(idmap.msg)) t.set(k, `msg:${v}`);
   return t;
 }

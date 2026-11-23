@@ -1,4 +1,5 @@
-import { openAppDb as openStorage, type AppDb } from "../storage/db";
+import { openAppDb as openStorage } from "../storage/db";
+import type { AppDbLike } from "../ingest/deps";
 import type { QueryDb, Row, SqlValue } from "./db";
 
 type Bind = SqlValue[] | Record<string, SqlValue> | unknown[] | undefined;
@@ -10,14 +11,19 @@ function toArray(bind: Bind): SqlValue[] {
 }
 
 /** QueryDb over the app DB (superset: also get, exec and close, which some route modules use). */
-export function adaptAppDb(app: AppDb): QueryDb & {
+export function adaptAppDb(app: AppDbLike): QueryDb & {
   exec(sql: string): Promise<void>;
   close(): Promise<void>;
 } {
   return {
     all: (sql, bind) => app.all(sql, toArray(bind)) as Promise<Row[]>,
     get: async (sql, bind) => ((await app.all(sql, toArray(bind))) as Row[])[0],
-    run: (sql, bind) => app.run(sql, toArray(bind)),
+    // unit 10 reads `.changes` after UPDATEs
+    run: async (sql, bind) => {
+      await app.run(sql, toArray(bind));
+      const r = await app.all<{ n: number }>("SELECT changes() AS n");
+      return { changes: Number(r[0]?.n ?? 0) } as never;
+    },
     exec: (sql) => app.exec(sql),
     close: () => app.close(),
   };

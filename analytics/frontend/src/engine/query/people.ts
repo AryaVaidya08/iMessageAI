@@ -101,7 +101,7 @@ export async function listPeople(
       SELECT participant_id AS pid, COUNT(*) AS conversation_count
         FROM v_conversation_participants GROUP BY participant_id
     ), people AS (
-      SELECT p.id, COALESCE(p.handle, '') AS handle, ${displayNameSql("p", "c")} AS display_name,
+      SELECT p.id, p.seq, COALESCE(p.handle, '') AS handle, ${displayNameSql("p", "c")} AS display_name,
              COALESCE(msg.message_count, 0) AS message_count,
              COALESCE(conv.conversation_count, 0) AS conversation_count,
              msg.last_message_at AS last_message_at
@@ -122,7 +122,7 @@ export async function listPeople(
   const items = await db.all<PersonSummary>(
     `${base} SELECT id, handle, display_name, message_count, conversation_count, last_message_at
        FROM people ${whereSql}
-      ORDER BY ${SORT_COLUMN[sort]} ${order}, LOWER(display_name), id
+      ORDER BY ${SORT_COLUMN[sort]} ${order}, seq
       LIMIT ? OFFSET ?`,
     [...params, pageSize, (page - 1) * pageSize],
   );

@@ -22,6 +22,7 @@ import wasmUrl from "wa-sqlite/dist/wa-sqlite.wasm?url";
 import * as SQLite from "wa-sqlite";
 import * as VFS from "wa-sqlite/src/VFS.js";
 
+import { parseWal, type WalOverlay, type WalSource } from "./walOverlay";
 export const CHUNK_BYTES = 64 * 1024;
 export const CACHE_BYTES = 32 * 1024 * 1024;
 const SQLITE_MAGIC = "SQLite format 3\0";
@@ -57,6 +58,8 @@ export interface DbInfo {
   pageSize: number;
   walMode: boolean;
   fileSize: number;
+  /** committed WAL frames overlaid on the database (0 when no -wal file was supplied / usable) */
+  walFramesApplied?: number;
 }
 
 /** Random-looking, non-text first bytes with no SQLite magic => likely encrypted. */
@@ -130,6 +133,7 @@ export class FileVFS extends (VFS.Base as new () => any) {
     private reader: SyncReader,
     private patchWal: boolean,
     cacheBytes = CACHE_BYTES,
+    private wal?: { overlay: WalOverlay; source: WalSource },
   ) {
     super();
     this.name = name;
@@ -164,16 +168,48 @@ export class FileVFS extends (VFS.Base as new () => any) {
   xClose() {
     return VFS.SQLITE_OK;
   }
+  /** Effective database size: the WAL can extend the database past the file's last page. */
+  private dbSize(): number {
+    const w = this.wal;
+    return w ? Math.max(this.reader.size, w.overlay.dbPages * w.overlay.pageSize) : this.reader.size;
+  }
+
+  private walPage(pageNo: number): Uint8Array {
+    const w = this.wal!;
+    let c = this.cache.get(-pageNo);
+    if (!c) {
+      c = w.source.read(w.overlay.pages.get(pageNo)!, w.overlay.pageSize);
+      this.bytesFetched += c.length;
+      this.cache.set(-pageNo, c);
+    }
+    return c;
+  }
+
   xRead(_fileId: number, pData: Uint8Array, iOffset: number) {
     const want = pData.byteLength;
-    const end = Math.min(iOffset + want, this.reader.size);
+    const end = Math.min(iOffset + want, this.dbSize());
     let pos = iOffset;
     this.reads++;
     while (pos < end) {
+      const w = this.wal;
+      if (w) {
+        const pageNo = Math.floor(pos / w.overlay.pageSize) + 1;
+        if (w.overlay.pages.has(pageNo)) {
+          const within = pos - (pageNo - 1) * w.overlay.pageSize;
+          const page = this.walPage(pageNo);
+          const n = Math.min(page.length - within, end - pos);
+          if (n <= 0) break;
+          pData.set(page.subarray(within, within + n), pos - iOffset);
+          pos += n;
+          continue;
+        }
+      }
       const ci = Math.floor(pos / CHUNK_BYTES);
       const c = this.chunk(ci);
       const within = pos - ci * CHUNK_BYTES;
-      const n = Math.min(c.length - within, end - pos);
+      // never run into a page that the WAL overrides
+      const limit = w ? Math.min(end, (Math.floor(pos / w.overlay.pageSize) + 1) * w.overlay.pageSize) : end;
+      const n = Math.min(c.length - within, limit - pos);
       if (n <= 0) break;
       pData.set(c.subarray(within, within + n), pos - iOffset);
       pos += n;
@@ -199,7 +235,7 @@ export class FileVFS extends (VFS.Base as new () => any) {
     return VFS.SQLITE_OK;
   }
   xFileSize(_id: number, pSize64: DataView) {
-    pSize64.setBigInt64(0, BigInt(this.reader.size), true);
+    pSize64.setBigInt64(0, BigInt(this.dbSize()), true);
     return VFS.SQLITE_OK;
   }
   xLock() {
@@ -241,6 +277,8 @@ export interface OpenOptions {
   cacheBytes?: number;
   /** The chat.db-wal copied next to chat.db: committed frames are overlaid on the database pages. */
   walFile?: Blob;
+  /** Inject a WAL reader (tests). */
+  walReader?: WalSource;
 }
 
 export interface ChatDbHandle {
@@ -277,7 +315,16 @@ export async function openChatDb(file: Blob, opts: OpenOptions = {}): Promise<Ch
   const Module = await getModule(opts.wasmUrl ?? wasmUrl, opts.wasmBinary);
   const sqlite3 = SQLite.Factory(Module);
   const dbName = "upload.db";
-  const vfs = new FileVFS(`file-vfs-${++vfsCounter}`, dbName, reader, info.walMode, opts.cacheBytes);
+  let wal: { overlay: ReturnType<typeof parseWal> & object; source: WalSource } | undefined;
+  if (info.walMode && (opts.walFile || opts.walReader)) {
+    const source = opts.walReader ?? fileReaderSync(opts.walFile as Blob);
+    const overlay = parseWal(source, info.pageSize);
+    if (overlay) {
+      wal = { overlay, source };
+      info.walFramesApplied = overlay.frames;
+    }
+  }
+  const vfs = new FileVFS(`file-vfs-${++vfsCounter}`, dbName, reader, info.walMode, opts.cacheBytes, wal);
   sqlite3.vfs_register(vfs as any, false);
 
   const db = await sqlite3.open_v2(dbName, SQLite.SQLITE_OPEN_READONLY, vfs.name);

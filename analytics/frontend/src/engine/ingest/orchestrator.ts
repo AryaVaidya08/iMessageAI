@@ -91,6 +91,11 @@ export async function runIngest(args: RunArgs): Promise<void> {
       }
     }
 
+    if (deps.preflight) {
+      check();
+      await deps.preflight();
+    }
+
     check();
     const prevRaw = await writer.getSyncState(KEY_FP);
     let prev: Fingerprint | null = null;

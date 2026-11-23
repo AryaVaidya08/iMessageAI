@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { DragEvent, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
-import { DebugConsole } from "../components/DebugConsole";
 import {
   deleteAllData,
   getSyncInfo,
@@ -11,6 +10,7 @@ import {
   subscribeIngest,
   type SyncInfo,
 } from "../engine/appState";
+import { isWalMode, splitChatDbFiles } from "../engine/ingest/walCheck";
 import styles from "./HomePage.module.css";
 
 const hasOpfs = typeof navigator !== "undefined" && !!navigator.storage && "getDirectory" in navigator.storage;
@@ -96,11 +96,24 @@ export function HomePage() {
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState<SyncInfo | null>(null);
   const [ingesting, setIngesting] = useState(isIngestRunning());
-  const [chatDb, setChatDb] = useState<File[]>([]);
+  const [chatFiles, setChatFiles] = useState<File[]>([]);
+  const [walWarning, setWalWarning] = useState(false);
+  const { main: chatDb, sidecars } = splitChatDbFiles(chatFiles);
   const [contacts, setContacts] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [lowStorage, setLowStorage] = useState<string | null>(null);
   const [showUpload, setShowUpload] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    setWalWarning(false);
+    if (chatDb && !sidecars.some((f) => /-wal$/i.test(f.name)))
+      isWalMode(chatDb).then((w) => live && setWalWarning(w)).catch(() => {});
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatDb, sidecars.length]);
 
   const refresh = useCallback(async () => {
     setInfo(await getSyncInfo());
@@ -117,7 +130,7 @@ export function HomePage() {
       if (e.type === "done") {
         setIngesting(false);
         setShowUpload(false);
-        setChatDb([]);
+        setChatFiles([]);
         void refresh();
       }
     });
@@ -134,11 +147,11 @@ export function HomePage() {
   }, []);
 
   const start = async () => {
-    if (!chatDb[0]) return;
+    if (!chatDb) return;
     setError(null);
     setIngesting(true);
     try {
-      await startIngest({ chatDb: chatDb[0], contacts });
+      await startIngest({ chatDb, sidecars, contacts });
     } catch (e) {
       setIngesting(false);
       setError(e instanceof Error ? e.message : String(e));
@@ -159,10 +172,11 @@ export function HomePage() {
       <div className={styles.zones}>
         <DropZone
           title="1. chat.db"
-          hint="Drop your Messages database here or click to browse"
-          files={chatDb}
+          hint="Drop chat.db here (and chat.db-wal / chat.db-shm if you copied them) or click to browse"
+          files={chatFiles}
+          multiple
           testId="chatdb-input"
-          onFiles={setChatDb}
+          onFiles={setChatFiles}
         />
         <DropZone
           title="2. Contacts (optional)"
@@ -192,7 +206,15 @@ export function HomePage() {
           />
         </label>
       </p>
-      <button className={styles.primary} disabled={!chatDb[0] || ingesting} onClick={start}>
+      {walWarning && (
+        <p className={styles.warn} data-testid="wal-warning">
+          This chat.db uses write-ahead logging, so your newest messages may still be in a separate{" "}
+          <code>chat.db-wal</code> file. For a complete import, quit the Messages app, copy <code>chat.db</code>,{" "}
+          <code>chat.db-wal</code> and <code>chat.db-shm</code> together, and drop all three here. You can also continue
+          without it and sync again later.
+        </p>
+      )}
+      <button className={styles.primary} disabled={!chatDb || ingesting} onClick={start}>
         {info ? "Sync new messages" : "Start analysis"}
       </button>
     </>
@@ -218,7 +240,8 @@ export function HomePage() {
       {ingesting && (
         <section className={styles.card}>
           <h2>Importing...</h2>
-          <DebugConsole />
+          <p className={styles.muted}>Live progress, the current chat and memory use are in the Import console at the bottom of the screen.</p>
+          <Link to="/debug">Open the full debug console</Link>
           <h3>Explore while it loads</h3>
           <Explore />
         </section>

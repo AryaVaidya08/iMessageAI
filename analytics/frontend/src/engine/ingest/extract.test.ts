@@ -172,7 +172,7 @@ describe("ChatDbExtractor", () => {
       ["renamed convo", "me", null],
       ["added person", "me", "bob@example.com"],
       ["removed person", "+14155550001", "+14155550002"],
-      ["left convo", "bob@example.com", null],
+      ["left convo", "bob@example.com", "bob@example.com"], // the person who left is the affected one
     ]);
     expect(b.announcements[0].title).toBe("Road Trip");
     expect(b.messages.map((m) => m.sender_id)).toEqual(["+14155550002", "bob@example.com"]);

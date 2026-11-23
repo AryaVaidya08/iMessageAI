@@ -23,6 +23,29 @@ const idmap = JSON.parse(readFileSync(join(GOLDEN, "_idmap.json"), "utf8"));
 /** case name -> reason. Documented, intentional engine-vs-legacy differences; these cases are skipped. */
 const KNOWN_DIVERGENCES: Record<string, string> = {};
 
+/**
+ * case name -> JSON paths excluded from the diff, with the reason. These are differences in the LEGACY side's
+ * arbitrary choices, not engine bugs; every other path in the case is still compared.
+ */
+const IGNORED_PATHS: Record<string, { paths: string[]; reason: string }> = {
+  "conv-group-leaderboard": {
+    paths: ["$.most_revolving_door", "$.top_unsender"],
+    reason:
+      "most_revolving_door: three people tie at one event each and the legacy winner follows random uuid order. " +
+      "top_unsender: make-goldens.py drops unsent messages, the real legacy parser (and the engine) records 'unsent message' announcements.",
+  },
+  "conv-email-leaderboard": {
+    paths: ["$.top_unsender"],
+    reason: "make-goldens.py drops unsent messages; the engine records 'unsent message' announcements like the legacy parser.",
+  },
+  "person-me-detail": {
+    paths: ["$.leaderboard.most_emoji_message", "$.leaderboard.top_unsender"],
+    reason:
+      "most_emoji_message: equal emoji counts, legacy tie goes to the first message in random-uuid conversation order. " +
+      "top_unsender: see conv-email-leaderboard.",
+  },
+};
+
 describe("golden integrity (always on)", () => {
   it("every case has a golden file with a status", () => {
     for (const c of cases) {
@@ -64,7 +87,10 @@ describe.skipIf(!process.env.PARITY_ENGINE)("legacy route parity", () => {
       const body = c.body ? JSON.parse(resolvePlaceholders(JSON.stringify(c.body), chatDb).replace(/%[0-9A-F]{2}/g, decodeURIComponent)) : undefined;
       const res = await engine.request(c.method, path, body);
       expect(res.status, `${c.method} ${path}`).toBe(golden.status);
-      const problems = diff(normalize(golden.body, legacy), normalize(res.body, fresh));
+      const ignored = IGNORED_PATHS[c.name]?.paths ?? [];
+      const problems = diff(normalize(golden.body, legacy), normalize(res.body, fresh)).filter(
+        (p) => !ignored.some((ip) => p.startsWith(ip + ":") || p.startsWith(ip + ".") || p.startsWith(ip + "[")),
+      );
       expect(problems, problems.join("\n")).toEqual([]);
     });
   }

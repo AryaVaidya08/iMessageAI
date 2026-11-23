@@ -239,7 +239,6 @@ export interface ConversationLeaderboard {
   most_reacted_message: LeaderboardMessageEntry | null;
   most_aggressive_message: LeaderboardMessageEntry | null;
   happiest_message: LeaderboardMessageEntry | null;
-  angriest_message: LeaderboardMessageEntry | null;
   most_emoji_message: LeaderboardMessageEntry | null;
   late_night_message: LeaderboardMessageEntry | null;
   fastest_reply_message: LeaderboardMessageEntry | null;

@@ -1,3 +1,4 @@
+import { RouteError } from "./router";
 /**
  * Minimal contracts shared by the conversation-analytics modules. Deliberately tiny so they can be
  * adapted to whichever SQLite binding the query worker ends up using (wa-sqlite in the browser,
@@ -15,12 +16,9 @@ export interface QueryDb {
 }
 
 /** Thrown by handlers; the router turns it into an HTTP-like error (status + detail) like FastAPI does. */
-export class HttpError extends Error {
-  constructor(
-    public status: number,
-    public detail: string,
-  ) {
-    super(detail);
+export class HttpError extends RouteError {
+  constructor(status: number, detail: string) {
+    super(status, detail);
     this.name = "HttpError";
   }
 }

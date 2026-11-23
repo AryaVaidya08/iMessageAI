@@ -125,3 +125,47 @@ c.close()`,
     await db.close();
   }, 120_000);
 });
+
+describe("chat.db-wal replay", () => {
+  beforeAll(() => {
+    // Keep the writer open with checkpointing off, then copy db + wal mid-flight (what a user's copy looks like).
+    py(
+      `import sqlite3,sys,shutil
+d=sys.argv[1]
+c=sqlite3.connect(d+'/live.db'); c.execute('pragma journal_mode=wal'); c.execute('pragma wal_autocheckpoint=0')
+c.execute('create table t(x integer primary key, y text)'); c.commit()
+c.executemany('insert into t values(?,?)',[(i,'row %d'%i) for i in range(1,3001)]); c.commit()
+c.executemany('insert into t values(?,?)',[(i,'late %d'%i) for i in range(3001,3101)]); c.commit()
+shutil.copy(d+'/live.db',d+'/copy.db'); shutil.copy(d+'/live.db-wal',d+'/copy.db-wal')
+c.close()`,
+      dir,
+    );
+  });
+
+  it("without the -wal the recent data is missing", async () => {
+    const db = await open(join(dir, "copy.db"));
+    expect(db.info.walMode).toBe(true);
+    await expect(db.query("SELECT count(*) AS n FROM t")).rejects.toThrow();
+    await db.close();
+  });
+
+  it("applies committed WAL frames when the -wal is supplied", async () => {
+    const db = await open(join(dir, "copy.db"), { walReader: nodeReader(join(dir, "copy.db-wal")) });
+    expect(db.info.walFramesApplied).toBeGreaterThan(0);
+    const r = await db.query("SELECT count(*) AS n, max(x) AS mx FROM t");
+    expect(r[0].n).toBe(3100);
+    expect(r[0].mx).toBe(3100);
+    expect((await db.query("SELECT y FROM t WHERE x=3050"))[0].y).toBe("late 3050");
+    await db.close();
+  });
+
+  it("ignores a torn trailing frame", async () => {
+    const wal = readFileSync(join(dir, "copy.db-wal"));
+    const cut = join(dir, "torn.db-wal");
+    writeFileSync(cut, wal.subarray(0, wal.length - 100)); // truncated final frame => last commit invalid
+    const db = await open(join(dir, "copy.db"), { walReader: nodeReader(cut) });
+    const r = await db.query("SELECT count(*) AS n FROM t");
+    expect(r[0].n).toBe(3000); // the last transaction (100 rows) is dropped, the earlier one still counts
+    await db.close();
+  });
+});

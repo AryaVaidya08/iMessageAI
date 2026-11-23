@@ -4,15 +4,15 @@
 //   writer    = storage AppDb (one transaction per batch, rows + sync keys together)
 //   contacts  = unit 4 importContacts (.abcddb files -> contacts table)
 import type { IngestInputFiles } from "../protocol";
-import { openAppDb, type AppDb } from "../storage/db";
-import { transaction, type SqlValue } from "../storage/helpers";
+import { openAppDb } from "../storage/db";
+import { transaction, type Queryable, type SqlValue } from "../storage/helpers";
 import { importContacts, pickAbcddbFiles } from "../contacts";
-import { inferDefaultRegion, DEFAULT_REGION, type Region } from "../handles";
+import { inferDefaultRegion, normalizeHandle, DEFAULT_REGION, type Region } from "../handles";
 import { adaptAppDb } from "../query/openDb";
 import { refreshOverviewSummary } from "../query/overview";
 import { refreshConversationSummary } from "../query/conversations";
 import { refreshStatsSummary } from "../query/stats";
-import { openChatDb } from "./fileVfs";
+import { openChatDb, type ChatDbHandle, type OpenOptions } from "./fileVfs";
 import {
   ChatDbExtractor,
   type ChatInfo as XChatInfo,
@@ -45,13 +45,27 @@ const chunked = <T>(xs: T[], n: number): T[][] => {
 };
 const ph = (n: number) => new Array(n).fill("?").join(",");
 
+/** What the ingest writer needs from the app DB (AppDb in the browser; a better-sqlite3 wrapper in Node tests). */
+export interface AppDbLike extends Queryable {
+  exec(sql: string): Promise<void>;
+  runMany(sql: string, rows: SqlValue[][]): Promise<void>;
+  close(): Promise<void>;
+}
+
+/** Test seams: run the same pipeline in Node (no OPFS / IndexedDB / FileReaderSync). */
+export interface DepsInjection {
+  app?: AppDbLike;
+  openChat?: (file: Blob, opts?: OpenOptions) => Promise<ChatDbHandle>;
+}
+
 export interface RealDeps extends IngestDeps {
   /** Unregisters summary hooks (call when the run is over). */
   dispose(): void;
 }
 
-export async function createRealDeps(files: IngestInputFiles): Promise<RealDeps> {
-  const chat = await openChatDb(files.chatDb, { walFile: files.chatDbWal });
+export async function createRealDeps(files: IngestInputFiles, inject: DepsInjection = {}): Promise<RealDeps> {
+  const open = inject.openChat ?? openChatDb;
+  const chat = await open(files.chatDb, { walFile: files.chatDbWal });
 
   // Region for national-format numbers: inferred from the user's own +CC handles.
   let region: Region = DEFAULT_REGION;
@@ -173,14 +187,14 @@ export async function createRealDeps(files: IngestInputFiles): Promise<RealDeps>
     },
   };
 
-  const app = await openAppDb({ durability: "relaxed" });
+  const app: AppDbLike = inject.app ?? (await openAppDb({ durability: "relaxed" }));
   const writer = new AppWriter(app);
 
   const contacts: ContactsImporter = {
     async importContacts(abFiles, w) {
       const rows: { handle: string; display_name: string }[] = [];
       for await (const item of importContacts(pickAbcddbFiles(abFiles), {
-        openReader: (f) => openChatDb(f) as never,
+        openReader: (f) => open(f) as never,
         defaultRegion: region,
       })) {
         if (Array.isArray(item)) rows.push(...item);
@@ -198,11 +212,22 @@ export async function createRealDeps(files: IngestInputFiles): Promise<RealDeps>
     registerSummaryHook((ids) => refreshStatsSummary(q as never, ids)),
   ];
 
-  return { reader, extractor, writer, contacts, dispose: () => offs.forEach((o) => o()) };
+  // Every handle in chat.db is a participant, even one without a chat yet (it shows up in People with 0 messages).
+  const preflight = async () => {
+    const rows = await chat.query("SELECT id FROM handle");
+    const ids = new Set<string>();
+    for (const r of rows) {
+      const id = normalizeHandle(String(r.id ?? ""), region);
+      if (id) ids.add(id);
+    }
+    await writer.ensureParticipants(["me", ...ids]);
+  };
+
+  return { reader, extractor, writer, contacts, preflight, dispose: () => offs.forEach((o) => o()) };
 }
 
 class AppWriter implements AppDbWriter {
-  constructor(private app: AppDb) {}
+  constructor(private app: AppDbLike) {}
 
   async getSyncState(key: string): Promise<string | null> {
     const r = await this.app.all<{ value: string | null }>("SELECT value FROM sync_state WHERE key = ?", [key]);
@@ -247,7 +272,7 @@ class AppWriter implements AppDbWriter {
       // Participants first (FKs): everything this batch references.
       const known = new Map<string, SqlValue[]>();
       for (const p of b.participants ?? [])
-        known.set(p.id, [p.id, p.phone_num, p.email, p.is_me, p.handle ?? p.id, p.display_name]);
+        known.set(p.id, [p.id, p.phone_num, p.email, p.is_me, p.is_me ? "" : (p.handle ?? p.id), p.display_name]);
       const refs = new Set<string>(["me"]);
       for (const m of b.messages) refs.add(m.sender_id);
       for (const t of b.tapbacks ?? []) refs.add(t.reactor_id);
@@ -344,6 +369,17 @@ class AppWriter implements AppDbWriter {
       }
       return n;
     });
+  }
+
+  async ensureParticipants(ids: string[]): Promise<void> {
+    for (const part of chunked(ids, 2000)) {
+      await transaction(this.app, async () => {
+        await this.app.runMany!(
+          "INSERT OR IGNORE INTO participants(id, phone_num, email, is_me, handle, display_name) VALUES(?,?,?,?,?,NULL)",
+          part.map((id) => [id, id === "me" || id.includes("@") ? null : id, id.includes("@") ? id : null, id === "me" ? 1 : 0, id === "me" ? "" : id]),
+        );
+      });
+    }
   }
 
   async upsertContacts(rows: { handle: string; display_name: string }[]): Promise<void> {
