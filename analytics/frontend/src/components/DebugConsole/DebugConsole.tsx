@@ -142,6 +142,9 @@ export function DebugConsole({
   if (hidden) return null;
   // On the home page there is nothing to show until an import has started.
   if (inline && !s.running && !s.finished && s.runs === 0) return null;
+  // The floating dock on the other pages only appears while an import is running (or has failed, so an error is
+  // never hidden). Once the import is finished or the app is idle it stays out of the way; the /debug page forces it open.
+  if (!inline && !forceOpen && !s.running && !(s.errorCount > 0 && !s.finished)) return null;
 
   return (
     <aside

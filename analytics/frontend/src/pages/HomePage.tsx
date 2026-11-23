@@ -247,9 +247,6 @@ export function HomePage() {
         </section>
       )}
 
-      {/* Stays on screen after the import finishes so the green "complete" dot is visible. */}
-      <DebugConsole subscribe={subscribeIngest} inline />
-
       {!ingesting && info && (
         <section className={styles.card}>
           <h2>Your data</h2>
@@ -282,6 +279,10 @@ export function HomePage() {
           {showUpload && uploader}
         </section>
       )}
+
+      {/* Below the "Your data" box (or the "Importing..." card while the first import runs). It stays on screen after
+          the import finishes so the green "complete" dot is visible. */}
+      <DebugConsole subscribe={subscribeIngest} inline />
 
       {!ingesting && !info && (
         <>
