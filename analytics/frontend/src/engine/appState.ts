@@ -2,7 +2,7 @@
 // data-changed notifications, saved-data checks and "delete all data". Everything runs in the browser.
 import type { IngestCommand, IngestEvent, IngestInputFiles } from "./protocol";
 import { onDataChanged, publishDataChanged } from "./events";
-import { query, resetQueryWorker } from "./queryClient";
+import { getEngineWorker, onIngestEvent, query, resetEngine } from "./engineClient";
 import { clearAllData, hasSavedDb } from "./storage/marker";
 
 export type { IngestEvent } from "./protocol";
@@ -31,17 +31,15 @@ type Listener = (e: IngestEvent) => void;
 const listeners = new Set<Listener>();
 const stateListeners = new Set<() => void>();
 let state: IngestState = { running: false, percent: 0, overall: null, error: null };
-let worker: Worker | null = null;
 
 function setState(patch: Partial<IngestState>) {
   state = { ...state, ...patch };
   stateListeners.forEach((l) => l());
 }
 
-function stopWorker() {
-  worker?.terminate();
-  worker = null;
-}
+// the engine worker also serves queries, so it is never terminated when an import ends
+function stopWorker() {}
+onIngestEvent((e) => handle(e));
 
 function handle(e: IngestEvent) {
   if (e.type === "overall") {
@@ -89,17 +87,14 @@ export async function startIngest(input: IngestInput): Promise<void> {
   };
   setState({ running: true, percent: 0, overall: null, error: null });
   try {
-    worker = new Worker(new URL("./workers/ingest.worker.ts", import.meta.url), { type: "module", name: "ingest" });
-    worker.onmessage = (m: MessageEvent<IngestEvent>) => handle(m.data);
-    worker.onerror = (ev) => handle({ type: "error", fatal: true, message: ev.message || "ingest worker failed to load" });
-    worker.postMessage({ type: "start", files } satisfies IngestCommand);
+    getEngineWorker().postMessage({ type: "start", files } satisfies IngestCommand);
   } catch (err) {
     handle({ type: "error", fatal: true, message: String(err instanceof Error ? err.message : err) });
   }
 }
 
 export function cancelIngest(): void {
-  worker?.postMessage({ type: "cancel" } satisfies IngestCommand);
+  getEngineWorker().postMessage({ type: "cancel" } satisfies IngestCommand);
 }
 
 export async function hasSavedData(): Promise<boolean> {
@@ -118,14 +113,14 @@ export async function getSyncInfo(): Promise<SyncInfo | null> {
 /** Closes every DB connection, then removes all stored data. */
 export async function deleteAllData(): Promise<void> {
   cancelIngest();
-  stopWorker();
   setState({ running: false, percent: 0, overall: null, error: null });
   try {
     await query("POST /api/admin/close");
   } catch {
     /* the DB may never have been opened in this tab */
   }
-  resetQueryWorker();
+  resetEngine(); // terminating the worker releases its exclusive OPFS file handles
+  await new Promise((r) => setTimeout(r, 300));
   await clearAllData();
   publishDataChanged();
 }

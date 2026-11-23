@@ -1,4 +1,4 @@
-import { query } from "../engine/queryClient";
+import { query } from "../engine/engineClient";
 
 export type Granularity = "day" | "week" | "month";
 

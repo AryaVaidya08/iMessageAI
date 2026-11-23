@@ -86,8 +86,13 @@ test("full flow on a 100 MB chat.db", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Get started", exact: true })).toBeVisible({ timeout: 60_000 });
   await page.reload();
   await expect(page.getByRole("heading", { name: "Get started", exact: true })).toBeVisible();
-  const dbs = await page.evaluate(async () => (await indexedDB.databases()).map((d) => d.name));
-  expect(dbs).not.toContain("imessage-analytics-db");
+  const opfs = await page.evaluate(async () => {
+    const root = await navigator.storage.getDirectory();
+    const names: string[] = [];
+    for await (const k of (root as unknown as { keys(): AsyncIterable<string> }).keys()) names.push(k);
+    return names;
+  });
+  expect(opfs.filter((n) => n.startsWith("imessage-analytics"))).toEqual([]);
 
   expect(errors, errors.join("\n")).toEqual([]);
 });
