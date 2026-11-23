@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { FiSlash } from "react-icons/fi";
 
 // iPadOS Safari reports itself as "MacIntel" but has a touch screen; real Macs report 0 touch points.
 export function isMac(): boolean {
@@ -27,9 +28,7 @@ const page: CSSProperties = {
 export function MacOnlyPage() {
   return (
     <div role="alert" style={page}>
-      <div style={{ fontSize: 72 }} aria-hidden="true">
-        👎
-      </div>
+      <FiSlash size={72} aria-hidden="true" />
       <h1 style={{ margin: 0, fontSize: 28 }}>This only works on a Mac</h1>
       <p style={{ margin: 0, maxWidth: 420, fontSize: 17, lineHeight: 1.5 }}>
         This app reads the iMessage database stored on a Mac, so it can't be used on this device. Please open it on a
