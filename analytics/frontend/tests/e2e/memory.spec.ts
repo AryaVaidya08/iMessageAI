@@ -4,7 +4,7 @@
 // by that profile path; your own Chrome is never touched.
 //   MEMORY_SIZE=small|100mb|1gb   MEMORY_TIMEOUT_MIN=120   npm run test:e2e -- tests/e2e/memory.spec.ts
 import { expect, test } from "@playwright/test";
-import { execFileSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { CACHE_DIR, ensureFixtures, fixturePath } from "../../scripts/make-fixtures";
@@ -82,6 +82,13 @@ test(`browser memory while importing a ${SIZE} chat.db and using the app`, async
     }
     return `total ${(r.bytes / 1048576).toFixed(0)}MB | ` + [...by].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k, v]) => `${k}: ${(v / 1048576).toFixed(0)}MB`).join(" ; ");
   };
+  const freePct = (): number | null => {
+    try {
+      const o = execSync("memory_pressure", { encoding: "utf8" });
+      const m = /free percentage: (\d+)%/.exec(o);
+      return m ? Number(m[1]) : null;
+    } catch { return null; }
+  };
   const sample = async (msgs: number) => {
     const m = browserMemory();
     samples.push({ t: Math.round((Date.now() - t0) / 1000), msgs, total: Math.round(m.total), renderer: Math.round(m.renderer), browser: Math.round(m.browser), heap: Math.round(await heapMB()), rss: Math.round(m.rssTotal) });
@@ -106,6 +113,14 @@ test(`browser memory while importing a ${SIZE} chat.db and using the app`, async
     if (samples.length % 6 === 1 && line !== last) console.log(line);
     if (process.env.E2E_ISOLATE && samples.length % 3 === 1) console.log(`   uaMemory: ${await breakdown()}`);
     last = line;
+    if (samples.length % 10 === 1) {
+      const fp = freePct();
+      console.log(`   system free memory ${fp}%`);
+      if (fp !== null && fp < 25) {
+        writeFileSync(join(CACHE_DIR, `memory-${SIZE}.json`), JSON.stringify({ aborted: `system free memory ${fp}% (< ~6 GB free)`, samples }, null, 1));
+        throw new Error(`system free memory fell to ${fp}% at ${msgs} messages`);
+      }
+    }
     if (s.total > Number(process.env.MEMORY_CAP_MB ?? 3000)) {
       writeFileSync(join(CACHE_DIR, `memory-${SIZE}.json`), JSON.stringify({ aborted: `footprint cap ${process.env.MEMORY_CAP_MB ?? 3000} MB exceeded`, samples }, null, 1));
       throw new Error(`footprint ${s.total} MB exceeded the safety cap at ${msgs} messages`);
