@@ -17,7 +17,7 @@ export default defineConfig({
     launchOptions: { args: ["--js-flags=--expose-gc"] },
   },
   webServer: {
-    command: `${process.env.E2E_TRACE ? "VITE_TRACE=1 " : ""}npm run build && npm run preview -- --port 4173 --strictPort`,
+    command: `${process.env.E2E_TRACE ? "VITE_TRACE=1 " : ""}${process.env.E2E_ISOLATE ? "VITE_ISOLATE=1 " : ""}npm run build && ${process.env.E2E_ISOLATE ? "VITE_ISOLATE=1 " : ""}npm run preview -- --port 4173 --strictPort`,
     url: "http://localhost:4173",
     reuseExistingServer: false,
     timeout: 180_000,
