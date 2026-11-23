@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { TopNav } from "./components/TopNav";
@@ -9,6 +10,10 @@ import { OverviewPage } from "./pages/OverviewPage";
 import { PeopleListPage } from "./pages/PeopleListPage";
 import { PersonDetailPage } from "./pages/PersonDetailPage";
 import { SharePage } from "./pages/SharePage";
+
+const DebugConsoleDemoPage = import.meta.env.DEV
+  ? lazy(() => import("./components/DebugConsole/DebugConsoleDemoPage"))
+  : null;
 
 export default function App() {
   return (
@@ -23,6 +28,16 @@ export default function App() {
           <Route path="/people/:id" element={<PersonDetailPage />} />
           <Route path="/merge" element={<MergePage />} />
           <Route path="/share" element={<SharePage />} />
+          {DebugConsoleDemoPage && (
+            <Route
+              path="/debug-console-demo"
+              element={
+                <Suspense fallback={null}>
+                  <DebugConsoleDemoPage />
+                </Suspense>
+              }
+            />
+          )}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

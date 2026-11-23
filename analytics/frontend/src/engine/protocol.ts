@@ -20,22 +20,23 @@ export type IngestPhase =
   | "finalizing";
 
 export type IngestEvent =
-  | { type: "phase"; phase: IngestPhase; detail?: string }
-  | { type: "chat-start"; chatId: string; name: string; index: number; total: number }
+  | { type: "phase"; phase: IngestPhase | (string & {}); detail?: string; label?: string }
+  | { type: "chat-start"; chatId: string; name: string; index?: number; total: number }
   | { type: "chat-progress"; chatId: string; name: string; done: number; total: number }
-  | { type: "chat-done"; chatId: string; name: string; inserted: number; updated: number }
+  | { type: "chat-done"; chatId: string; name?: string; inserted?: number; updated?: number }
   | ({ type: "overall" } & OverallProgress)
-  | { type: "log"; level: "info" | "warn" | "error"; message: string; ts: number }
+  | { type: "log"; level?: "debug" | "info" | "warn" | "error"; message: string; ts?: number }
   | { type: "memory"; usedMB: number; limitMB: number }
   | { type: "data-changed"; chatId?: string }
-  | { type: "error"; message: string; fatal: boolean }
+  | { type: "error"; message: string; fatal?: boolean; chatId?: string }
   | {
       type: "done";
-      cancelled: boolean;
-      skipped: boolean; // nothing changed (fingerprint match)
-      inserted: number;
-      updated: number;
-      chatsChanged: number;
+      cancelled?: boolean;
+      skipped?: boolean; // nothing changed (fingerprint match)
+      inserted?: number;
+      updated?: number;
+      chatsChanged?: number;
+      summary?: string;
     };
 
 export interface IngestOptions {
@@ -53,3 +54,5 @@ export interface IngestInputFiles {
 export type IngestCommand =
   | { type: "start"; files: IngestInputFiles; options?: IngestOptions }
   | { type: "cancel" };
+
+export type IngestSubscribe = (fn: (e: IngestEvent) => void) => () => void;
