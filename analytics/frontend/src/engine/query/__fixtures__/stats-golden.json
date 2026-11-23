@@ -1,0 +1,3034 @@
+{
+ "participant_stats": {
+  "c1": {
+   "participants": [
+    {
+     "participant_id": "+15551230001",
+     "display_name": "Alice",
+     "handle": "+15551230001",
+     "message_count": 202,
+     "median_reply_seconds": 400.978,
+     "reply_histogram": [
+      {
+       "label": "<1m",
+       "count": 19
+      },
+      {
+       "label": "1-5m",
+       "count": 19
+      },
+      {
+       "label": "5-30m",
+       "count": 14
+      },
+      {
+       "label": "30m-2h",
+       "count": 16
+      },
+      {
+       "label": "2-12h",
+       "count": 17
+      },
+      {
+       "label": "12-24h",
+       "count": 0
+      },
+      {
+       "label": ">24h",
+       "count": 17
+      }
+     ],
+     "gap_initiator_count": 33,
+     "late_night_ratio": 0.3069306930693069,
+     "top_words": [
+      {
+       "word": "i'm",
+       "count": 18
+      },
+      {
+       "word": "omg",
+       "count": 12
+      },
+      {
+       "word": "angry",
+       "count": 11
+      },
+      {
+       "word": "right",
+       "count": 11
+      },
+      {
+       "word": "heyyyy",
+       "count": 10
+      },
+      {
+       "word": "amazing",
+       "count": 10
+      },
+      {
+       "word": "worry",
+       "count": 9
+      },
+      {
+       "word": "fine",
+       "count": 9
+      },
+      {
+       "word": "chill",
+       "count": 9
+      },
+      {
+       "word": "haha",
+       "count": 9
+      },
+      {
+       "word": "wild",
+       "count": 9
+      },
+      {
+       "word": "best",
+       "count": 9
+      },
+      {
+       "word": "movie",
+       "count": 9
+      },
+      {
+       "word": "ever",
+       "count": 9
+      },
+      {
+       "word": "good",
+       "count": 8
+      }
+     ],
+     "top_emojis": [
+      {
+       "emoji": "\ud83d\ude2d",
+       "count": 18
+      },
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 15
+      },
+      {
+       "emoji": "\ud83d\ude21",
+       "count": 11
+      },
+      {
+       "emoji": "\ud83d\ude0d",
+       "count": 10
+      },
+      {
+       "emoji": "\ud83d\ude18",
+       "count": 8
+      },
+      {
+       "emoji": "\u2764",
+       "count": 4
+      },
+      {
+       "emoji": "\ud83d\udc80",
+       "count": 4
+      }
+     ],
+     "tapbacks_given": [
+      {
+       "action": "liked",
+       "count": 8
+      },
+      {
+       "action": "emphasized",
+       "count": 8
+      },
+      {
+       "action": "loved",
+       "count": 6
+      },
+      {
+       "action": "laughed",
+       "count": 3
+      }
+     ],
+     "tapbacks_received": [
+      {
+       "action": "emphasized",
+       "count": 9
+      },
+      {
+       "action": "liked",
+       "count": 8
+      },
+      {
+       "action": "laughed",
+       "count": 7
+      },
+      {
+       "action": "loved",
+       "count": 7
+      }
+     ],
+     "sentiment_series": [
+      {
+       "bucket": "2024-01-01",
+       "score": 0.223675
+      },
+      {
+       "bucket": "2024-01-08",
+       "score": 0.13097499999999998
+      },
+      {
+       "bucket": "2024-01-15",
+       "score": 0.14770833333333333
+      },
+      {
+       "bucket": "2024-01-22",
+       "score": 0.20083571428571428
+      },
+      {
+       "bucket": "2024-01-29",
+       "score": 0.28371999999999997
+      },
+      {
+       "bucket": "2024-02-05",
+       "score": 0.14466896551724134
+      },
+      {
+       "bucket": "2024-02-12",
+       "score": 0.2007071428571429
+      },
+      {
+       "bucket": "2024-02-19",
+       "score": 0.2539583333333333
+      },
+      {
+       "bucket": "2024-02-26",
+       "score": 0.24542222222222224
+      },
+      {
+       "bucket": "2024-03-04",
+       "score": 0.15869
+      },
+      {
+       "bucket": "2024-03-11",
+       "score": -0.0717785714285714
+      },
+      {
+       "bucket": "2024-03-18",
+       "score": 0.1774133333333334
+      },
+      {
+       "bucket": "2024-03-25",
+       "score": 0.2711071428571429
+      },
+      {
+       "bucket": "2024-04-01",
+       "score": 0.4083142857142857
+      }
+     ],
+     "personality": [
+      {
+       "trait": "Aggressive",
+       "percentage": 16.8
+      },
+      {
+       "trait": "Chaotic",
+       "percentage": 15.2
+      },
+      {
+       "trait": "Dramatic",
+       "percentage": 10.2
+      },
+      {
+       "trait": "Sarcastic",
+       "percentage": 12.2
+      },
+      {
+       "trait": "Chill",
+       "percentage": 7.6
+      },
+      {
+       "trait": "Wholesome",
+       "percentage": 26.4
+      }
+     ]
+    },
+    {
+     "participant_id": "me",
+     "display_name": "You",
+     "handle": "",
+     "message_count": 198,
+     "median_reply_seconds": 3000.341,
+     "reply_histogram": [
+      {
+       "label": "<1m",
+       "count": 15
+      },
+      {
+       "label": "1-5m",
+       "count": 14
+      },
+      {
+       "label": "5-30m",
+       "count": 17
+      },
+      {
+       "label": "30m-2h",
+       "count": 19
+      },
+      {
+       "label": "2-12h",
+       "count": 17
+      },
+      {
+       "label": "12-24h",
+       "count": 0
+      },
+      {
+       "label": ">24h",
+       "count": 21
+      }
+     ],
+     "gap_initiator_count": 38,
+     "late_night_ratio": 0.32323232323232326,
+     "top_words": [
+      {
+       "word": "i'm",
+       "count": 18
+      },
+      {
+       "word": "worry",
+       "count": 12
+      },
+      {
+       "word": "fine",
+       "count": 12
+      },
+      {
+       "word": "chill",
+       "count": 12
+      },
+      {
+       "word": "sorry",
+       "count": 11
+      },
+      {
+       "word": "late",
+       "count": 11
+      },
+      {
+       "word": "best",
+       "count": 11
+      },
+      {
+       "word": "movie",
+       "count": 11
+      },
+      {
+       "word": "ever",
+       "count": 11
+      },
+      {
+       "word": "heyyyy",
+       "count": 9
+      },
+      {
+       "word": "good",
+       "count": 9
+      },
+      {
+       "word": "night",
+       "count": 9
+      },
+      {
+       "word": "sure",
+       "count": 9
+      },
+      {
+       "word": "totally",
+       "count": 9
+      },
+      {
+       "word": "wow",
+       "count": 9
+      }
+     ],
+     "top_emojis": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 30
+      },
+      {
+       "emoji": "\ud83d\ude18",
+       "count": 9
+      },
+      {
+       "emoji": "\ud83d\udc80",
+       "count": 9
+      },
+      {
+       "emoji": "\ud83d\ude2d",
+       "count": 8
+      },
+      {
+       "emoji": "\ud83d\ude0d",
+       "count": 8
+      },
+      {
+       "emoji": "\ud83d\ude21",
+       "count": 7
+      },
+      {
+       "emoji": "\u2764",
+       "count": 7
+      }
+     ],
+     "tapbacks_given": [
+      {
+       "action": "laughed",
+       "count": 13
+      },
+      {
+       "action": "emphasized",
+       "count": 9
+      },
+      {
+       "action": "liked",
+       "count": 7
+      },
+      {
+       "action": "loved",
+       "count": 4
+      }
+     ],
+     "tapbacks_received": [
+      {
+       "action": "laughed",
+       "count": 9
+      },
+      {
+       "action": "emphasized",
+       "count": 8
+      },
+      {
+       "action": "liked",
+       "count": 7
+      },
+      {
+       "action": "loved",
+       "count": 3
+      }
+     ],
+     "sentiment_series": [
+      {
+       "bucket": "2024-01-01",
+       "score": 0.019333333333333338
+      },
+      {
+       "bucket": "2024-01-08",
+       "score": 0.21459999999999999
+      },
+      {
+       "bucket": "2024-01-15",
+       "score": 0.26488571428571434
+      },
+      {
+       "bucket": "2024-01-22",
+       "score": 0.12431250000000002
+      },
+      {
+       "bucket": "2024-01-29",
+       "score": 0.4211850000000001
+      },
+      {
+       "bucket": "2024-02-05",
+       "score": 0.16721666666666665
+      },
+      {
+       "bucket": "2024-02-12",
+       "score": 0.25518
+      },
+      {
+       "bucket": "2024-02-19",
+       "score": 0.42185555555555554
+      },
+      {
+       "bucket": "2024-02-26",
+       "score": 0.027588888888888878
+      },
+      {
+       "bucket": "2024-03-04",
+       "score": 0.2987166666666667
+      },
+      {
+       "bucket": "2024-03-11",
+       "score": 0.3813894736842105
+      },
+      {
+       "bucket": "2024-03-18",
+       "score": 0.11430909090909087
+      },
+      {
+       "bucket": "2024-03-25",
+       "score": 0.055057894736842104
+      },
+      {
+       "bucket": "2024-04-01",
+       "score": 0.48212
+      }
+     ],
+     "personality": [
+      {
+       "trait": "Aggressive",
+       "percentage": 13.0
+      },
+      {
+       "trait": "Chaotic",
+       "percentage": 12.4
+      },
+      {
+       "trait": "Dramatic",
+       "percentage": 13.5
+      },
+      {
+       "trait": "Sarcastic",
+       "percentage": 13.0
+      },
+      {
+       "trait": "Chill",
+       "percentage": 10.4
+      },
+      {
+       "trait": "Wholesome",
+       "percentage": 29.0
+      }
+     ]
+    }
+   ]
+  },
+  "c2": {
+   "participants": [
+    {
+     "participant_id": "+15551230001",
+     "display_name": "Alice",
+     "handle": "+15551230001",
+     "message_count": 103,
+     "median_reply_seconds": 3000.4889999999996,
+     "reply_histogram": [
+      {
+       "label": "<1m",
+       "count": 12
+      },
+      {
+       "label": "1-5m",
+       "count": 10
+      },
+      {
+       "label": "5-30m",
+       "count": 9
+      },
+      {
+       "label": "30m-2h",
+       "count": 15
+      },
+      {
+       "label": "2-12h",
+       "count": 17
+      },
+      {
+       "label": "12-24h",
+       "count": 0
+      },
+      {
+       "label": ">24h",
+       "count": 13
+      }
+     ],
+     "gap_initiator_count": 17,
+     "late_night_ratio": 0.3883495145631068,
+     "top_words": [
+      {
+       "word": "i'm",
+       "count": 10
+      },
+      {
+       "word": "angry",
+       "count": 9
+      },
+      {
+       "word": "right",
+       "count": 9
+      },
+      {
+       "word": "fuck",
+       "count": 6
+      },
+      {
+       "word": "stupid",
+       "count": 6
+      },
+      {
+       "word": "thing",
+       "count": 6
+      },
+      {
+       "word": "wow",
+       "count": 6
+      },
+      {
+       "word": "great",
+       "count": 6
+      },
+      {
+       "word": "job",
+       "count": 6
+      },
+      {
+       "word": "best",
+       "count": 6
+      },
+      {
+       "word": "movie",
+       "count": 6
+      },
+      {
+       "word": "ever",
+       "count": 6
+      },
+      {
+       "word": "whatever",
+       "count": 5
+      },
+      {
+       "word": "vibes",
+       "count": 5
+      },
+      {
+       "word": "worry",
+       "count": 5
+      }
+     ],
+     "top_emojis": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 21
+      },
+      {
+       "emoji": "\ud83d\ude21",
+       "count": 9
+      },
+      {
+       "emoji": "\ud83d\ude18",
+       "count": 4
+      },
+      {
+       "emoji": "\ud83d\ude0d",
+       "count": 4
+      },
+      {
+       "emoji": "\u2764",
+       "count": 4
+      },
+      {
+       "emoji": "\ud83d\udc80",
+       "count": 4
+      },
+      {
+       "emoji": "\ud83d\ude2d",
+       "count": 2
+      }
+     ],
+     "tapbacks_given": [
+      {
+       "action": "liked",
+       "count": 7
+      },
+      {
+       "action": "loved",
+       "count": 5
+      },
+      {
+       "action": "laughed",
+       "count": 4
+      },
+      {
+       "action": "emphasized",
+       "count": 1
+      }
+     ],
+     "tapbacks_received": [
+      {
+       "action": "liked",
+       "count": 5
+      },
+      {
+       "action": "loved",
+       "count": 4
+      },
+      {
+       "action": "emphasized",
+       "count": 3
+      },
+      {
+       "action": "laughed",
+       "count": 1
+      }
+     ],
+     "sentiment_series": [
+      {
+       "bucket": "2024-01-01",
+       "score": -0.033299999999999996
+      },
+      {
+       "bucket": "2024-01-08",
+       "score": 0.61378
+      },
+      {
+       "bucket": "2024-01-15",
+       "score": -0.1388125
+      },
+      {
+       "bucket": "2024-01-22",
+       "score": -0.04345000000000002
+      },
+      {
+       "bucket": "2024-01-29",
+       "score": 0.44287777777777776
+      },
+      {
+       "bucket": "2024-02-05",
+       "score": -0.0013000000000000327
+      },
+      {
+       "bucket": "2024-02-12",
+       "score": 0.3697857142857143
+      },
+      {
+       "bucket": "2024-02-19",
+       "score": 0.2524235294117647
+      },
+      {
+       "bucket": "2024-02-26",
+       "score": -0.06475
+      },
+      {
+       "bucket": "2024-03-04",
+       "score": 0.28419999999999995
+      },
+      {
+       "bucket": "2024-03-11",
+       "score": 0.35581999999999997
+      },
+      {
+       "bucket": "2024-03-18",
+       "score": -0.27688
+      },
+      {
+       "bucket": "2024-03-25",
+       "score": -0.16785
+      }
+     ],
+     "personality": [
+      {
+       "trait": "Aggressive",
+       "percentage": 25.5
+      },
+      {
+       "trait": "Chaotic",
+       "percentage": 10.2
+      },
+      {
+       "trait": "Dramatic",
+       "percentage": 13.3
+      },
+      {
+       "trait": "Sarcastic",
+       "percentage": 19.4
+      },
+      {
+       "trait": "Chill",
+       "percentage": 10.2
+      },
+      {
+       "trait": "Wholesome",
+       "percentage": 23.5
+      }
+     ]
+    },
+    {
+     "participant_id": "+15551230002",
+     "display_name": "+15551230002",
+     "handle": "+15551230002",
+     "message_count": 86,
+     "median_reply_seconds": 400.7605,
+     "reply_histogram": [
+      {
+       "label": "<1m",
+       "count": 9
+      },
+      {
+       "label": "1-5m",
+       "count": 20
+      },
+      {
+       "label": "5-30m",
+       "count": 7
+      },
+      {
+       "label": "30m-2h",
+       "count": 9
+      },
+      {
+       "label": "2-12h",
+       "count": 11
+      },
+      {
+       "label": "12-24h",
+       "count": 0
+      },
+      {
+       "label": ">24h",
+       "count": 14
+      }
+     ],
+     "gap_initiator_count": 15,
+     "late_night_ratio": 0.29069767441860467,
+     "top_words": [
+      {
+       "word": "see",
+       "count": 8
+      },
+      {
+       "word": "tomorrow",
+       "count": 8
+      },
+      {
+       "word": "dinner",
+       "count": 8
+      },
+      {
+       "word": "sure",
+       "count": 7
+      },
+      {
+       "word": "totally",
+       "count": 7
+      },
+      {
+       "word": "hate",
+       "count": 6
+      },
+      {
+       "word": "i'm",
+       "count": 5
+      },
+      {
+       "word": "omg",
+       "count": 5
+      },
+      {
+       "word": "good",
+       "count": 4
+      },
+      {
+       "word": "night",
+       "count": 4
+      },
+      {
+       "word": "amazing",
+       "count": 4
+      },
+      {
+       "word": "best",
+       "count": 4
+      },
+      {
+       "word": "movie",
+       "count": 4
+      },
+      {
+       "word": "ever",
+       "count": 4
+      },
+      {
+       "word": "call",
+       "count": 4
+      }
+     ],
+     "top_emojis": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 9
+      },
+      {
+       "emoji": "\ud83d\ude18",
+       "count": 4
+      },
+      {
+       "emoji": "\ud83d\ude0d",
+       "count": 4
+      },
+      {
+       "emoji": "\ud83d\udc80",
+       "count": 3
+      },
+      {
+       "emoji": "\ud83d\ude21",
+       "count": 3
+      },
+      {
+       "emoji": "\u2764",
+       "count": 2
+      }
+     ],
+     "tapbacks_given": [
+      {
+       "action": "emphasized",
+       "count": 8
+      },
+      {
+       "action": "liked",
+       "count": 5
+      },
+      {
+       "action": "loved",
+       "count": 3
+      },
+      {
+       "action": "laughed",
+       "count": 2
+      }
+     ],
+     "tapbacks_received": [
+      {
+       "action": "liked",
+       "count": 4
+      },
+      {
+       "action": "loved",
+       "count": 2
+      },
+      {
+       "action": "emphasized",
+       "count": 2
+      },
+      {
+       "action": "laughed",
+       "count": 2
+      }
+     ],
+     "sentiment_series": [
+      {
+       "bucket": "2024-01-01",
+       "score": 0.28468
+      },
+      {
+       "bucket": "2024-01-08",
+       "score": 0.3155727272727273
+      },
+      {
+       "bucket": "2024-01-15",
+       "score": 0.24743333333333337
+      },
+      {
+       "bucket": "2024-01-22",
+       "score": 0.26543333333333335
+      },
+      {
+       "bucket": "2024-01-29",
+       "score": 0.20706666666666665
+      },
+      {
+       "bucket": "2024-02-05",
+       "score": -0.085175
+      },
+      {
+       "bucket": "2024-02-12",
+       "score": 0.11159999999999999
+      },
+      {
+       "bucket": "2024-02-19",
+       "score": 0.2640166666666667
+      },
+      {
+       "bucket": "2024-02-26",
+       "score": -0.013700000000000018
+      },
+      {
+       "bucket": "2024-03-04",
+       "score": 0.3711875
+      },
+      {
+       "bucket": "2024-03-11",
+       "score": 0.24492499999999998
+      },
+      {
+       "bucket": "2024-03-18",
+       "score": 0.15693333333333329
+      },
+      {
+       "bucket": "2024-03-25",
+       "score": 0.21106666666666665
+      }
+     ],
+     "personality": [
+      {
+       "trait": "Aggressive",
+       "percentage": 17.1
+      },
+      {
+       "trait": "Chaotic",
+       "percentage": 7.3
+      },
+      {
+       "trait": "Dramatic",
+       "percentage": 11.0
+      },
+      {
+       "trait": "Sarcastic",
+       "percentage": 15.9
+      },
+      {
+       "trait": "Chill",
+       "percentage": 4.9
+      },
+      {
+       "trait": "Wholesome",
+       "percentage": 23.2
+      }
+     ]
+    },
+    {
+     "participant_id": "a@example.com",
+     "display_name": "a@example.com",
+     "handle": "a@example.com",
+     "message_count": 101,
+     "median_reply_seconds": 3000.366,
+     "reply_histogram": [
+      {
+       "label": "<1m",
+       "count": 10
+      },
+      {
+       "label": "1-5m",
+       "count": 15
+      },
+      {
+       "label": "5-30m",
+       "count": 14
+      },
+      {
+       "label": "30m-2h",
+       "count": 14
+      },
+      {
+       "label": "2-12h",
+       "count": 16
+      },
+      {
+       "label": "12-24h",
+       "count": 0
+      },
+      {
+       "label": ">24h",
+       "count": 12
+      }
+     ],
+     "gap_initiator_count": 16,
+     "late_night_ratio": 0.21782178217821782,
+     "top_words": [
+      {
+       "word": "i'm",
+       "count": 7
+      },
+      {
+       "word": "heyyyy",
+       "count": 6
+      },
+      {
+       "word": "sorry",
+       "count": 6
+      },
+      {
+       "word": "late",
+       "count": 6
+      },
+      {
+       "word": "see",
+       "count": 6
+      },
+      {
+       "word": "tomorrow",
+       "count": 6
+      },
+      {
+       "word": "dinner",
+       "count": 6
+      },
+      {
+       "word": "can't",
+       "count": 5
+      },
+      {
+       "word": "believe",
+       "count": 5
+      },
+      {
+       "word": "love",
+       "count": 5
+      },
+      {
+       "word": "much",
+       "count": 5
+      },
+      {
+       "word": "best",
+       "count": 5
+      },
+      {
+       "word": "movie",
+       "count": 5
+      },
+      {
+       "word": "ever",
+       "count": 5
+      },
+      {
+       "word": "omg",
+       "count": 5
+      }
+     ],
+     "top_emojis": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 18
+      },
+      {
+       "emoji": "\ud83d\ude2d",
+       "count": 6
+      },
+      {
+       "emoji": "\ud83d\ude0d",
+       "count": 4
+      },
+      {
+       "emoji": "\u2764",
+       "count": 4
+      },
+      {
+       "emoji": "\ud83d\ude18",
+       "count": 3
+      },
+      {
+       "emoji": "\ud83d\udc80",
+       "count": 3
+      },
+      {
+       "emoji": "\ud83d\ude21",
+       "count": 1
+      }
+     ],
+     "tapbacks_given": [
+      {
+       "action": "loved",
+       "count": 4
+      },
+      {
+       "action": "liked",
+       "count": 4
+      },
+      {
+       "action": "laughed",
+       "count": 3
+      },
+      {
+       "action": "emphasized",
+       "count": 1
+      }
+     ],
+     "tapbacks_received": [
+      {
+       "action": "loved",
+       "count": 9
+      },
+      {
+       "action": "liked",
+       "count": 6
+      },
+      {
+       "action": "emphasized",
+       "count": 5
+      },
+      {
+       "action": "laughed",
+       "count": 3
+      }
+     ],
+     "sentiment_series": [
+      {
+       "bucket": "2024-01-01",
+       "score": 0.26718000000000003
+      },
+      {
+       "bucket": "2024-01-08",
+       "score": 0.036212499999999995
+      },
+      {
+       "bucket": "2024-01-15",
+       "score": 0.1759090909090909
+      },
+      {
+       "bucket": "2024-01-22",
+       "score": 0.33311666666666667
+      },
+      {
+       "bucket": "2024-01-29",
+       "score": 0.11287000000000003
+      },
+      {
+       "bucket": "2024-02-05",
+       "score": 0.01916666666666665
+      },
+      {
+       "bucket": "2024-02-12",
+       "score": 0.24271999999999996
+      },
+      {
+       "bucket": "2024-02-19",
+       "score": 0.3491583333333333
+      },
+      {
+       "bucket": "2024-02-26",
+       "score": 0.21996666666666664
+      },
+      {
+       "bucket": "2024-03-04",
+       "score": 0.30696
+      },
+      {
+       "bucket": "2024-03-11",
+       "score": 0.69145
+      },
+      {
+       "bucket": "2024-03-18",
+       "score": 0.31906
+      },
+      {
+       "bucket": "2024-03-25",
+       "score": 0.11826
+      }
+     ],
+     "personality": [
+      {
+       "trait": "Aggressive",
+       "percentage": 12.4
+      },
+      {
+       "trait": "Chaotic",
+       "percentage": 17.5
+      },
+      {
+       "trait": "Dramatic",
+       "percentage": 13.4
+      },
+      {
+       "trait": "Sarcastic",
+       "percentage": 6.2
+      },
+      {
+       "trait": "Chill",
+       "percentage": 6.2
+      },
+      {
+       "trait": "Wholesome",
+       "percentage": 32.0
+      }
+     ]
+    },
+    {
+     "participant_id": "me",
+     "display_name": "You",
+     "handle": "",
+     "message_count": 110,
+     "median_reply_seconds": 400.842,
+     "reply_histogram": [
+      {
+       "label": "<1m",
+       "count": 17
+      },
+      {
+       "label": "1-5m",
+       "count": 13
+      },
+      {
+       "label": "5-30m",
+       "count": 19
+      },
+      {
+       "label": "30m-2h",
+       "count": 14
+      },
+      {
+       "label": "2-12h",
+       "count": 16
+      },
+      {
+       "label": "12-24h",
+       "count": 0
+      },
+      {
+       "label": ">24h",
+       "count": 12
+      }
+     ],
+     "gap_initiator_count": 18,
+     "late_night_ratio": 0.34545454545454546,
+     "top_words": [
+      {
+       "word": "heyyyy",
+       "count": 9
+      },
+      {
+       "word": "thanks",
+       "count": 7
+      },
+      {
+       "word": "appreciate",
+       "count": 7
+      },
+      {
+       "word": "worry",
+       "count": 7
+      },
+      {
+       "word": "fine",
+       "count": 7
+      },
+      {
+       "word": "chill",
+       "count": 7
+      },
+      {
+       "word": "fuck",
+       "count": 7
+      },
+      {
+       "word": "stupid",
+       "count": 7
+      },
+      {
+       "word": "thing",
+       "count": 7
+      },
+      {
+       "word": "amazing",
+       "count": 7
+      },
+      {
+       "word": "i'm",
+       "count": 7
+      },
+      {
+       "word": "hate",
+       "count": 6
+      },
+      {
+       "word": "omg",
+       "count": 5
+      },
+      {
+       "word": "good",
+       "count": 5
+      },
+      {
+       "word": "night",
+       "count": 5
+      }
+     ],
+     "top_emojis": [
+      {
+       "emoji": "\ud83d\ude0d",
+       "count": 7
+      },
+      {
+       "emoji": "\ud83d\ude2d",
+       "count": 6
+      },
+      {
+       "emoji": "\ud83d\ude18",
+       "count": 5
+      },
+      {
+       "emoji": "\ud83d\ude21",
+       "count": 5
+      },
+      {
+       "emoji": "\u2764",
+       "count": 3
+      },
+      {
+       "emoji": "\ud83d\udc80",
+       "count": 3
+      },
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 3
+      }
+     ],
+     "tapbacks_given": [
+      {
+       "action": "liked",
+       "count": 5
+      },
+      {
+       "action": "loved",
+       "count": 4
+      },
+      {
+       "action": "laughed",
+       "count": 3
+      },
+      {
+       "action": "emphasized",
+       "count": 1
+      }
+     ],
+     "tapbacks_received": [
+      {
+       "action": "liked",
+       "count": 6
+      },
+      {
+       "action": "laughed",
+       "count": 6
+      },
+      {
+       "action": "loved",
+       "count": 1
+      },
+      {
+       "action": "emphasized",
+       "count": 1
+      }
+     ],
+     "sentiment_series": [
+      {
+       "bucket": "2024-01-01",
+       "score": 0.43497142857142856
+      },
+      {
+       "bucket": "2024-01-08",
+       "score": 0.11380909090909092
+      },
+      {
+       "bucket": "2024-01-15",
+       "score": 0.26871
+      },
+      {
+       "bucket": "2024-01-22",
+       "score": 0.07289999999999998
+      },
+      {
+       "bucket": "2024-01-29",
+       "score": -0.1455888888888889
+      },
+      {
+       "bucket": "2024-02-05",
+       "score": 0.0018000000000000342
+      },
+      {
+       "bucket": "2024-02-12",
+       "score": 0.1788727272727273
+      },
+      {
+       "bucket": "2024-02-19",
+       "score": 0.20141
+      },
+      {
+       "bucket": "2024-02-26",
+       "score": 0.2374666666666667
+      },
+      {
+       "bucket": "2024-03-04",
+       "score": 0.1976
+      },
+      {
+       "bucket": "2024-03-11",
+       "score": 0.19707142857142856
+      },
+      {
+       "bucket": "2024-03-18",
+       "score": -0.0055454545454545305
+      },
+      {
+       "bucket": "2024-03-25",
+       "score": 0.1357888888888889
+      }
+     ],
+     "personality": [
+      {
+       "trait": "Aggressive",
+       "percentage": 21.0
+      },
+      {
+       "trait": "Chaotic",
+       "percentage": 18.1
+      },
+      {
+       "trait": "Dramatic",
+       "percentage": 6.7
+      },
+      {
+       "trait": "Sarcastic",
+       "percentage": 10.5
+      },
+      {
+       "trait": "Chill",
+       "percentage": 9.5
+      },
+      {
+       "trait": "Wholesome",
+       "percentage": 28.6
+      }
+     ]
+    }
+   ]
+  },
+  "c3": {
+   "participants": [
+    {
+     "participant_id": "+15551230002",
+     "display_name": "+15551230002",
+     "handle": "+15551230002",
+     "message_count": 9,
+     "median_reply_seconds": 400.734,
+     "reply_histogram": [
+      {
+       "label": "<1m",
+       "count": 1
+      },
+      {
+       "label": "1-5m",
+       "count": 0
+      },
+      {
+       "label": "5-30m",
+       "count": 1
+      },
+      {
+       "label": "30m-2h",
+       "count": 0
+      },
+      {
+       "label": "2-12h",
+       "count": 0
+      },
+      {
+       "label": "12-24h",
+       "count": 0
+      },
+      {
+       "label": ">24h",
+       "count": 1
+      }
+     ],
+     "gap_initiator_count": 3,
+     "late_night_ratio": 0.2222222222222222,
+     "top_words": [
+      {
+       "word": "thanks",
+       "count": 2
+      },
+      {
+       "word": "appreciate",
+       "count": 2
+      },
+      {
+       "word": "best",
+       "count": 1
+      },
+      {
+       "word": "movie",
+       "count": 1
+      },
+      {
+       "word": "ever",
+       "count": 1
+      },
+      {
+       "word": "sure",
+       "count": 1
+      },
+      {
+       "word": "totally",
+       "count": 1
+      },
+      {
+       "word": "heyyyy",
+       "count": 1
+      }
+     ],
+     "top_emojis": [
+      {
+       "emoji": "\ud83d\ude02",
+       "count": 3
+      }
+     ],
+     "tapbacks_given": [
+      {
+       "action": "emphasized",
+       "count": 1
+      },
+      {
+       "action": "laughed",
+       "count": 1
+      }
+     ],
+     "tapbacks_received": [
+      {
+       "action": "laughed",
+       "count": 1
+      }
+     ],
+     "sentiment_series": [
+      {
+       "bucket": "2024-01-01",
+       "score": 0.49942857142857144
+      }
+     ],
+     "personality": []
+    },
+    {
+     "participant_id": "me",
+     "display_name": "You",
+     "handle": "",
+     "message_count": 6,
+     "median_reply_seconds": 20000.22,
+     "reply_histogram": [
+      {
+       "label": "<1m",
+       "count": 1
+      },
+      {
+       "label": "1-5m",
+       "count": 0
+      },
+      {
+       "label": "5-30m",
+       "count": 0
+      },
+      {
+       "label": "30m-2h",
+       "count": 0
+      },
+      {
+       "label": "2-12h",
+       "count": 1
+      },
+      {
+       "label": "12-24h",
+       "count": 0
+      },
+      {
+       "label": ">24h",
+       "count": 1
+      }
+     ],
+     "gap_initiator_count": 1,
+     "late_night_ratio": 0.6666666666666666,
+     "top_words": [
+      {
+       "word": "amazing",
+       "count": 1
+      },
+      {
+       "word": "literally",
+       "count": 1
+      },
+      {
+       "word": "dying",
+       "count": 1
+      },
+      {
+       "word": "whatever",
+       "count": 1
+      },
+      {
+       "word": "vibes",
+       "count": 1
+      },
+      {
+       "word": "heyyyy",
+       "count": 1
+      },
+      {
+       "word": "wow",
+       "count": 1
+      },
+      {
+       "word": "great",
+       "count": 1
+      },
+      {
+       "word": "job",
+       "count": 1
+      },
+      {
+       "word": "call",
+       "count": 1
+      },
+      {
+       "word": "you're",
+       "count": 1
+      },
+      {
+       "word": "free",
+       "count": 1
+      }
+     ],
+     "top_emojis": [
+      {
+       "emoji": "\ud83d\ude0d",
+       "count": 1
+      },
+      {
+       "emoji": "\ud83d\udc80",
+       "count": 1
+      }
+     ],
+     "tapbacks_given": [
+      {
+       "action": "loved",
+       "count": 1
+      }
+     ],
+     "tapbacks_received": [
+      {
+       "action": "emphasized",
+       "count": 1
+      },
+      {
+       "action": "loved",
+       "count": 1
+      }
+     ],
+     "sentiment_series": [
+      {
+       "bucket": "2024-01-01",
+       "score": 0.35415
+      }
+     ],
+     "personality": []
+    }
+   ]
+  }
+ },
+ "personality_leaderboard": {
+  "c1": {
+   "traits": [
+    {
+     "trait": "Aggressive",
+     "entries": [
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 33,
+       "share": 16.3
+      },
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 25,
+       "share": 12.6
+      }
+     ]
+    },
+    {
+     "trait": "Chaotic",
+     "entries": [
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 30,
+       "share": 14.9
+      },
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 24,
+       "share": 12.1
+      }
+     ]
+    },
+    {
+     "trait": "Dramatic",
+     "entries": [
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 26,
+       "share": 13.1
+      },
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 20,
+       "share": 9.9
+      }
+     ]
+    },
+    {
+     "trait": "Sarcastic",
+     "entries": [
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 25,
+       "share": 12.6
+      },
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 24,
+       "share": 11.9
+      }
+     ]
+    },
+    {
+     "trait": "Chill",
+     "entries": [
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 20,
+       "share": 10.1
+      },
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 15,
+       "share": 7.4
+      }
+     ]
+    },
+    {
+     "trait": "Wholesome",
+     "entries": [
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 56,
+       "share": 28.3
+      },
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 52,
+       "share": 25.7
+      }
+     ]
+    }
+   ]
+  },
+  "c2": {
+   "traits": [
+    {
+     "trait": "Aggressive",
+     "entries": [
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 25,
+       "share": 24.3
+      },
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 22,
+       "share": 20.0
+      },
+      {
+       "participant_id": "+15551230002",
+       "display_name": "+15551230002",
+       "message_count": 14,
+       "share": 16.3
+      },
+      {
+       "participant_id": "a@example.com",
+       "display_name": "a@example.com",
+       "message_count": 12,
+       "share": 11.9
+      }
+     ]
+    },
+    {
+     "trait": "Chaotic",
+     "entries": [
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 19,
+       "share": 17.3
+      },
+      {
+       "participant_id": "a@example.com",
+       "display_name": "a@example.com",
+       "message_count": 17,
+       "share": 16.8
+      },
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 10,
+       "share": 9.7
+      },
+      {
+       "participant_id": "+15551230002",
+       "display_name": "+15551230002",
+       "message_count": 6,
+       "share": 7.0
+      }
+     ]
+    },
+    {
+     "trait": "Dramatic",
+     "entries": [
+      {
+       "participant_id": "a@example.com",
+       "display_name": "a@example.com",
+       "message_count": 13,
+       "share": 12.9
+      },
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 13,
+       "share": 12.6
+      },
+      {
+       "participant_id": "+15551230002",
+       "display_name": "+15551230002",
+       "message_count": 9,
+       "share": 10.5
+      },
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 7,
+       "share": 6.4
+      }
+     ]
+    },
+    {
+     "trait": "Sarcastic",
+     "entries": [
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 19,
+       "share": 18.4
+      },
+      {
+       "participant_id": "+15551230002",
+       "display_name": "+15551230002",
+       "message_count": 13,
+       "share": 15.1
+      },
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 11,
+       "share": 10.0
+      },
+      {
+       "participant_id": "a@example.com",
+       "display_name": "a@example.com",
+       "message_count": 6,
+       "share": 5.9
+      }
+     ]
+    },
+    {
+     "trait": "Chill",
+     "entries": [
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 10,
+       "share": 9.7
+      },
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 10,
+       "share": 9.1
+      },
+      {
+       "participant_id": "a@example.com",
+       "display_name": "a@example.com",
+       "message_count": 6,
+       "share": 5.9
+      },
+      {
+       "participant_id": "+15551230002",
+       "display_name": "+15551230002",
+       "message_count": 4,
+       "share": 4.7
+      }
+     ]
+    },
+    {
+     "trait": "Wholesome",
+     "entries": [
+      {
+       "participant_id": "a@example.com",
+       "display_name": "a@example.com",
+       "message_count": 31,
+       "share": 30.7
+      },
+      {
+       "participant_id": "me",
+       "display_name": "You",
+       "message_count": 30,
+       "share": 27.3
+      },
+      {
+       "participant_id": "+15551230001",
+       "display_name": "Alice",
+       "message_count": 23,
+       "share": 22.3
+      },
+      {
+       "participant_id": "+15551230002",
+       "display_name": "+15551230002",
+       "message_count": 19,
+       "share": 22.1
+      }
+     ]
+    }
+   ]
+  },
+  "c3": {
+   "traits": [
+    {
+     "trait": "Aggressive",
+     "entries": []
+    },
+    {
+     "trait": "Chaotic",
+     "entries": []
+    },
+    {
+     "trait": "Dramatic",
+     "entries": []
+    },
+    {
+     "trait": "Sarcastic",
+     "entries": []
+    },
+    {
+     "trait": "Chill",
+     "entries": []
+    },
+    {
+     "trait": "Wholesome",
+     "entries": []
+    }
+   ]
+  }
+ },
+ "person_stats": {
+  "me": {
+   "participant_id": "me",
+   "display_name": "You",
+   "handle": "",
+   "message_count": 314,
+   "median_reply_seconds": 3000.075,
+   "reply_histogram": [
+    {
+     "label": "<1m",
+     "count": 33
+    },
+    {
+     "label": "1-5m",
+     "count": 27
+    },
+    {
+     "label": "5-30m",
+     "count": 36
+    },
+    {
+     "label": "30m-2h",
+     "count": 33
+    },
+    {
+     "label": "2-12h",
+     "count": 34
+    },
+    {
+     "label": "12-24h",
+     "count": 0
+    },
+    {
+     "label": ">24h",
+     "count": 34
+    }
+   ],
+   "gap_initiator_count": 57,
+   "late_night_ratio": 0.3375796178343949,
+   "top_words": [
+    {
+     "word": "i'm",
+     "count": 25
+    },
+    {
+     "word": "heyyyy",
+     "count": 19
+    },
+    {
+     "word": "worry",
+     "count": 19
+    },
+    {
+     "word": "fine",
+     "count": 19
+    },
+    {
+     "word": "chill",
+     "count": 19
+    },
+    {
+     "word": "amazing",
+     "count": 16
+    },
+    {
+     "word": "thanks",
+     "count": 15
+    },
+    {
+     "word": "appreciate",
+     "count": 15
+    },
+    {
+     "word": "good",
+     "count": 14
+    },
+    {
+     "word": "night",
+     "count": 14
+    },
+    {
+     "word": "sorry",
+     "count": 13
+    },
+    {
+     "word": "late",
+     "count": 13
+    },
+    {
+     "word": "best",
+     "count": 13
+    },
+    {
+     "word": "movie",
+     "count": 13
+    },
+    {
+     "word": "ever",
+     "count": 13
+    }
+   ],
+   "top_emojis": [
+    {
+     "emoji": "\ud83d\ude02",
+     "count": 33
+    },
+    {
+     "emoji": "\ud83d\ude0d",
+     "count": 16
+    },
+    {
+     "emoji": "\ud83d\ude18",
+     "count": 14
+    },
+    {
+     "emoji": "\ud83d\ude2d",
+     "count": 14
+    },
+    {
+     "emoji": "\ud83d\udc80",
+     "count": 13
+    },
+    {
+     "emoji": "\ud83d\ude21",
+     "count": 12
+    },
+    {
+     "emoji": "\u2764",
+     "count": 10
+    }
+   ],
+   "tapbacks_given": [
+    {
+     "action": "laughed",
+     "count": 16
+    },
+    {
+     "action": "liked",
+     "count": 12
+    },
+    {
+     "action": "emphasized",
+     "count": 10
+    },
+    {
+     "action": "loved",
+     "count": 9
+    }
+   ],
+   "tapbacks_received": [
+    {
+     "action": "laughed",
+     "count": 15
+    },
+    {
+     "action": "liked",
+     "count": 13
+    },
+    {
+     "action": "emphasized",
+     "count": 10
+    },
+    {
+     "action": "loved",
+     "count": 5
+    }
+   ],
+   "sentiment_series": [
+    {
+     "bucket": "2024-01-01",
+     "score": 0.19498928571428573
+    },
+    {
+     "bucket": "2024-01-08",
+     "score": 0.1819911764705882
+    },
+    {
+     "bucket": "2024-01-15",
+     "score": 0.2664791666666667
+    },
+    {
+     "bucket": "2024-01-22",
+     "score": 0.11029090909090913
+    },
+    {
+     "bucket": "2024-01-29",
+     "score": 0.2452896551724139
+    },
+    {
+     "bucket": "2024-02-05",
+     "score": 0.1258625
+    },
+    {
+     "bucket": "2024-02-12",
+     "score": 0.22289615384615385
+    },
+    {
+     "bucket": "2024-02-19",
+     "score": 0.30583157894736845
+    },
+    {
+     "bucket": "2024-02-26",
+     "score": 0.11154
+    },
+    {
+     "bucket": "2024-03-04",
+     "score": 0.25826999999999994
+    },
+    {
+     "bucket": "2024-03-11",
+     "score": 0.33176538461538463
+    },
+    {
+     "bucket": "2024-03-18",
+     "score": 0.05438181818181817
+    },
+    {
+     "bucket": "2024-03-25",
+     "score": 0.08100714285714285
+    },
+    {
+     "bucket": "2024-04-01",
+     "score": 0.48212
+    }
+   ],
+   "personality": [
+    {
+     "trait": "Aggressive",
+     "percentage": 15.5
+    },
+    {
+     "trait": "Chaotic",
+     "percentage": 14.8
+    },
+    {
+     "trait": "Dramatic",
+     "percentage": 11.2
+    },
+    {
+     "trait": "Sarcastic",
+     "percentage": 12.2
+    },
+    {
+     "trait": "Chill",
+     "percentage": 10.2
+    },
+    {
+     "trait": "Wholesome",
+     "percentage": 28.6
+    }
+   ]
+  },
+  "+15551230001": {
+   "participant_id": "+15551230001",
+   "display_name": "Alice",
+   "handle": "+15551230001",
+   "message_count": 305,
+   "median_reply_seconds": 3000.126,
+   "reply_histogram": [
+    {
+     "label": "<1m",
+     "count": 31
+    },
+    {
+     "label": "1-5m",
+     "count": 29
+    },
+    {
+     "label": "5-30m",
+     "count": 23
+    },
+    {
+     "label": "30m-2h",
+     "count": 31
+    },
+    {
+     "label": "2-12h",
+     "count": 34
+    },
+    {
+     "label": "12-24h",
+     "count": 0
+    },
+    {
+     "label": ">24h",
+     "count": 30
+    }
+   ],
+   "gap_initiator_count": 50,
+   "late_night_ratio": 0.3344262295081967,
+   "top_words": [
+    {
+     "word": "i'm",
+     "count": 28
+    },
+    {
+     "word": "angry",
+     "count": 20
+    },
+    {
+     "word": "right",
+     "count": 20
+    },
+    {
+     "word": "best",
+     "count": 15
+    },
+    {
+     "word": "movie",
+     "count": 15
+    },
+    {
+     "word": "ever",
+     "count": 15
+    },
+    {
+     "word": "worry",
+     "count": 14
+    },
+    {
+     "word": "fine",
+     "count": 14
+    },
+    {
+     "word": "chill",
+     "count": 14
+    },
+    {
+     "word": "amazing",
+     "count": 14
+    },
+    {
+     "word": "fuck",
+     "count": 14
+    },
+    {
+     "word": "stupid",
+     "count": 14
+    },
+    {
+     "word": "thing",
+     "count": 14
+    },
+    {
+     "word": "omg",
+     "count": 14
+    },
+    {
+     "word": "wow",
+     "count": 13
+    }
+   ],
+   "top_emojis": [
+    {
+     "emoji": "\ud83d\ude02",
+     "count": 36
+    },
+    {
+     "emoji": "\ud83d\ude2d",
+     "count": 20
+    },
+    {
+     "emoji": "\ud83d\ude21",
+     "count": 20
+    },
+    {
+     "emoji": "\ud83d\ude0d",
+     "count": 14
+    },
+    {
+     "emoji": "\ud83d\ude18",
+     "count": 12
+    },
+    {
+     "emoji": "\u2764",
+     "count": 8
+    },
+    {
+     "emoji": "\ud83d\udc80",
+     "count": 8
+    }
+   ],
+   "tapbacks_given": [
+    {
+     "action": "liked",
+     "count": 15
+    },
+    {
+     "action": "loved",
+     "count": 11
+    },
+    {
+     "action": "emphasized",
+     "count": 9
+    },
+    {
+     "action": "laughed",
+     "count": 7
+    }
+   ],
+   "tapbacks_received": [
+    {
+     "action": "liked",
+     "count": 13
+    },
+    {
+     "action": "emphasized",
+     "count": 12
+    },
+    {
+     "action": "loved",
+     "count": 11
+    },
+    {
+     "action": "laughed",
+     "count": 8
+    }
+   ],
+   "sentiment_series": [
+    {
+     "bucket": "2024-01-01",
+     "score": 0.17228000000000002
+    },
+    {
+     "bucket": "2024-01-08",
+     "score": 0.2459285714285714
+    },
+    {
+     "bucket": "2024-01-15",
+     "score": 0.03309999999999998
+    },
+    {
+     "bucket": "2024-01-22",
+     "score": 0.11200454545454544
+    },
+    {
+     "bucket": "2024-01-29",
+     "score": 0.3434041666666667
+    },
+    {
+     "bucket": "2024-02-05",
+     "score": 0.1019463414634146
+    },
+    {
+     "bucket": "2024-02-12",
+     "score": 0.25706666666666667
+    },
+    {
+     "bucket": "2024-02-19",
+     "score": 0.2530586206896552
+    },
+    {
+     "bucket": "2024-02-26",
+     "score": 0.09945882352941178
+    },
+    {
+     "bucket": "2024-03-04",
+     "score": 0.20575625
+    },
+    {
+     "bucket": "2024-03-11",
+     "score": 0.04074736842105265
+    },
+    {
+     "bucket": "2024-03-18",
+     "score": 0.06384000000000004
+    },
+    {
+     "bucket": "2024-03-25",
+     "score": 0.17356111111111114
+    },
+    {
+     "bucket": "2024-04-01",
+     "score": 0.4083142857142857
+    }
+   ],
+   "personality": [
+    {
+     "trait": "Aggressive",
+     "percentage": 19.7
+    },
+    {
+     "trait": "Chaotic",
+     "percentage": 13.6
+    },
+    {
+     "trait": "Dramatic",
+     "percentage": 11.2
+    },
+    {
+     "trait": "Sarcastic",
+     "percentage": 14.6
+    },
+    {
+     "trait": "Chill",
+     "percentage": 8.5
+    },
+    {
+     "trait": "Wholesome",
+     "percentage": 25.4
+    }
+   ]
+  },
+  "+15551230002": {
+   "participant_id": "+15551230002",
+   "display_name": "+15551230002",
+   "handle": "+15551230002",
+   "message_count": 95,
+   "median_reply_seconds": 400.734,
+   "reply_histogram": [
+    {
+     "label": "<1m",
+     "count": 10
+    },
+    {
+     "label": "1-5m",
+     "count": 20
+    },
+    {
+     "label": "5-30m",
+     "count": 8
+    },
+    {
+     "label": "30m-2h",
+     "count": 9
+    },
+    {
+     "label": "2-12h",
+     "count": 11
+    },
+    {
+     "label": "12-24h",
+     "count": 0
+    },
+    {
+     "label": ">24h",
+     "count": 15
+    }
+   ],
+   "gap_initiator_count": 18,
+   "late_night_ratio": 0.28421052631578947,
+   "top_words": [
+    {
+     "word": "see",
+     "count": 8
+    },
+    {
+     "word": "tomorrow",
+     "count": 8
+    },
+    {
+     "word": "dinner",
+     "count": 8
+    },
+    {
+     "word": "sure",
+     "count": 8
+    },
+    {
+     "word": "totally",
+     "count": 8
+    },
+    {
+     "word": "hate",
+     "count": 6
+    },
+    {
+     "word": "i'm",
+     "count": 5
+    },
+    {
+     "word": "thanks",
+     "count": 5
+    },
+    {
+     "word": "appreciate",
+     "count": 5
+    },
+    {
+     "word": "best",
+     "count": 5
+    },
+    {
+     "word": "movie",
+     "count": 5
+    },
+    {
+     "word": "ever",
+     "count": 5
+    },
+    {
+     "word": "omg",
+     "count": 5
+    },
+    {
+     "word": "good",
+     "count": 4
+    },
+    {
+     "word": "night",
+     "count": 4
+    }
+   ],
+   "top_emojis": [
+    {
+     "emoji": "\ud83d\ude02",
+     "count": 12
+    },
+    {
+     "emoji": "\ud83d\ude18",
+     "count": 4
+    },
+    {
+     "emoji": "\ud83d\ude0d",
+     "count": 4
+    },
+    {
+     "emoji": "\ud83d\udc80",
+     "count": 3
+    },
+    {
+     "emoji": "\ud83d\ude21",
+     "count": 3
+    },
+    {
+     "emoji": "\u2764",
+     "count": 2
+    }
+   ],
+   "tapbacks_given": [
+    {
+     "action": "emphasized",
+     "count": 9
+    },
+    {
+     "action": "liked",
+     "count": 5
+    },
+    {
+     "action": "loved",
+     "count": 3
+    },
+    {
+     "action": "laughed",
+     "count": 3
+    }
+   ],
+   "tapbacks_received": [
+    {
+     "action": "liked",
+     "count": 4
+    },
+    {
+     "action": "laughed",
+     "count": 3
+    },
+    {
+     "action": "loved",
+     "count": 2
+    },
+    {
+     "action": "emphasized",
+     "count": 2
+    }
+   ],
+   "sentiment_series": [
+    {
+     "bucket": "2024-01-01",
+     "score": 0.40995
+    },
+    {
+     "bucket": "2024-01-08",
+     "score": 0.3155727272727273
+    },
+    {
+     "bucket": "2024-01-15",
+     "score": 0.24743333333333337
+    },
+    {
+     "bucket": "2024-01-22",
+     "score": 0.26543333333333335
+    },
+    {
+     "bucket": "2024-01-29",
+     "score": 0.20706666666666665
+    },
+    {
+     "bucket": "2024-02-05",
+     "score": -0.085175
+    },
+    {
+     "bucket": "2024-02-12",
+     "score": 0.11159999999999999
+    },
+    {
+     "bucket": "2024-02-19",
+     "score": 0.2640166666666667
+    },
+    {
+     "bucket": "2024-02-26",
+     "score": -0.013700000000000018
+    },
+    {
+     "bucket": "2024-03-04",
+     "score": 0.3711875
+    },
+    {
+     "bucket": "2024-03-11",
+     "score": 0.24492499999999998
+    },
+    {
+     "bucket": "2024-03-18",
+     "score": 0.15693333333333329
+    },
+    {
+     "bucket": "2024-03-25",
+     "score": 0.21106666666666665
+    }
+   ],
+   "personality": [
+    {
+     "trait": "Aggressive",
+     "percentage": 15.7
+    },
+    {
+     "trait": "Chaotic",
+     "percentage": 7.9
+    },
+    {
+     "trait": "Dramatic",
+     "percentage": 11.2
+    },
+    {
+     "trait": "Sarcastic",
+     "percentage": 15.7
+    },
+    {
+     "trait": "Chill",
+     "percentage": 4.5
+    },
+    {
+     "trait": "Wholesome",
+     "percentage": 24.7
+    }
+   ]
+  },
+  "a@example.com": {
+   "participant_id": "a@example.com",
+   "display_name": "a@example.com",
+   "handle": "a@example.com",
+   "message_count": 101,
+   "median_reply_seconds": 3000.366,
+   "reply_histogram": [
+    {
+     "label": "<1m",
+     "count": 10
+    },
+    {
+     "label": "1-5m",
+     "count": 15
+    },
+    {
+     "label": "5-30m",
+     "count": 14
+    },
+    {
+     "label": "30m-2h",
+     "count": 14
+    },
+    {
+     "label": "2-12h",
+     "count": 16
+    },
+    {
+     "label": "12-24h",
+     "count": 0
+    },
+    {
+     "label": ">24h",
+     "count": 12
+    }
+   ],
+   "gap_initiator_count": 16,
+   "late_night_ratio": 0.21782178217821782,
+   "top_words": [
+    {
+     "word": "i'm",
+     "count": 7
+    },
+    {
+     "word": "heyyyy",
+     "count": 6
+    },
+    {
+     "word": "sorry",
+     "count": 6
+    },
+    {
+     "word": "late",
+     "count": 6
+    },
+    {
+     "word": "see",
+     "count": 6
+    },
+    {
+     "word": "tomorrow",
+     "count": 6
+    },
+    {
+     "word": "dinner",
+     "count": 6
+    },
+    {
+     "word": "can't",
+     "count": 5
+    },
+    {
+     "word": "believe",
+     "count": 5
+    },
+    {
+     "word": "love",
+     "count": 5
+    },
+    {
+     "word": "much",
+     "count": 5
+    },
+    {
+     "word": "best",
+     "count": 5
+    },
+    {
+     "word": "movie",
+     "count": 5
+    },
+    {
+     "word": "ever",
+     "count": 5
+    },
+    {
+     "word": "omg",
+     "count": 5
+    }
+   ],
+   "top_emojis": [
+    {
+     "emoji": "\ud83d\ude02",
+     "count": 18
+    },
+    {
+     "emoji": "\ud83d\ude2d",
+     "count": 6
+    },
+    {
+     "emoji": "\ud83d\ude0d",
+     "count": 4
+    },
+    {
+     "emoji": "\u2764",
+     "count": 4
+    },
+    {
+     "emoji": "\ud83d\ude18",
+     "count": 3
+    },
+    {
+     "emoji": "\ud83d\udc80",
+     "count": 3
+    },
+    {
+     "emoji": "\ud83d\ude21",
+     "count": 1
+    }
+   ],
+   "tapbacks_given": [
+    {
+     "action": "loved",
+     "count": 4
+    },
+    {
+     "action": "liked",
+     "count": 4
+    },
+    {
+     "action": "laughed",
+     "count": 3
+    },
+    {
+     "action": "emphasized",
+     "count": 1
+    }
+   ],
+   "tapbacks_received": [
+    {
+     "action": "loved",
+     "count": 9
+    },
+    {
+     "action": "liked",
+     "count": 6
+    },
+    {
+     "action": "emphasized",
+     "count": 5
+    },
+    {
+     "action": "laughed",
+     "count": 3
+    }
+   ],
+   "sentiment_series": [
+    {
+     "bucket": "2024-01-01",
+     "score": 0.26718000000000003
+    },
+    {
+     "bucket": "2024-01-08",
+     "score": 0.036212499999999995
+    },
+    {
+     "bucket": "2024-01-15",
+     "score": 0.1759090909090909
+    },
+    {
+     "bucket": "2024-01-22",
+     "score": 0.33311666666666667
+    },
+    {
+     "bucket": "2024-01-29",
+     "score": 0.11287000000000003
+    },
+    {
+     "bucket": "2024-02-05",
+     "score": 0.01916666666666665
+    },
+    {
+     "bucket": "2024-02-12",
+     "score": 0.24271999999999996
+    },
+    {
+     "bucket": "2024-02-19",
+     "score": 0.3491583333333333
+    },
+    {
+     "bucket": "2024-02-26",
+     "score": 0.21996666666666664
+    },
+    {
+     "bucket": "2024-03-04",
+     "score": 0.30696
+    },
+    {
+     "bucket": "2024-03-11",
+     "score": 0.69145
+    },
+    {
+     "bucket": "2024-03-18",
+     "score": 0.31906
+    },
+    {
+     "bucket": "2024-03-25",
+     "score": 0.11826
+    }
+   ],
+   "personality": [
+    {
+     "trait": "Aggressive",
+     "percentage": 12.4
+    },
+    {
+     "trait": "Chaotic",
+     "percentage": 17.5
+    },
+    {
+     "trait": "Dramatic",
+     "percentage": 13.4
+    },
+    {
+     "trait": "Sarcastic",
+     "percentage": 6.2
+    },
+    {
+     "trait": "Chill",
+     "percentage": 6.2
+    },
+    {
+     "trait": "Wholesome",
+     "percentage": 32.0
+    }
+   ]
+  }
+ }
+}
