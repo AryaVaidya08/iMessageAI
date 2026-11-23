@@ -35,6 +35,7 @@ export function parseTs(ts: string): number {
 }
 
 export function median(values: number[]): number {
+  if (!values.length) throw new Error("median of empty list"); // matches Python statistics.median
   const s = [...values].sort((a, b) => a - b);
   const n = s.length;
   const mid = n >> 1;
