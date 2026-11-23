@@ -27,9 +27,7 @@ export default function App() {
           <Route path="/people" element={<PeopleListPage />} />
           <Route path="/people/:id" element={<PersonDetailPage />} />
           <Route path="/merge" element={<MergePage />} />
-<<<<<<< HEAD
           <Route path="/share" element={<SharePage />} />
-=======
           {DebugConsoleDemoPage && (
             <Route
               path="/debug-console-demo"
@@ -40,7 +38,6 @@ export default function App() {
               }
             />
           )}
->>>>>>> c657782 (Add ingest debug console dock, reducer hook, dev-only demo route)
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
