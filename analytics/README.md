@@ -73,12 +73,15 @@ Measured as the resident memory (RSS) of every process of a headless Chrome test
 
 | import | peak above empty app | notes |
 |---|---|---|
-| 100 MB chat.db (220k messages) | about +730 MB (renderer +560, browser/IndexedDB +160) | 20 s |
+| 100 MB chat.db (220k messages) | about +730 MB (renderer +560, browser/IndexedDB +160) | imports in ~20-35 s |
+| 1 GB chat.db (2.19M messages) | **did not finish**: stalled at 1.43M messages with ~3.4 GB total (renderer ~0.9, browser/IndexedDB ~2.3) | cause not diagnosed |
 
 The JS heap itself stays at a few MB and the workers' own JS+wasm memory is ~40 MB (Chrome `measureUserAgentSpecificMemory`);
 the remainder is browser-internal (IndexedDB backing store, renderer allocations). **This does not meet the original
 500 MB budget**, and large imports (1 GB chat.db, ~2.2M messages) use several GB of browser memory in this design. Memory
-grows with the amount of imported data because IndexedDB is the storage backend. See the 1 GB numbers in the PR description.
+grows with the amount of imported data (the browser process that hosts IndexedDB). A real Messages database of a few hundred
+thousand messages is in the 100 MB class above; a multi-GB one is not supported yet. Known next steps: find why the 1 GB
+import stalls, and move storage off IndexedDB (OPFS) once a multi-connection VFS is available.
 
 ## Legacy
 
