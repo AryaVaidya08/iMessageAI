@@ -144,7 +144,7 @@ export function getPersonDetail(db: SqlDb, id: string) {
     [id, id],
   );
   const grid = Array.from({ length: 7 }, () => new Array<number>(24).fill(0));
-  for (const c of cells) grid[c.dow][c.hour] = c.c;
+  for (const c of cells) if (c.dow != null && c.hour != null) grid[c.dow][c.hour] = c.c;
 
   const convIds = db
     .all<{ cid: string }>(

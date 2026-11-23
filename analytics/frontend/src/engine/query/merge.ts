@@ -131,6 +131,7 @@ export function mergeParticipants(db: SqlDb, keepId: string, removeId: string): 
   const keep = getResolvedParticipant(db, keepId);
   const remove = getResolvedParticipant(db, removeId);
   if (!keep || !remove) throw new MergeError("One or both contacts weren't found.");
+  if (keep.is_me || remove.is_me) throw new MergeError("Can't merge yourself with another contact.");
   const q = `SELECT COUNT(*) AS c FROM messages WHERE sender_id IN (${PARTICIPANT_IDS_SQL})`;
   const keepCount = count(db, q, keepId);
   const removeCount = count(db, q, removeId);
