@@ -1,0 +1,917 @@
+{
+ "stats": {
+  "total_messages": 465,
+  "total_conversations": 5,
+  "total_participants": 5,
+  "date_range_start": "2022-12-07T20:06:40.585Z",
+  "date_range_end": "2023-04-22T19:17:58.806Z"
+ },
+ "volume": {
+  "day": [
+   {
+    "bucket": "2022-12-07",
+    "count": 4
+   },
+   {
+    "bucket": "2022-12-08",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-09",
+    "count": 17
+   },
+   {
+    "bucket": "2022-12-10",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-11",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-12",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-13",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-14",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-15",
+    "count": 1
+   },
+   {
+    "bucket": "2022-12-16",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-17",
+    "count": 5
+   },
+   {
+    "bucket": "2022-12-18",
+    "count": 10
+   },
+   {
+    "bucket": "2022-12-19",
+    "count": 16
+   },
+   {
+    "bucket": "2022-12-20",
+    "count": 1
+   },
+   {
+    "bucket": "2022-12-21",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-22",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-23",
+    "count": 3
+   },
+   {
+    "bucket": "2022-12-24",
+    "count": 9
+   },
+   {
+    "bucket": "2022-12-25",
+    "count": 2
+   },
+   {
+    "bucket": "2022-12-26",
+    "count": 0
+   },
+   {
+    "bucket": "2022-12-27",
+    "count": 7
+   },
+   {
+    "bucket": "2022-12-28",
+    "count": 9
+   },
+   {
+    "bucket": "2022-12-29",
+    "count": 15
+   },
+   {
+    "bucket": "2022-12-30",
+    "count": 2
+   },
+   {
+    "bucket": "2022-12-31",
+    "count": 6
+   },
+   {
+    "bucket": "2023-01-01",
+    "count": 7
+   },
+   {
+    "bucket": "2023-01-02",
+    "count": 2
+   },
+   {
+    "bucket": "2023-01-03",
+    "count": 3
+   },
+   {
+    "bucket": "2023-01-04",
+    "count": 0
+   },
+   {
+    "bucket": "2023-01-05",
+    "count": 0
+   },
+   {
+    "bucket": "2023-01-06",
+    "count": 1
+   },
+   {
+    "bucket": "2023-01-07",
+    "count": 14
+   },
+   {
+    "bucket": "2023-01-08",
+    "count": 1
+   },
+   {
+    "bucket": "2023-01-09",
+    "count": 6
+   },
+   {
+    "bucket": "2023-01-10",
+    "count": 3
+   },
+   {
+    "bucket": "2023-01-11",
+    "count": 5
+   },
+   {
+    "bucket": "2023-01-12",
+    "count": 3
+   },
+   {
+    "bucket": "2023-01-13",
+    "count": 1
+   },
+   {
+    "bucket": "2023-01-14",
+    "count": 0
+   },
+   {
+    "bucket": "2023-01-15",
+    "count": 6
+   },
+   {
+    "bucket": "2023-01-16",
+    "count": 0
+   },
+   {
+    "bucket": "2023-01-17",
+    "count": 13
+   },
+   {
+    "bucket": "2023-01-18",
+    "count": 8
+   },
+   {
+    "bucket": "2023-01-19",
+    "count": 9
+   },
+   {
+    "bucket": "2023-01-20",
+    "count": 6
+   },
+   {
+    "bucket": "2023-01-21",
+    "count": 13
+   },
+   {
+    "bucket": "2023-01-22",
+    "count": 11
+   },
+   {
+    "bucket": "2023-01-23",
+    "count": 6
+   },
+   {
+    "bucket": "2023-01-24",
+    "count": 2
+   },
+   {
+    "bucket": "2023-01-25",
+    "count": 2
+   },
+   {
+    "bucket": "2023-01-26",
+    "count": 6
+   },
+   {
+    "bucket": "2023-01-27",
+    "count": 0
+   },
+   {
+    "bucket": "2023-01-28",
+    "count": 2
+   },
+   {
+    "bucket": "2023-01-29",
+    "count": 2
+   },
+   {
+    "bucket": "2023-01-30",
+    "count": 1
+   },
+   {
+    "bucket": "2023-01-31",
+    "count": 4
+   },
+   {
+    "bucket": "2023-02-01",
+    "count": 9
+   },
+   {
+    "bucket": "2023-02-02",
+    "count": 3
+   },
+   {
+    "bucket": "2023-02-03",
+    "count": 10
+   },
+   {
+    "bucket": "2023-02-04",
+    "count": 4
+   },
+   {
+    "bucket": "2023-02-05",
+    "count": 3
+   },
+   {
+    "bucket": "2023-02-06",
+    "count": 3
+   },
+   {
+    "bucket": "2023-02-07",
+    "count": 8
+   },
+   {
+    "bucket": "2023-02-08",
+    "count": 3
+   },
+   {
+    "bucket": "2023-02-09",
+    "count": 2
+   },
+   {
+    "bucket": "2023-02-10",
+    "count": 7
+   },
+   {
+    "bucket": "2023-02-11",
+    "count": 11
+   },
+   {
+    "bucket": "2023-02-12",
+    "count": 2
+   },
+   {
+    "bucket": "2023-02-13",
+    "count": 11
+   },
+   {
+    "bucket": "2023-02-14",
+    "count": 1
+   },
+   {
+    "bucket": "2023-02-15",
+    "count": 4
+   },
+   {
+    "bucket": "2023-02-16",
+    "count": 3
+   },
+   {
+    "bucket": "2023-02-17",
+    "count": 3
+   },
+   {
+    "bucket": "2023-02-18",
+    "count": 0
+   },
+   {
+    "bucket": "2023-02-19",
+    "count": 3
+   },
+   {
+    "bucket": "2023-02-20",
+    "count": 2
+   },
+   {
+    "bucket": "2023-02-21",
+    "count": 1
+   },
+   {
+    "bucket": "2023-02-22",
+    "count": 0
+   },
+   {
+    "bucket": "2023-02-23",
+    "count": 3
+   },
+   {
+    "bucket": "2023-02-24",
+    "count": 2
+   },
+   {
+    "bucket": "2023-02-25",
+    "count": 2
+   },
+   {
+    "bucket": "2023-02-26",
+    "count": 0
+   },
+   {
+    "bucket": "2023-02-27",
+    "count": 0
+   },
+   {
+    "bucket": "2023-02-28",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-01",
+    "count": 3
+   },
+   {
+    "bucket": "2023-03-02",
+    "count": 4
+   },
+   {
+    "bucket": "2023-03-03",
+    "count": 4
+   },
+   {
+    "bucket": "2023-03-04",
+    "count": 6
+   },
+   {
+    "bucket": "2023-03-05",
+    "count": 14
+   },
+   {
+    "bucket": "2023-03-06",
+    "count": 3
+   },
+   {
+    "bucket": "2023-03-07",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-08",
+    "count": 4
+   },
+   {
+    "bucket": "2023-03-09",
+    "count": 3
+   },
+   {
+    "bucket": "2023-03-10",
+    "count": 2
+   },
+   {
+    "bucket": "2023-03-11",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-12",
+    "count": 5
+   },
+   {
+    "bucket": "2023-03-13",
+    "count": 4
+   },
+   {
+    "bucket": "2023-03-14",
+    "count": 4
+   },
+   {
+    "bucket": "2023-03-15",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-16",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-17",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-18",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-19",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-20",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-21",
+    "count": 0
+   },
+   {
+    "bucket": "2023-03-22",
+    "count": 5
+   },
+   {
+    "bucket": "2023-03-23",
+    "count": 1
+   },
+   {
+    "bucket": "2023-03-24",
+    "count": 10
+   },
+   {
+    "bucket": "2023-03-25",
+    "count": 5
+   },
+   {
+    "bucket": "2023-03-26",
+    "count": 5
+   },
+   {
+    "bucket": "2023-03-27",
+    "count": 1
+   },
+   {
+    "bucket": "2023-03-28",
+    "count": 7
+   },
+   {
+    "bucket": "2023-03-29",
+    "count": 1
+   },
+   {
+    "bucket": "2023-03-30",
+    "count": 7
+   },
+   {
+    "bucket": "2023-03-31",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-01",
+    "count": 1
+   },
+   {
+    "bucket": "2023-04-02",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-03",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-04",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-05",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-06",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-07",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-08",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-09",
+    "count": 2
+   },
+   {
+    "bucket": "2023-04-10",
+    "count": 1
+   },
+   {
+    "bucket": "2023-04-11",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-12",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-13",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-14",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-15",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-16",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-17",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-18",
+    "count": 4
+   },
+   {
+    "bucket": "2023-04-19",
+    "count": 3
+   },
+   {
+    "bucket": "2023-04-20",
+    "count": 0
+   },
+   {
+    "bucket": "2023-04-21",
+    "count": 1
+   },
+   {
+    "bucket": "2023-04-22",
+    "count": 11
+   }
+  ],
+  "week": [
+   {
+    "bucket": "2022-12-05",
+    "count": 21
+   },
+   {
+    "bucket": "2022-12-12",
+    "count": 16
+   },
+   {
+    "bucket": "2022-12-19",
+    "count": 31
+   },
+   {
+    "bucket": "2022-12-26",
+    "count": 46
+   },
+   {
+    "bucket": "2023-01-02",
+    "count": 21
+   },
+   {
+    "bucket": "2023-01-09",
+    "count": 24
+   },
+   {
+    "bucket": "2023-01-16",
+    "count": 60
+   },
+   {
+    "bucket": "2023-01-23",
+    "count": 20
+   },
+   {
+    "bucket": "2023-01-30",
+    "count": 34
+   },
+   {
+    "bucket": "2023-02-06",
+    "count": 36
+   },
+   {
+    "bucket": "2023-02-13",
+    "count": 25
+   },
+   {
+    "bucket": "2023-02-20",
+    "count": 10
+   },
+   {
+    "bucket": "2023-02-27",
+    "count": 31
+   },
+   {
+    "bucket": "2023-03-06",
+    "count": 17
+   },
+   {
+    "bucket": "2023-03-13",
+    "count": 8
+   },
+   {
+    "bucket": "2023-03-20",
+    "count": 26
+   },
+   {
+    "bucket": "2023-03-27",
+    "count": 17
+   },
+   {
+    "bucket": "2023-04-03",
+    "count": 2
+   },
+   {
+    "bucket": "2023-04-10",
+    "count": 1
+   },
+   {
+    "bucket": "2023-04-17",
+    "count": 19
+   }
+  ],
+  "month": [
+   {
+    "bucket": "2022-12",
+    "count": 107
+   },
+   {
+    "bucket": "2023-01",
+    "count": 137
+   },
+   {
+    "bucket": "2023-02",
+    "count": 100
+   },
+   {
+    "bucket": "2023-03",
+    "count": 98
+   },
+   {
+    "bucket": "2023-04",
+    "count": 23
+   }
+  ]
+ },
+ "top": {
+  "1": [
+   {
+    "conversation_id": "c3",
+    "display_name": "Alice A, Carol C +2 more",
+    "message_count": 136,
+    "is_group_chat": true
+   }
+  ],
+  "3": [
+   {
+    "conversation_id": "c3",
+    "display_name": "Alice A, Carol C +2 more",
+    "message_count": 136,
+    "is_group_chat": true
+   },
+   {
+    "conversation_id": "c5",
+    "display_name": "+15551110004",
+    "message_count": 92,
+    "is_group_chat": false
+   },
+   {
+    "conversation_id": "c4",
+    "display_name": "Work Crew",
+    "message_count": 80,
+    "is_group_chat": true
+   }
+  ],
+  "10": [
+   {
+    "conversation_id": "c3",
+    "display_name": "Alice A, Carol C +2 more",
+    "message_count": 136,
+    "is_group_chat": true
+   },
+   {
+    "conversation_id": "c5",
+    "display_name": "+15551110004",
+    "message_count": 92,
+    "is_group_chat": false
+   },
+   {
+    "conversation_id": "c4",
+    "display_name": "Work Crew",
+    "message_count": 80,
+    "is_group_chat": true
+   },
+   {
+    "conversation_id": "c1",
+    "display_name": "Alice A",
+    "message_count": 79,
+    "is_group_chat": false
+   },
+   {
+    "conversation_id": "c2",
+    "display_name": "Bob B",
+    "message_count": 78,
+    "is_group_chat": false
+   }
+  ]
+ },
+ "heatmap": {
+  "grid": [
+   [
+    3,
+    0,
+    10,
+    0,
+    0,
+    3,
+    2,
+    1,
+    0,
+    5,
+    1,
+    3,
+    8,
+    1,
+    1,
+    0,
+    3,
+    4,
+    7,
+    0,
+    7,
+    1,
+    7,
+    6
+   ],
+   [
+    0,
+    7,
+    0,
+    1,
+    1,
+    2,
+    2,
+    5,
+    2,
+    8,
+    2,
+    3,
+    0,
+    3,
+    2,
+    1,
+    4,
+    1,
+    3,
+    1,
+    0,
+    1,
+    5,
+    2
+   ],
+   [
+    0,
+    0,
+    0,
+    6,
+    3,
+    1,
+    2,
+    2,
+    3,
+    0,
+    4,
+    3,
+    9,
+    6,
+    1,
+    0,
+    0,
+    5,
+    2,
+    5,
+    0,
+    0,
+    2,
+    4
+   ],
+   [
+    1,
+    8,
+    5,
+    3,
+    0,
+    0,
+    2,
+    0,
+    4,
+    1,
+    3,
+    6,
+    2,
+    3,
+    0,
+    5,
+    1,
+    0,
+    0,
+    2,
+    6,
+    2,
+    6,
+    0
+   ],
+   [
+    5,
+    0,
+    0,
+    3,
+    5,
+    6,
+    3,
+    1,
+    4,
+    3,
+    0,
+    0,
+    1,
+    5,
+    9,
+    2,
+    2,
+    1,
+    0,
+    6,
+    2,
+    1,
+    1,
+    0
+   ],
+   [
+    1,
+    8,
+    1,
+    1,
+    1,
+    0,
+    6,
+    5,
+    1,
+    1,
+    1,
+    9,
+    12,
+    3,
+    1,
+    0,
+    7,
+    2,
+    2,
+    2,
+    3,
+    1,
+    1,
+    0
+   ],
+   [
+    2,
+    1,
+    0,
+    0,
+    2,
+    1,
+    4,
+    11,
+    14,
+    1,
+    2,
+    3,
+    7,
+    0,
+    2,
+    2,
+    2,
+    9,
+    4,
+    2,
+    4,
+    6,
+    5,
+    5
+   ]
+  ]
+ },
+ "fastest": {
+  "relationship_type": "friend",
+  "median_reply_seconds": 600.366
+ }
+}
