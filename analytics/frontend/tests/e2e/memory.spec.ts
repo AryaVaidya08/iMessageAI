@@ -22,15 +22,30 @@ interface ProcMem {
 }
 
 /** RSS (MB) of the test browser's processes only (identified by the Playwright temp profile path). */
-function browserMemory(): ProcMem {
-  const out = execFileSync("ps", ["-axww", "-o", "rss=,command="], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
-  const m: ProcMem = { total: 0, browser: 0, renderer: 0, other: 0 };
+/** macOS physical footprint (MB) of one process: the figure Activity Monitor / memory pressure use (RSS also counts reclaimable file-backed pages). */
+function footprintMB(pid: string): number {
+  try {
+    const out = execFileSync("vmmap", ["-summary", pid], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
+    const m = /Physical footprint:\s+([\d.]+)([KMG])/.exec(out);
+    if (!m) return 0;
+    return Number(m[1]) * (m[2] === "G" ? 1024 : m[2] === "K" ? 1 / 1024 : 1);
+  } catch {
+    return 0;
+  }
+}
+
+/** Memory (MB) of the test browser's processes only. `fp*` = physical footprint (the headline), `rss*` = resident set. */
+function browserMemory(): ProcMem & { rssTotal: number } {
+  const out = execFileSync("ps", ["-axww", "-o", "pid=,rss=,command="], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  const m = { total: 0, browser: 0, renderer: 0, other: 0, rssTotal: 0 };
   for (const line of out.split("\n")) {
     if (!line.includes("playwright_chromiumdev_profile")) continue;
-    const mb = Number(line.trim().split(/\s+/)[0]) / 1024;
+    const [pid, rss] = line.trim().split(/\s+/);
+    const fp = footprintMB(pid);
     const kind = line.includes("--type=renderer") ? "renderer" : line.includes("--type=") ? "other" : "browser";
-    m[kind] += mb;
-    m.total += mb;
+    m[kind] += fp;
+    m.total += fp;
+    m.rssTotal += Number(rss) / 1024;
   }
   return m;
 }
@@ -46,9 +61,9 @@ test(`browser memory while importing a ${SIZE} chat.db and using the app`, async
 
   const baseline = browserMemory();
   const baselineHeap = await heapMB();
-  console.log(`baseline (empty app): browser RSS ${baseline.total.toFixed(0)} MB (browser ${baseline.browser.toFixed(0)}, renderer ${baseline.renderer.toFixed(0)}), JS heap ${baselineHeap.toFixed(0)} MB`);
+  console.log(`baseline (empty app): browser physical footprint ${baseline.total.toFixed(0)} MB (RSS ${baseline.rssTotal.toFixed(0)} MB) (browser ${baseline.browser.toFixed(0)}, renderer ${baseline.renderer.toFixed(0)}), JS heap ${baselineHeap.toFixed(0)} MB`);
 
-  const samples: { t: number; msgs: number; total: number; renderer: number; browser: number; heap: number }[] = [];
+  const samples: { t: number; msgs: number; total: number; renderer: number; browser: number; heap: number; rss: number }[] = [];
   const t0 = Date.now();
   /** Per-realm breakdown (needs E2E_ISOLATE=1): bytes by attributed script URL, so each worker shows up separately. */
   const breakdown = async (): Promise<string> => {
@@ -69,7 +84,7 @@ test(`browser memory while importing a ${SIZE} chat.db and using the app`, async
   };
   const sample = async (msgs: number) => {
     const m = browserMemory();
-    samples.push({ t: Math.round((Date.now() - t0) / 1000), msgs, total: Math.round(m.total), renderer: Math.round(m.renderer), browser: Math.round(m.browser), heap: Math.round(await heapMB()) });
+    samples.push({ t: Math.round((Date.now() - t0) / 1000), msgs, total: Math.round(m.total), renderer: Math.round(m.renderer), browser: Math.round(m.browser), heap: Math.round(await heapMB()), rss: Math.round(m.rssTotal) });
   };
 
   const run0 = Number((await consoleEl(page).getAttribute("data-run")) ?? 0);
@@ -87,12 +102,16 @@ test(`browser memory while importing a ${SIZE} chat.db and using the app`, async
     const msgs = mm ? Number(mm[1].replace(/,/g, "")) : 0;
     await sample(msgs);
     const s = samples[samples.length - 1];
-    const line = `t=${s.t}s msgs=${msgs.toLocaleString()} RSS=${s.total}MB (renderer ${s.renderer}, browser ${s.browser}) heap=${s.heap}MB`;
+    const line = `t=${s.t}s msgs=${msgs.toLocaleString()} footprint=${s.total}MB (renderer ${s.renderer}, browser ${s.browser}) rss=${s.rss}MB heap=${s.heap}MB`;
     if (samples.length % 6 === 1 && line !== last) console.log(line);
     if (process.env.E2E_ISOLATE && samples.length % 3 === 1) console.log(`   uaMemory: ${await breakdown()}`);
     last = line;
+    if (s.total > Number(process.env.MEMORY_CAP_MB ?? 3000)) {
+      writeFileSync(join(CACHE_DIR, `memory-${SIZE}.json`), JSON.stringify({ aborted: `footprint cap ${process.env.MEMORY_CAP_MB ?? 3000} MB exceeded`, samples }, null, 1));
+      throw new Error(`footprint ${s.total} MB exceeded the safety cap at ${msgs} messages`);
+    }
     done = (await consoleEl(page).getAttribute("data-state")) === "done" && Number((await consoleEl(page).getAttribute("data-run")) ?? 0) > run0;
-    if (!done) await page.waitForTimeout(5000);
+    if (!done) await page.waitForTimeout(3000);
   }
   expect(done, "import did not finish before the timeout").toBe(true);
   const importSec = Math.round((Date.now() - t0) / 1000);

@@ -184,7 +184,9 @@ async function openAppDbOnce(): Promise<AppDb> {
     try {
       // 16 KB pages (only effective when the file is created); modest page cache keeps the wasm heap small.
       await app.exec("PRAGMA page_size = 16384;");
-      await app.exec("PRAGMA foreign_keys = ON; PRAGMA synchronous = NORMAL; PRAGMA cache_size = -8192;");
+      // journal_mode=MEMORY + synchronous=OFF: no rollback-journal file and no fsyncs, which roughly halves the bytes
+      // written to OPFS (the browser process grew in step with them). An interrupted import resumes from per-chat watermarks.
+      await app.exec("PRAGMA foreign_keys = ON; PRAGMA journal_mode = MEMORY; PRAGMA synchronous = OFF; PRAGMA cache_size = -8192;");
       await migrate({
         exec: (s) => app.exec(s),
         getUserVersion: async () => Number((await app.all<{ user_version: number }>("PRAGMA user_version"))[0].user_version),
