@@ -10,6 +10,7 @@ import {
   subscribeIngest,
   type SyncInfo,
 } from "../engine/appState";
+import { DebugConsole } from "../components/DebugConsole";
 import { isWalMode, splitChatDbFiles } from "../engine/ingest/walCheck";
 import styles from "./HomePage.module.css";
 
@@ -240,12 +241,14 @@ export function HomePage() {
       {ingesting && (
         <section className={styles.card}>
           <h2>Importing...</h2>
-          <p className={styles.muted}>Live progress, the current chat and memory use are in the Import console at the bottom of the screen.</p>
-          <Link to="/debug">Open the full debug console</Link>
+          <p className={styles.muted}>Live progress, the current chat and memory use are shown in the console below.</p>
           <h3>Explore while it loads</h3>
           <Explore />
         </section>
       )}
+
+      {/* Stays on screen after the import finishes so the green "complete" dot is visible. */}
+      <DebugConsole subscribe={subscribeIngest} inline />
 
       {!ingesting && info && (
         <section className={styles.card}>

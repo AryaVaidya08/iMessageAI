@@ -83,9 +83,21 @@ function LogView({ log }: { log: IngestState["log"] }) {
   );
 }
 
-export function DebugConsole({ subscribe, forceOpen = false }: { subscribe: IngestSubscribe; forceOpen?: boolean }) {
+export function DebugConsole({
+  subscribe,
+  forceOpen = false,
+  inline = false,
+  hidden = false,
+}: {
+  subscribe: IngestSubscribe;
+  forceOpen?: boolean;
+  /** Render in the page flow (home page) instead of as the floating dock; stays open after the import ends. */
+  inline?: boolean;
+  /** Keep tracking events but render nothing (used for the dock while the inline console is on screen). */
+  hidden?: boolean;
+}) {
   const { state: s } = useIngestEvents(subscribe);
-  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const [collapsed, setCollapsed] = useState(() => (inline ? false : readCollapsed()));
   const wasRunning = useRef(false);
   // Expand automatically when an import starts so progress is visible without hunting for it.
   useEffect(() => {
@@ -94,20 +106,21 @@ export function DebugConsole({ subscribe, forceOpen = false }: { subscribe: Inge
   }, [s.running]);
   // Tuck the dock away a few seconds after a successful import so it stops covering the page.
   useEffect(() => {
-    if (!s.finished || s.errorCount > 0) return;
+    if (inline || !s.finished || s.errorCount > 0) return;
     const t = setTimeout(() => setCollapsed(true), 4000);
     return () => clearTimeout(t);
-  }, [s.finished, s.errorCount]);
+  }, [inline, s.finished, s.errorCount]);
   const open = forceOpen || !collapsed;
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    if (inline) return; // the inline console's open state is not the dock's remembered preference
     try {
       localStorage.setItem(STORAGE_KEY, collapsed ? "1" : "0");
     } catch {
       /* ignore */
     }
-  }, [collapsed]);
+  }, [inline, collapsed]);
 
   const copy = async () => {
     try {
@@ -123,11 +136,25 @@ export function DebugConsole({ subscribe, forceOpen = false }: { subscribe: Inge
   const pct = o.messagesTotal > 0 ? Math.round((o.messagesDone / o.messagesTotal) * 100) : 0;
   const status = s.finished ? "Done - ingest complete" : s.running ? (s.phaseLabel ?? s.phase ?? "Working") : "Idle";
   const mem = s.memory;
+  const complete = s.finished && s.errorCount === 0;
+
+  if (hidden) return null;
+  // On the home page there is nothing to show until an import has started.
+  if (inline && !s.running && !s.finished && s.runs === 0) return null;
 
   return (
-    <aside className={styles.dock} aria-label="Ingest debug console" data-testid="debug-console" data-state={s.finished ? "done" : s.running ? "running" : "idle"} data-run={s.runs}>
+    <aside
+      className={`${styles.dock} ${inline ? styles.inline : ""}`}
+      aria-label="Ingest debug console"
+      data-testid="debug-console"
+      data-state={s.finished ? "done" : s.running ? "running" : "idle"}
+      data-run={s.runs}
+    >
       <button type="button" className={styles.header} onClick={() => setCollapsed((c) => !c)} aria-expanded={open}>
-        <span className={`${styles.dot} ${s.errorCount ? styles.dotError : s.running ? styles.dotRun : ""}`} />
+        <span
+          className={`${styles.dot} ${s.errorCount ? styles.dotError : complete ? styles.dotDone : s.running ? styles.dotRun : ""}`}
+          data-testid="debug-console-dot"
+        />
         <span className={styles.title}>Import</span>
         <span className={styles.status}>
           {status}

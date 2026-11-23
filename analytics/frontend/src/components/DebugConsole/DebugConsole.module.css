@@ -23,6 +23,9 @@
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-text-secondary); }
 .dotRun { background: var(--color-accent); animation: pulse 1.2s ease-in-out infinite; }
 .dotError { background: #FF453A; }
+.dotDone { background: #30D158; }
+/* In-page variant used on the home page: sits in the flow under the import card instead of floating. */
+.dock.inline { position: static; width: 100%; margin: 16px 0; z-index: auto; box-shadow: var(--shadow-card); }
 .errBadge { background: #FF453A; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: var(--radius-pill); }
 .body { padding: 0 16px 16px; }
 .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }

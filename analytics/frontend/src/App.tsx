@@ -61,7 +61,8 @@ export default function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
-      <DebugConsole subscribe={subscribeIngest} forceOpen={pathname === "/debug"} />
+      {/* The home page shows the console inline; the floating dock is for the other pages while an import runs. */}
+      <DebugConsole subscribe={subscribeIngest} forceOpen={pathname === "/debug"} hidden={pathname === "/"} />
     </>
   );
 }
