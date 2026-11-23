@@ -48,7 +48,7 @@ test("home page shows the import console inline and turns its dot green when com
   // Still on screen after completion (not auto-collapsed), so the green dot can be seen.
   await page.waitForTimeout(6000);
   await expect(consoleEl(page)).toBeVisible();
-  await expect(consoleEl(page)).toContainText(/current chat/i);
+  await expect(consoleEl(page)).toContainText(/overall/i); // body still expanded (the "Current chat" section only shows mid-import)
   await consoleEl(page).screenshot({ path: join(SHOTS, "console-inline-done.png") });
   await page.screenshot({ path: join(SHOTS, "home-console-inline-done.png"), fullPage: true });
 
