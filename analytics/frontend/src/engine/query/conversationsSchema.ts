@@ -6,14 +6,8 @@
  */
 
 /** Per-conversation counters, refreshed by `refreshConversationSummary` after ingest batches. */
-export const SUMMARY_DDL = `
-CREATE TABLE IF NOT EXISTS summary_conversation (
-  conversation_id TEXT PRIMARY KEY,
-  message_count INTEGER NOT NULL,
-  first_ts TEXT,
-  last_ts TEXT
-);
-`;
+import { CONVERSATION_SUMMARY_DDL } from "../ddl";
+export const SUMMARY_DDL = CONVERSATION_SUMMARY_DDL;
 
 /**
  * Message-search index decision: a trigram FTS5 table (substring-capable, so results match the

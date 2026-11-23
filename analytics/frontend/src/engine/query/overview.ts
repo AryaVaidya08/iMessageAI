@@ -4,33 +4,8 @@
 import { registerRoute, type QueryDb, type Row } from "./registerRoute";
 
 /** Additive DDL for unit 1's schema migration. */
-export const OVERVIEW_SUMMARY_DDL = `
-CREATE TABLE IF NOT EXISTS summary_overview_conv (
-  conversation_id TEXT PRIMARY KEY,
-  message_count INTEGER NOT NULL,
-  min_ts TEXT,
-  max_ts TEXT
-);
-CREATE TABLE IF NOT EXISTS summary_overview_daily (
-  conversation_id TEXT NOT NULL,
-  day TEXT NOT NULL,
-  count INTEGER NOT NULL,
-  PRIMARY KEY (conversation_id, day)
-) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS summary_overview_dow_hour (
-  conversation_id TEXT NOT NULL,
-  dow INTEGER NOT NULL,
-  hour INTEGER NOT NULL,
-  count INTEGER NOT NULL,
-  PRIMARY KEY (conversation_id, dow, hour)
-) WITHOUT ROWID;
-CREATE TABLE IF NOT EXISTS summary_reply_delta (
-  conversation_id TEXT NOT NULL,
-  delta_ms INTEGER NOT NULL,
-  n INTEGER NOT NULL,
-  PRIMARY KEY (conversation_id, delta_ms)
-) WITHOUT ROWID;
-`;
+import { OVERVIEW_SUMMARY_DDL } from "../ddl";
+export { OVERVIEW_SUMMARY_DDL };
 
 export const MAX_VOLUME_POINTS = 1000;
 const CHUNK = 200;

@@ -1,6 +1,11 @@
-// Facade between UI and the ingest engine. This is a localStorage-backed STUB
-// with fake events; unit 14 swaps in the real worker-backed implementation
-// while keeping this exported API.
+// Facade between the UI and the in-browser engine: ingest worker lifecycle, ingest progress state,
+// data-changed notifications, saved-data checks and "delete all data". Everything runs in the browser.
+import type { IngestCommand, IngestEvent, IngestInputFiles } from "./protocol";
+import { onDataChanged, publishDataChanged } from "./events";
+import { query, resetQueryWorker } from "./queryClient";
+import { clearAllData, hasSavedDb } from "./storage/marker";
+
+export type { IngestEvent } from "./protocol";
 
 export interface SyncInfo {
   conversations: number;
@@ -8,77 +13,119 @@ export interface SyncInfo {
   lastSyncedAt: string | null; // ISO 8601
 }
 
-export interface IngestEventLite {
-  type: "phase" | "chat-start" | "chat-progress" | "chat-done" | "overall" | "log" | "memory" | "error" | "done";
-  [key: string]: unknown;
+export interface IngestState {
+  running: boolean;
+  percent: number; // 0..100
+  overall: { messagesDone: number; messagesTotal: number; chatsDone: number; chatsTotal: number } | null;
+  error: string | null;
 }
 
-export type IngestListener = (e: IngestEventLite) => void;
+export interface IngestInput {
+  chatDb: File;
+  /** chat.db-wal / chat.db-shm, if the user copied them next to chat.db. */
+  sidecars?: File[];
+  contacts: File[];
+}
 
-const KEY = "imessage-analytics-stub-sync";
-const listeners = new Set<IngestListener>();
-let running = false;
+type Listener = (e: IngestEvent) => void;
+const listeners = new Set<Listener>();
+const stateListeners = new Set<() => void>();
+let state: IngestState = { running: false, percent: 0, overall: null, error: null };
+let worker: Worker | null = null;
 
-function emit(e: IngestEventLite) {
+function setState(patch: Partial<IngestState>) {
+  state = { ...state, ...patch };
+  stateListeners.forEach((l) => l());
+}
+
+function stopWorker() {
+  worker?.terminate();
+  worker = null;
+}
+
+function handle(e: IngestEvent) {
+  if (e.type === "overall") {
+    setState({
+      overall: e,
+      percent: e.messagesTotal ? Math.min(100, Math.round((e.messagesDone / e.messagesTotal) * 100)) : 0,
+    });
+  } else if (e.type === "error" && e.fatal !== false) {
+    setState({ running: false, error: e.message });
+    stopWorker();
+  } else if (e.type === "done") {
+    setState({ running: false, percent: e.cancelled ? state.percent : 100 });
+    stopWorker();
+  }
   listeners.forEach((l) => l(e));
+  if (e.type === "data-changed" || e.type === "done") publishDataChanged();
+}
+
+export function subscribeIngest(fn: Listener): () => void {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+export function subscribeIngestState(fn: () => void): () => void {
+  stateListeners.add(fn);
+  return () => stateListeners.delete(fn);
+}
+/** Fires (from any context) whenever stored data changed: ingest chat finished, merge, delete. */
+export const subscribeDataChanged = onDataChanged;
+export const notifyDataChanged = publishDataChanged;
+
+export function getIngestState(): IngestState {
+  return state;
+}
+export function isIngestRunning(): boolean {
+  return state.running;
+}
+
+export async function startIngest(input: IngestInput): Promise<void> {
+  if (state.running) return;
+  const files: IngestInputFiles = {
+    chatDb: input.chatDb,
+    chatDbWal: input.sidecars?.find((f) => /-wal$/i.test(f.name)),
+    chatDbShm: input.sidecars?.find((f) => /-shm$/i.test(f.name)),
+    addressBooks: input.contacts,
+  };
+  setState({ running: true, percent: 0, overall: null, error: null });
+  try {
+    worker = new Worker(new URL("./workers/ingest.worker.ts", import.meta.url), { type: "module" });
+    worker.onmessage = (m: MessageEvent<IngestEvent>) => handle(m.data);
+    worker.onerror = (ev) => handle({ type: "error", fatal: true, message: ev.message || "ingest worker failed to load" });
+    worker.postMessage({ type: "start", files } satisfies IngestCommand);
+  } catch (err) {
+    handle({ type: "error", fatal: true, message: String(err instanceof Error ? err.message : err) });
+  }
+}
+
+export function cancelIngest(): void {
+  worker?.postMessage({ type: "cancel" } satisfies IngestCommand);
 }
 
 export async function hasSavedData(): Promise<boolean> {
-  return (await getSyncInfo()) !== null;
+  return hasSavedDb();
 }
 
 export async function getSyncInfo(): Promise<SyncInfo | null> {
+  if (!(await hasSavedDb())) return null;
   try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as SyncInfo) : null;
+    return await query<SyncInfo>("GET /api/sync-info");
   } catch {
     return null;
   }
 }
 
-export function isIngestRunning(): boolean {
-  return running;
-}
-
-export function subscribeIngest(fn: IngestListener): () => void {
-  listeners.add(fn);
-  return () => {
-    listeners.delete(fn);
-  };
-}
-
+/** Closes every DB connection, then removes all stored data. */
 export async function deleteAllData(): Promise<void> {
+  cancelIngest();
+  stopWorker();
+  setState({ running: false, percent: 0, overall: null, error: null });
   try {
-    localStorage.removeItem(KEY);
+    await query("POST /api/admin/close");
   } catch {
-    /* ignore */
+    /* the DB may never have been opened in this tab */
   }
-}
-
-export async function startIngest(_input: { chatDb: File; contacts: File[] }): Promise<void> {
-  if (running) return;
-  running = true;
-  const chats = ["Family", "Alex", "Roommates", "Jordan"];
-  const perChat = 500;
-  const total = chats.length * perChat;
-  emit({ type: "phase", phase: "parsing" });
-  let done = 0;
-  for (let c = 0; c < chats.length; c++) {
-    emit({ type: "chat-start", chatId: `chat${c}`, name: chats[c] });
-    for (let i = 0; i < perChat; i += 100) {
-      await new Promise((r) => setTimeout(r, 250));
-      done += 100;
-      emit({ type: "chat-progress", chatId: `chat${c}`, name: chats[c], done: i + 100, total: perChat });
-      emit({ type: "overall", messagesDone: done, messagesTotal: total, chatsDone: c, chatsTotal: chats.length });
-    }
-    emit({ type: "chat-done", chatId: `chat${c}` });
-  }
-  const info: SyncInfo = { conversations: chats.length, messages: total, lastSyncedAt: new Date().toISOString() };
-  try {
-    localStorage.setItem(KEY, JSON.stringify(info));
-  } catch {
-    /* ignore */
-  }
-  running = false;
-  emit({ type: "done" });
+  resetQueryWorker();
+  await clearAllData();
+  publishDataChanged();
 }

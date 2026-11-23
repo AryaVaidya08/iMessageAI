@@ -19,7 +19,9 @@ describe("schema", () => {
     const names = (db.prepare("SELECT name FROM sqlite_master").all() as { name: string }[]).map((r) => r.name);
     for (const t of ["participants", "conversations", "conversation_participants", "messages", "tapbacks",
       "announcements", "contacts", "sync_state", "participant_alias", "conversation_alias",
-      "summary_conversation", "summary_cache", "v_participant_map", "v_conversation_map",
+      "summary_conversation", "summary_overview_conv", "summary_overview_daily", "summary_overview_dow_hour",
+      "summary_reply_delta", "merge_history", "conversation_merge_history",
+      "v_participants", "v_conversations", "v_conversation_participants", "v_messages", "v_tapbacks", "v_announcements",
       "idx_messages_conversation", "idx_messages_sender", "idx_messages_reply_to",
       "idx_messages_convo_ts_id", "idx_tapbacks_message", "idx_announcements_conversation"]) {
       expect(names).toContain(t);
@@ -46,8 +48,9 @@ describe("schema", () => {
     `);
     expect(() => db.exec(`INSERT INTO messages(id,conversation_id,sender_id,timestamp,text,guid)
       VALUES('m2','c1','me','t','x','g1')`)).toThrow(/UNIQUE/);
-    const map = db.prepare("SELECT canonical_id FROM v_participant_map WHERE id='+15557654321'").get() as { canonical_id: string };
-    expect(map.canonical_id).toBe("+15551234567");
+    expect(db.prepare("SELECT id FROM v_participants ORDER BY id").all()).toEqual([{ id: "+15551234567" }, { id: "me" }]);
+    db.exec("INSERT INTO messages(id,conversation_id,sender_id,timestamp,text,guid) VALUES('m3','c1','+15557654321','t','y','g3')");
+    expect(db.prepare("SELECT sender_id FROM v_messages WHERE id='m3'").get()).toEqual({ sender_id: "+15551234567" });
     db.exec("DELETE FROM conversations WHERE id='c1'");
     expect(db.prepare("SELECT count(*) n FROM messages").get()).toEqual({ n: 0 });
     expect(db.prepare("SELECT count(*) n FROM tapbacks").get()).toEqual({ n: 0 });

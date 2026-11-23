@@ -48,6 +48,9 @@ export interface IngestOptions {
 
 export interface IngestInputFiles {
   chatDb: File;
+  /** chat.db-wal / chat.db-shm copied alongside chat.db (recent messages live in the -wal). */
+  chatDbWal?: File;
+  chatDbShm?: File;
   addressBooks?: File[];
 }
 

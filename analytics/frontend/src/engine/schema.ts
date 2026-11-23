@@ -4,6 +4,8 @@
 // IDs are deterministic: conversations.id = chat_guid, participants.id = normalized
 // handle (E.164 phone or lowercase email) or 'me'. Timestamps are ISO 8601 UTC text.
 
+import { CONVERSATION_SUMMARY_DDL, MERGE_VIEWS_MIGRATION, OVERVIEW_SUMMARY_DDL } from "./ddl";
+
 export interface Migration {
   version: number;
   sql: string;
@@ -78,51 +80,9 @@ CREATE TABLE IF NOT EXISTS sync_state (
     value TEXT
 );
 
--- Merges are alias rows applied at read time through the views below.
-CREATE TABLE IF NOT EXISTS participant_alias (
-    from_id TEXT PRIMARY KEY,
-    to_id TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS conversation_alias (
-    from_id TEXT PRIMARY KEY,
-    to_id TEXT NOT NULL
-);
-
--- Aggregate caches, refreshed per affected conversation.
-CREATE TABLE IF NOT EXISTS summary_conversation (
-    conversation_id TEXT PRIMARY KEY REFERENCES conversations(id) ON DELETE CASCADE,
-    message_count INTEGER NOT NULL DEFAULT 0,
-    first_timestamp TEXT,
-    last_timestamp TEXT,
-    updated_at TEXT
-);
-
-CREATE TABLE IF NOT EXISTS summary_conversation_participant (
-    conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
-    participant_id TEXT NOT NULL,
-    message_count INTEGER NOT NULL DEFAULT 0,
-    word_count INTEGER NOT NULL DEFAULT 0,
-    first_timestamp TEXT,
-    last_timestamp TEXT,
-    PRIMARY KEY (conversation_id, participant_id)
-);
-
--- Generic JSON cache for expensive aggregates (key like 'heatmap:<conversation_id>').
-CREATE TABLE IF NOT EXISTS summary_cache (
-    key TEXT PRIMARY KEY,
-    conversation_id TEXT,
-    json TEXT NOT NULL,
-    updated_at TEXT
-);
-
-CREATE VIEW IF NOT EXISTS v_participant_map AS
-    SELECT p.id AS id, COALESCE(a.to_id, p.id) AS canonical_id
-    FROM participants p LEFT JOIN participant_alias a ON a.from_id = p.id;
-
-CREATE VIEW IF NOT EXISTS v_conversation_map AS
-    SELECT c.id AS id, COALESCE(a.to_id, c.id) AS canonical_id
-    FROM conversations c LEFT JOIN conversation_alias a ON a.from_id = c.id;
+${MERGE_VIEWS_MIGRATION}
+${OVERVIEW_SUMMARY_DDL}
+${CONVERSATION_SUMMARY_DDL}
 
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
@@ -131,7 +91,6 @@ CREATE INDEX IF NOT EXISTS idx_messages_convo_ts_id ON messages(conversation_id,
 CREATE INDEX IF NOT EXISTS idx_messages_rowid_src ON messages(rowid_src);
 CREATE INDEX IF NOT EXISTS idx_tapbacks_message ON tapbacks(message_id);
 CREATE INDEX IF NOT EXISTS idx_announcements_conversation ON announcements(conversation_id);
-CREATE INDEX IF NOT EXISTS idx_summary_cache_convo ON summary_cache(conversation_id);
 `;
 
 /** Append new migrations here; never edit a released one. */
@@ -154,16 +113,21 @@ export async function migrate(db: SqlRunner): Promise<number> {
   }
   for (const m of MIGRATIONS) {
     if (m.version <= current) continue;
-    await db.exec("BEGIN");
+    // IMMEDIATE takes the write lock up front; re-read the version inside it so two workers opening
+    // the same DB at once don't both run the migration.
+    await db.exec("BEGIN IMMEDIATE");
     try {
-      await db.exec(m.sql);
-      await db.setUserVersion(m.version);
+      const inside = await db.getUserVersion();
+      if (inside < m.version) {
+        await db.exec(m.sql);
+        await db.setUserVersion(m.version);
+      }
       await db.exec("COMMIT");
+      current = Math.max(inside, m.version);
     } catch (e) {
       await db.exec("ROLLBACK");
       throw e;
     }
-    current = m.version;
   }
   return current;
 }
