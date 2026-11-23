@@ -12,6 +12,7 @@ export default defineConfig({
     browserName: "chromium",
     channel: process.env.E2E_CHANNEL ?? "chrome",
     headless: true,
+    actionTimeout: 30_000,
     viewport: { width: 1280, height: 900 },
     launchOptions: { args: ["--js-flags=--expose-gc"] },
   },

@@ -125,7 +125,7 @@ export function DebugConsole({ subscribe, forceOpen = false }: { subscribe: Inge
   const mem = s.memory;
 
   return (
-    <aside className={styles.dock} aria-label="Ingest debug console" data-testid="debug-console" data-state={s.finished ? "done" : s.running ? "running" : "idle"}>
+    <aside className={styles.dock} aria-label="Ingest debug console" data-testid="debug-console" data-state={s.finished ? "done" : s.running ? "running" : "idle"} data-run={s.runs}>
       <button type="button" className={styles.header} onClick={() => setCollapsed((c) => !c)} aria-expanded={open}>
         <span className={`${styles.dot} ${s.errorCount ? styles.dotError : s.running ? styles.dotRun : ""}`} />
         <span className={styles.title}>Import</span>

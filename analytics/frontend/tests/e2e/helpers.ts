@@ -36,8 +36,14 @@ export async function goto(page: Page, hash: string) {
 }
 
 /** Waits for the import to finish, printing progress every 15 s so a stall is visible. */
-export async function waitImportDone(page: Page, timeout = 25 * 60_000) {
+export async function runCount(page: Page): Promise<number> {
+  return Number((await consoleEl(page).getAttribute("data-run").catch(() => "0")) ?? 0);
+}
+
+/** Waits for the import to finish. Pass the run count taken BEFORE starting, so a previous run's "done" is ignored. */
+export async function waitImportDone(page: Page, timeout = 25 * 60_000, afterRun = 0) {
   const t0 = Date.now();
+  await expect(consoleEl(page)).toHaveAttribute("data-run", new RegExp(`^(${Array.from({ length: 50 }, (_, i) => i + afterRun + 1).join("|")})$`), { timeout });
   let last = "";
   const ticker = setInterval(async () => {
     const txt = await consoleEl(page).innerText().catch(() => "");

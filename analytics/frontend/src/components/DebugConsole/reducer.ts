@@ -12,6 +12,8 @@ export interface LogLine {
 }
 
 export interface IngestState {
+  /** how many imports this console has seen (a new run starts on the first phase/chat-start event) */
+  runs: number;
   running: boolean;
   finished: boolean;
   phase: string | null;
@@ -30,6 +32,7 @@ export interface IngestState {
 }
 
 export const initialIngestState: IngestState = {
+  runs: 0,
   running: false,
   finished: false,
   phase: null,
@@ -62,10 +65,12 @@ export function ingestReducer(state: IngestState, action: IngestAction): IngestS
   if (action.type === "reset") return initialIngestState;
   const { event: e, now } = action;
   // A new run (phase/chat-start after done) starts from a clean slate.
-  const base = state.finished && (e.type === "phase" || e.type === "chat-start") ? initialIngestState : state;
+  const starts = (e.type === "phase" || e.type === "chat-start") && (state.finished || state.runs === 0);
+  const base = state.finished && (e.type === "phase" || e.type === "chat-start") ? { ...initialIngestState, runs: state.runs } : state;
   const lifecycle = e.type === "phase" || e.type === "chat-start" || e.type === "chat-progress" || e.type === "overall";
   let s: IngestState = {
     ...base,
+    runs: starts ? state.runs + 1 : base.runs,
     startedAt: base.startedAt ?? now,
     running: e.type === "done" ? false : base.finished ? false : lifecycle ? true : base.running || e.type === "error",
     finished: base.finished && !lifecycle && e.type !== "error" ? true : false,
