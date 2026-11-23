@@ -4242,9 +4242,9 @@
     "participant_id": "+15552220002"
    },
    "top_renamer": {
-    "count": 1,
-    "display_name": "Bob B",
-    "participant_id": "+15552220002"
+    "count": 2,
+    "display_name": "Alice A",
+    "participant_id": "+15552220001"
    },
    "top_unsender": {
     "count": 1,
@@ -9039,9 +9039,9 @@
     "participant_id": "+15552220002"
    },
    "top_renamer": {
-    "count": 1,
-    "display_name": "Bob B",
-    "participant_id": "+15552220002"
+    "count": 2,
+    "display_name": "Alice A",
+    "participant_id": "+15552220001"
    },
    "top_unsender": {
     "count": 1,

@@ -93,7 +93,8 @@ def build():
             ts = start + timedelta(days=ci * 3 + 1)
             evs = [("renamed convo", ALICE, None), ("added person", ALICE, CAROL), ("changed photo", BOB, None),
                    ("left convo", BOB, BOB), ("added person", ME, BOB), ("removed person", ME, CAROL),
-                   ("unsent message", CAROL, None), ("changed photo", BOB, None), ("renamed convo", BOB, None)]
+                   ("unsent message", CAROL, None), ("changed photo", BOB, None), ("renamed convo", BOB, None),
+                   ("renamed convo", ALICE, None)]
             for j, (act, annc, aff) in enumerate(evs):
                 announcements.append({
                     "id": f"{cid}-a{j}", "conversation_id": cid,
