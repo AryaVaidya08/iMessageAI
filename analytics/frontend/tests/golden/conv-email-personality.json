@@ -1,0 +1,75 @@
+{
+ "body": {
+  "traits": [
+   {
+    "entries": [],
+    "trait": "Aggressive"
+   },
+   {
+    "entries": [
+     {
+      "display_name": "Carol Chen",
+      "message_count": 1,
+      "participant_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+      "share": 3.1
+     },
+     {
+      "display_name": "You",
+      "message_count": 1,
+      "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+      "share": 2.9
+     }
+    ],
+    "trait": "Chaotic"
+   },
+   {
+    "entries": [],
+    "trait": "Dramatic"
+   },
+   {
+    "entries": [
+     {
+      "display_name": "You",
+      "message_count": 6,
+      "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+      "share": 17.1
+     },
+     {
+      "display_name": "Carol Chen",
+      "message_count": 5,
+      "participant_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+      "share": 15.6
+     }
+    ],
+    "trait": "Sarcastic"
+   },
+   {
+    "entries": [],
+    "trait": "Chill"
+   },
+   {
+    "entries": [
+     {
+      "display_name": "Carol Chen",
+      "message_count": 13,
+      "participant_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+      "share": 40.6
+     },
+     {
+      "display_name": "You",
+      "message_count": 12,
+      "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+      "share": 34.3
+     }
+    ],
+    "trait": "Wholesome"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-email-personality",
+  "path": "/api/conversations/{conv:#3}/personality-leaderboard"
+ },
+ "status": 200
+}

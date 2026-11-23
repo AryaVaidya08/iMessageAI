@@ -1,0 +1,89 @@
+{
+ "body": {
+  "fastest_reply_message": {
+   "message_id": "1a34659a-970a-5b32-954f-0f41b08b1126",
+   "sender_display_name": "Erin Evans",
+   "sender_id": "17433b20-0e08-595b-86e1-636251353758",
+   "text": "Is cat flight birthday thank wanna",
+   "timestamp": "2024-03-05T21:01:56.382",
+   "value": 479415.307
+  },
+  "happiest_message": {
+   "message_id": "ff5f2d50-4b2c-55d3-8e84-aefcbe03e3e0",
+   "sender_display_name": "Alice Anders",
+   "sender_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+   "text": "Yes train free food awesome the cat he okay with going thanks over",
+   "timestamp": "2024-01-17T07:11:12.943",
+   "value": 0.9313
+  },
+  "late_night_message": null,
+  "longest_message": {
+   "message_id": "bfa7c1c4-56e2-5429-8016-f84dab389cdc",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "Coffee not meeting dinner lol night going she night yesterday \ud83e\udd14 https://example.com/596dc1",
+   "timestamp": "2024-01-03T08:03:21.155",
+   "value": 90.0
+  },
+  "most_aggressive_message": null,
+  "most_argued_message": {
+   "message_id": "faf67714-7f80-5f9f-aabe-2ac2e81f7793",
+   "sender_display_name": "Bob Baker",
+   "sender_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+   "text": "Tired call no late come cat come movie tickets hungry mom train is!",
+   "timestamp": "2024-01-08T07:56:32.294",
+   "value": 1.0
+  },
+  "most_disliked_message": {
+   "message_id": "b27847b1-76b1-54b7-b6d4-e8c87f9f24fb",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "Lol night!",
+   "timestamp": "2024-02-15T10:42:04.510",
+   "value": 1.0
+  },
+  "most_emoji_message": {
+   "message_id": "bfa7c1c4-56e2-5429-8016-f84dab389cdc",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "Coffee not meeting dinner lol night going she night yesterday \ud83e\udd14 https://example.com/596dc1",
+   "timestamp": "2024-01-03T08:03:21.155",
+   "value": 1.0
+  },
+  "most_laughed_message": {
+   "message_id": "b4f2aede-3ce2-568a-a9d4-2c55c52d2d8e",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "Meeting I coffee today food work wanna tired coffee game train?",
+   "timestamp": "2024-02-01T09:50:59.564",
+   "value": 1.0
+  },
+  "most_loved_message": null,
+  "most_reacted_message": {
+   "message_id": "0fc15e5c-d876-5a0b-a515-29c0fcc53571",
+   "sender_display_name": "Erin Evans",
+   "sender_id": "17433b20-0e08-595b-86e1-636251353758",
+   "text": "It love we she song coffee pizza morning",
+   "timestamp": "2024-02-01T09:50:05.872",
+   "value": 1.0
+  },
+  "most_revolving_door": {
+   "count": 1,
+   "display_name": "Carol Chen",
+   "participant_id": "fb293335-2fa0-5a69-b335-9179962680ef"
+  },
+  "top_photo_changer": null,
+  "top_renamer": {
+   "count": 1,
+   "display_name": "Alice Anders",
+   "participant_id": "558f503b-a478-5cd1-9722-fa14af418fdd"
+  },
+  "top_unsender": null
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-group-leaderboard",
+  "path": "/api/conversations/{conv:#6}/leaderboard"
+ },
+ "status": 200
+}

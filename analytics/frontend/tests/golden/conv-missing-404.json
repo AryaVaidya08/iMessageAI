@@ -1,0 +1,11 @@
+{
+ "body": {
+  "detail": "conversation not found"
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-missing-404",
+  "path": "/api/conversations/does-not-exist"
+ },
+ "status": 404
+}

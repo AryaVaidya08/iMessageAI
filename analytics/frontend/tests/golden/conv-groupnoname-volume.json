@@ -1,0 +1,64 @@
+{
+ "body": {
+  "points": [
+   {
+    "bucket": "2024-01-01",
+    "count": 17
+   },
+   {
+    "bucket": "2024-01-08",
+    "count": 1
+   },
+   {
+    "bucket": "2024-01-15",
+    "count": 4
+   },
+   {
+    "bucket": "2024-01-22",
+    "count": 13
+   },
+   {
+    "bucket": "2024-01-29",
+    "count": 4
+   },
+   {
+    "bucket": "2024-02-05",
+    "count": 0
+   },
+   {
+    "bucket": "2024-02-12",
+    "count": 0
+   },
+   {
+    "bucket": "2024-02-19",
+    "count": 2
+   },
+   {
+    "bucket": "2024-02-26",
+    "count": 0
+   },
+   {
+    "bucket": "2024-03-04",
+    "count": 0
+   },
+   {
+    "bucket": "2024-03-11",
+    "count": 2
+   },
+   {
+    "bucket": "2024-03-18",
+    "count": 16
+   },
+   {
+    "bucket": "2024-03-25",
+    "count": 10
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-groupnoname-volume",
+  "path": "/api/conversations/{conv:#7}/volume?granularity=week"
+ },
+ "status": 200
+}

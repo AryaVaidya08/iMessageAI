@@ -1,0 +1,31 @@
+{
+ "body": {
+  "display_name": "Carol Chen",
+  "first_message_at": "2024-01-05T20:12:19.127",
+  "id": "c85a21fd-8310-59af-87d4-c616d40a64a2",
+  "is_group_chat": false,
+  "last_message_at": "2024-03-17T07:57:13.316",
+  "message_count": 67,
+  "participants": [
+   {
+    "display_name": "You",
+    "handle": "",
+    "id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "is_me": true
+   },
+   {
+    "display_name": "Carol Chen",
+    "handle": "carol@example.com",
+    "id": "fb293335-2fa0-5a69-b335-9179962680ef",
+    "is_me": false
+   }
+  ],
+  "relationship_type": "other"
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-email-detail",
+  "path": "/api/conversations/{conv:#3}"
+ },
+ "status": 200
+}

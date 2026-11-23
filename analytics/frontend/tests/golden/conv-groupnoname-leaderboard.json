@@ -1,0 +1,88 @@
+{
+ "body": {
+  "fastest_reply_message": {
+   "message_id": "86e0a983-e722-56ef-9880-900b6ff96d1c",
+   "sender_display_name": "Dev Dhillon",
+   "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+   "text": "Miss on okay",
+   "timestamp": "2024-01-05T11:29:49.397",
+   "value": 115276.749
+  },
+  "happiest_message": {
+   "message_id": "c8d355a9-4348-5b2b-950a-48044a44cdee",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "Free party to wanna this dinner really party thanks not dog \ud83d\ude05",
+   "timestamp": "2024-02-24T07:24:34.095",
+   "value": 0.8768
+  },
+  "late_night_message": null,
+  "longest_message": {
+   "message_id": "b6e280f6-8bd6-5fe1-8a3a-136fc627019c",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "No mom plan you miss going plan song they really but idea! https://example.com/025f69",
+   "timestamp": "2024-01-05T11:35:04.589",
+   "value": 85.0
+  },
+  "most_aggressive_message": null,
+  "most_argued_message": {
+   "message_id": "86e0a983-e722-56ef-9880-900b6ff96d1c",
+   "sender_display_name": "Dev Dhillon",
+   "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+   "text": "Miss on okay",
+   "timestamp": "2024-01-05T11:29:49.397",
+   "value": 1.0
+  },
+  "most_disliked_message": {
+   "message_id": "dd4740e9-2a57-52ae-83bc-291afeb4773e",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "That love night dad!",
+   "timestamp": "2024-01-26T07:03:36.141",
+   "value": 1.0
+  },
+  "most_emoji_message": {
+   "message_id": "f590fd0f-f647-5911-8a6a-6e3aa0ce6ee8",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "Traffic just \ud83e\udd14",
+   "timestamp": "2024-01-05T11:32:54.077",
+   "value": 1.0
+  },
+  "most_laughed_message": {
+   "message_id": "aab511e5-faf6-53a4-b2d1-d438fae604d8",
+   "sender_display_name": "You",
+   "sender_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+   "text": "To coffee thanks miss train wanna movie wanna okay they what!",
+   "timestamp": "2024-01-05T11:29:31.007",
+   "value": 1.0
+  },
+  "most_loved_message": {
+   "message_id": "86e0a983-e722-56ef-9880-900b6ff96d1c",
+   "sender_display_name": "Dev Dhillon",
+   "sender_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+   "text": "Miss on okay",
+   "timestamp": "2024-01-05T11:29:49.397",
+   "value": 1.0
+  },
+  "most_reacted_message": {
+   "message_id": "35368e1b-5b2e-5daa-9ef4-b3b7391f008d",
+   "sender_display_name": "Erin Evans",
+   "sender_id": "17433b20-0e08-595b-86e1-636251353758",
+   "text": "Sure no over weekend I and weekend running of really soon no friend?",
+   "timestamp": "2024-01-05T11:28:31.882",
+   "value": 1.0
+  },
+  "most_revolving_door": null,
+  "top_photo_changer": null,
+  "top_renamer": null,
+  "top_unsender": null
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-groupnoname-leaderboard",
+  "path": "/api/conversations/{conv:#7}/leaderboard"
+ },
+ "status": 200
+}

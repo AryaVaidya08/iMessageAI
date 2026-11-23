@@ -1,0 +1,491 @@
+{
+ "body": {
+  "conversation_count": 2,
+  "conversations": [
+   {
+    "conversation_id": "1e30fd2e-d07d-5e4a-88f3-98d014aa0fb1",
+    "display_name": "Weekend Crew 2",
+    "is_group_chat": true,
+    "message_count": 91,
+    "relationship_type": "other"
+   },
+   {
+    "conversation_id": "05c399e3-a03e-57de-b4d4-1783ff99b459",
+    "display_name": "Bob Baker",
+    "is_group_chat": false,
+    "message_count": 75,
+    "relationship_type": "other"
+   }
+  ],
+  "display_name": "Bob Baker",
+  "first_message_at": "2024-01-02T07:07:36.643",
+  "handle": "+15551110002",
+  "heatmap": {
+   "grid": [
+    [
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     6,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     6,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     4,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     2,
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ]
+  },
+  "id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+  "last_message_at": "2024-04-04T10:00:22.395",
+  "leaderboard": {
+   "fastest_reply_message": {
+    "message_id": "64ca2fce-babb-54cd-851f-67f4c5c1893c",
+    "sender_display_name": "Bob Baker",
+    "sender_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "text": "The he dinner pizza movie she today morning miss so",
+    "timestamp": "2024-01-15T07:16:08.332",
+    "value": 129.559
+   },
+   "happiest_message": {
+    "message_id": "a710bba6-ba96-5248-930b-211334ea80d4",
+    "sender_display_name": "Bob Baker",
+    "sender_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "text": "Free birthday soon awesome wow on plan \ud83c\udf89",
+    "timestamp": "2024-03-31T03:46:44.102",
+    "value": 0.9313
+   },
+   "late_night_message": {
+    "message_id": "81849112-adc3-518a-a3cb-ed5bb2fae4b3",
+    "sender_display_name": "Bob Baker",
+    "sender_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "text": "Traffic tired week \ud83d\udd25",
+    "timestamp": "2024-03-31T03:45:11.168",
+    "value": 676.0
+   },
+   "longest_message": {
+    "message_id": "175d8e4a-46c6-5acd-8a44-d281e639c340",
+    "sender_display_name": "Bob Baker",
+    "sender_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "text": "Train pizza party night is home idea mom yesterday morning of birthday movie soon",
+    "timestamp": "2024-01-16T17:00:23.574",
+    "value": 81.0
+   },
+   "most_aggressive_message": null,
+   "most_argued_message": {
+    "message_id": "faf67714-7f80-5f9f-aabe-2ac2e81f7793",
+    "sender_display_name": "Bob Baker",
+    "sender_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "text": "Tired call no late come cat come movie tickets hungry mom train is!",
+    "timestamp": "2024-01-08T07:56:32.294",
+    "value": 1.0
+   },
+   "most_disliked_message": {
+    "message_id": "db7ba94d-2d3e-55c8-a125-af8722f7517e",
+    "sender_display_name": "Bob Baker",
+    "sender_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "text": "This work so busy game tickets running wanna!",
+    "timestamp": "2024-03-24T09:43:17.447",
+    "value": 1.0
+   },
+   "most_emoji_message": {
+    "message_id": "f65cd719-7b18-572b-93a0-890fe336b078",
+    "sender_display_name": "Bob Baker",
+    "sender_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "text": "Awesome show party but this tomorrow but was flight watch over \u2764\ufe0f",
+    "timestamp": "2024-01-16T17:01:56.785",
+    "value": 1.0
+   },
+   "most_laughed_message": null,
+   "most_loved_message": null,
+   "most_reacted_message": {
+    "message_id": "db7ba94d-2d3e-55c8-a125-af8722f7517e",
+    "sender_display_name": "Bob Baker",
+    "sender_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "text": "This work so busy game tickets running wanna!",
+    "timestamp": "2024-03-24T09:43:17.447",
+    "value": 1.0
+   },
+   "most_revolving_door": {
+    "count": 1,
+    "display_name": "Bob Baker",
+    "participant_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba"
+   },
+   "top_photo_changer": null,
+   "top_renamer": null,
+   "top_unsender": null
+  },
+  "message_count": 42,
+  "stats": {
+   "display_name": "Bob Baker",
+   "gap_initiator_count": 9,
+   "handle": "+15551110002",
+   "late_night_ratio": 0.07142857142857142,
+   "median_reply_seconds": 33.399,
+   "message_count": 42,
+   "participant_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+   "personality": [
+    {
+     "percentage": 0.0,
+     "trait": "Aggressive"
+    },
+    {
+     "percentage": 0.0,
+     "trait": "Chaotic"
+    },
+    {
+     "percentage": 0.0,
+     "trait": "Dramatic"
+    },
+    {
+     "percentage": 7.9,
+     "trait": "Sarcastic"
+    },
+    {
+     "percentage": 0.0,
+     "trait": "Chill"
+    },
+    {
+     "percentage": 34.2,
+     "trait": "Wholesome"
+    }
+   ],
+   "reply_histogram": [
+    {
+     "count": 20,
+     "label": "<1m"
+    },
+    {
+     "count": 2,
+     "label": "1-5m"
+    },
+    {
+     "count": 0,
+     "label": "5-30m"
+    },
+    {
+     "count": 0,
+     "label": "30m-2h"
+    },
+    {
+     "count": 1,
+     "label": "2-12h"
+    },
+    {
+     "count": 1,
+     "label": "12-24h"
+    },
+    {
+     "count": 2,
+     "label": ">24h"
+    }
+   ],
+   "sentiment_series": [
+    {
+     "bucket": "2024-01-01",
+     "score": -0.026749999999999996
+    },
+    {
+     "bucket": "2024-01-08",
+     "score": 0.07429999999999998
+    },
+    {
+     "bucket": "2024-01-15",
+     "score": 0.32359999999999994
+    },
+    {
+     "bucket": "2024-01-22",
+     "score": 0.2795166666666667
+    },
+    {
+     "bucket": "2024-02-12",
+     "score": 0.5871999999999999
+    },
+    {
+     "bucket": "2024-02-19",
+     "score": 0.6412
+    },
+    {
+     "bucket": "2024-03-18",
+     "score": 0.55268
+    },
+    {
+     "bucket": "2024-03-25",
+     "score": 0.20620000000000002
+    },
+    {
+     "bucket": "2024-04-01",
+     "score": 0.43579999999999997
+    }
+   ],
+   "tapbacks_given": [
+    {
+     "action": "Liked",
+     "count": 1
+    }
+   ],
+   "tapbacks_received": [
+    {
+     "action": "Disliked",
+     "count": 1
+    }
+   ],
+   "top_emojis": [
+    {
+     "count": 2,
+     "emoji": "\ud83c\udf89"
+    },
+    {
+     "count": 1,
+     "emoji": "\u2764"
+    },
+    {
+     "count": 1,
+     "emoji": "\ud83d\ude0a"
+    },
+    {
+     "count": 1,
+     "emoji": "\ud83d\udd25"
+    }
+   ],
+   "top_words": [
+    {
+     "count": 9,
+     "word": "awesome"
+    },
+    {
+     "count": 8,
+     "word": "food"
+    },
+    {
+     "count": 8,
+     "word": "tired"
+    },
+    {
+     "count": 7,
+     "word": "dog"
+    },
+    {
+     "count": 7,
+     "word": "lunch"
+    },
+    {
+     "count": 6,
+     "word": "friend"
+    },
+    {
+     "count": 6,
+     "word": "traffic"
+    },
+    {
+     "count": 6,
+     "word": "train"
+    },
+    {
+     "count": 6,
+     "word": "thanks"
+    },
+    {
+     "count": 6,
+     "word": "mom"
+    },
+    {
+     "count": 6,
+     "word": "watch"
+    },
+    {
+     "count": 5,
+     "word": "idea"
+    },
+    {
+     "count": 5,
+     "word": "come"
+    },
+    {
+     "count": 5,
+     "word": "photo"
+    },
+    {
+     "count": 5,
+     "word": "dinner"
+    }
+   ]
+  }
+ },
+ "case": {
+  "method": "GET",
+  "name": "person-bob-detail",
+  "path": "/api/people/{person:+15551110002}/detail"
+ },
+ "status": 200
+}

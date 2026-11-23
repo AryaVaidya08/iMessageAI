@@ -1,0 +1,12 @@
+{
+ "body": {
+  "median_reply_seconds": 39.973,
+  "relationship_type": "other"
+ },
+ "case": {
+  "method": "GET",
+  "name": "overview-fastest-reply",
+  "path": "/api/overview/fastest-reply-relationship"
+ },
+ "status": 200
+}

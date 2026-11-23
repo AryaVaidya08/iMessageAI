@@ -1,0 +1,31 @@
+{
+ "body": {
+  "display_name": "Alice Anders",
+  "first_message_at": "2024-01-05T09:42:37.833",
+  "id": "1aeea4d7-3d30-56c1-84aa-de7616c2bdae",
+  "is_group_chat": false,
+  "last_message_at": "2024-04-02T23:53:19.473",
+  "message_count": 184,
+  "participants": [
+   {
+    "display_name": "Alice Anders",
+    "handle": "+15551110001",
+    "id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+    "is_me": false
+   },
+   {
+    "display_name": "You",
+    "handle": "",
+    "id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "is_me": true
+   }
+  ],
+  "relationship_type": "friend"
+ },
+ "case": {
+  "method": "GET",
+  "name": "post-conv-1to1-detail-after-edit",
+  "path": "/api/conversations/{conv:#1}"
+ },
+ "status": 200
+}

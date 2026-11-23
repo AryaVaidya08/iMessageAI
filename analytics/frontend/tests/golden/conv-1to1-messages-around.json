@@ -1,0 +1,13 @@
+{
+ "body": {
+  "items": [],
+  "newer_cursor": null,
+  "older_cursor": null
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-1to1-messages-around",
+  "path": "/api/conversations/{conv:#1}/messages?limit=20&around={msg:rowid:100}"
+ },
+ "status": 200
+}

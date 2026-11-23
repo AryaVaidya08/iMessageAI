@@ -1,0 +1,26 @@
+{
+ "body": {
+  "edges": [
+   {
+    "count": 1,
+    "original_display_name": "Bob Baker",
+    "original_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "replier_display_name": "You",
+    "replier_id": "7732097f-b7c2-574f-9b9b-69194e6dc432"
+   },
+   {
+    "count": 1,
+    "original_display_name": "Carol Chen",
+    "original_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+    "replier_display_name": "You",
+    "replier_id": "7732097f-b7c2-574f-9b9b-69194e6dc432"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-group-reply-graph",
+  "path": "/api/conversations/{conv:#6}/reply-graph"
+ },
+ "status": 200
+}

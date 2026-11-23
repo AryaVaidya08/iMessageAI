@@ -1,0 +1,23 @@
+{
+ "body": {
+  "items": [
+   {
+    "display_name": "Alice Anders",
+    "id": "1aeea4d7-3d30-56c1-84aa-de7616c2bdae",
+    "is_group_chat": false,
+    "last_activity": "2024-04-02T23:53:19.473",
+    "message_count": 184,
+    "relationship_type": "other"
+   }
+  ],
+  "page": 1,
+  "page_size": 25,
+  "total": 1
+ },
+ "case": {
+  "method": "GET",
+  "name": "conversations-search",
+  "path": "/api/conversations?search=alice"
+ },
+ "status": 200
+}

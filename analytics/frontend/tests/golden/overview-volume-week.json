@@ -1,0 +1,68 @@
+{
+ "body": {
+  "points": [
+   {
+    "bucket": "2024-01-01",
+    "count": 58
+   },
+   {
+    "bucket": "2024-01-08",
+    "count": 32
+   },
+   {
+    "bucket": "2024-01-15",
+    "count": 45
+   },
+   {
+    "bucket": "2024-01-22",
+    "count": 50
+   },
+   {
+    "bucket": "2024-01-29",
+    "count": 40
+   },
+   {
+    "bucket": "2024-02-05",
+    "count": 33
+   },
+   {
+    "bucket": "2024-02-12",
+    "count": 43
+   },
+   {
+    "bucket": "2024-02-19",
+    "count": 41
+   },
+   {
+    "bucket": "2024-02-26",
+    "count": 26
+   },
+   {
+    "bucket": "2024-03-04",
+    "count": 33
+   },
+   {
+    "bucket": "2024-03-11",
+    "count": 30
+   },
+   {
+    "bucket": "2024-03-18",
+    "count": 48
+   },
+   {
+    "bucket": "2024-03-25",
+    "count": 45
+   },
+   {
+    "bucket": "2024-04-01",
+    "count": 30
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "overview-volume-week",
+  "path": "/api/overview/volume?granularity=week"
+ },
+ "status": 200
+}

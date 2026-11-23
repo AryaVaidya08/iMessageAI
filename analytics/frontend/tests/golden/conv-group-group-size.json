@@ -1,0 +1,24 @@
+{
+ "body": {
+  "points": [
+   {
+    "datetime": "2024-01-17T07:10:32.132",
+    "size": 7
+   },
+   {
+    "datetime": "2024-02-01T09:49:36.188",
+    "size": 6
+   },
+   {
+    "datetime": "2024-02-18T12:49:19.823",
+    "size": 5
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-group-group-size",
+  "path": "/api/conversations/{conv:#6}/group-size"
+ },
+ "status": 200
+}

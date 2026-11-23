@@ -1,0 +1,19 @@
+{
+ "body": {
+  "edges": [
+   {
+    "count": 1,
+    "original_display_name": "Dev Dhillon",
+    "original_id": "57daa9f4-43f4-5feb-a5bd-dddb0ebc09f6",
+    "replier_display_name": "You",
+    "replier_id": "7732097f-b7c2-574f-9b9b-69194e6dc432"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-groupnoname-reply-graph",
+  "path": "/api/conversations/{conv:#7}/reply-graph"
+ },
+ "status": 200
+}

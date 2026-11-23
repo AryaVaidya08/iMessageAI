@@ -1,0 +1,11 @@
+{
+ "body": {
+  "items": []
+ },
+ "case": {
+  "method": "GET",
+  "name": "merge-conv-history-empty",
+  "path": "/api/merge-conversation-history"
+ },
+ "status": 200
+}

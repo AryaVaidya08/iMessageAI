@@ -1,0 +1,26 @@
+{
+ "body": {
+  "edges": [
+   {
+    "count": 6,
+    "original_display_name": "You",
+    "original_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "replier_display_name": "Alice Anders",
+    "replier_id": "558f503b-a478-5cd1-9722-fa14af418fdd"
+   },
+   {
+    "count": 3,
+    "original_display_name": "Alice Anders",
+    "original_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+    "replier_display_name": "You",
+    "replier_id": "7732097f-b7c2-574f-9b9b-69194e6dc432"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-1to1-reply-graph",
+  "path": "/api/conversations/{conv:#1}/reply-graph"
+ },
+ "status": 200
+}

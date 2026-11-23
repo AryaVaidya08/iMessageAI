@@ -1,0 +1,15 @@
+{
+ "body": {
+  "date_range_end": "2024-04-04T10:43:55.547",
+  "date_range_start": "2024-01-01T19:25:41.616",
+  "total_conversations": 7,
+  "total_messages": 554,
+  "total_participants": 9
+ },
+ "case": {
+  "method": "GET",
+  "name": "overview",
+  "path": "/api/overview"
+ },
+ "status": 200
+}

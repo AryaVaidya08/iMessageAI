@@ -1,0 +1,52 @@
+{
+ "body": {
+  "items": [
+   {
+    "id": "9a837ddb-3a3e-5883-9d09-60759c721dd4",
+    "text": "Call yesterday running this sorry pizza they photo come dinner thanks thanks photo sure \ud83d\ude4f",
+    "timestamp": "2024-01-05T09:44:57.879"
+   },
+   {
+    "id": "b4ed1ab7-a45c-5bd5-b348-f91f76f8e523",
+    "text": "Lol cat over a thanks I dinner today awesome the it running dog thank",
+    "timestamp": "2024-01-25T19:49:11.759"
+   },
+   {
+    "id": "640cfcc3-c21b-5be2-9baa-8171aeac14ce",
+    "text": "Game dinner love running I free over home cat",
+    "timestamp": "2024-01-25T23:47:12.042"
+   },
+   {
+    "id": "fff7f1f6-b004-5082-8dc2-61a07ef13918",
+    "text": "Can dinner on hungry wanna this free thank photo busy the",
+    "timestamp": "2024-02-13T07:31:40.647"
+   },
+   {
+    "id": "141e8e7f-57d5-5c83-ad54-12039b32ad81",
+    "text": "Thank movie later coffee wow dinner thank",
+    "timestamp": "2024-02-13T07:32:50.325"
+   },
+   {
+    "id": "af0a3656-51e4-5bca-afa3-09130e465697",
+    "text": "Over dog she food to plan dinner",
+    "timestamp": "2024-02-13T07:33:46.629"
+   },
+   {
+    "id": "ded23570-454d-5ca0-b7b4-725912027273",
+    "text": "Dad really yesterday thank but but sure a with free dinner thank lol?",
+    "timestamp": "2024-02-16T17:55:34.181"
+   },
+   {
+    "id": "c522931e-8ab0-5bdb-8641-88ca856ca9ac",
+    "text": "Is dad yesterday soon plan later wanna maybe late night can to and dinner!",
+    "timestamp": "2024-02-23T09:22:38.519"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-1to1-search",
+  "path": "/api/conversations/{conv:#1}/messages/search?q=dinner&limit=10"
+ },
+ "status": 200
+}

@@ -1,0 +1,17 @@
+{
+ "body": {
+  "keep_id": "05c399e3-a03e-57de-b4d4-1783ff99b459",
+  "ok": true,
+  "removed_id": "88ac2ab9-0681-5a24-99ad-ef3036097645"
+ },
+ "case": {
+  "body": {
+   "keep_id": "{conv:#2}",
+   "remove_id": "{conv:#5}"
+  },
+  "method": "POST",
+  "name": "post-merge-conversations",
+  "path": "/api/merge-conversation"
+ },
+ "status": 200
+}

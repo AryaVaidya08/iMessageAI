@@ -1,0 +1,11 @@
+{
+ "body": {
+  "points": []
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-email-group-size",
+  "path": "/api/conversations/{conv:#3}/group-size"
+ },
+ "status": 200
+}

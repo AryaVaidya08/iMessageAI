@@ -1,0 +1,13 @@
+{
+ "body": {
+  "display_name": "Alice Anders",
+  "handle": "+15551110001",
+  "id": "558f503b-a478-5cd1-9722-fa14af418fdd"
+ },
+ "case": {
+  "method": "GET",
+  "name": "person-alice",
+  "path": "/api/people/{person:+15551110001}"
+ },
+ "status": 200
+}

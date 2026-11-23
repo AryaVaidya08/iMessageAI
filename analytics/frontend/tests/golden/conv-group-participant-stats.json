@@ -1,0 +1,776 @@
+{
+ "body": {
+  "participants": [
+   {
+    "display_name": "Erin Evans",
+    "gap_initiator_count": 3,
+    "handle": "+15551110005",
+    "late_night_ratio": 0.0,
+    "median_reply_seconds": 48.815,
+    "message_count": 12,
+    "participant_id": "17433b20-0e08-595b-86e1-636251353758",
+    "personality": [],
+    "reply_histogram": [
+     {
+      "count": 6,
+      "label": "<1m"
+     },
+     {
+      "count": 2,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 0,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 1,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-29",
+      "score": 0.6369
+     },
+     {
+      "bucket": "2024-02-05",
+      "score": 0.8519
+     },
+     {
+      "bucket": "2024-03-04",
+      "score": 0.31128
+     },
+     {
+      "bucket": "2024-03-11",
+      "score": 0.375175
+     }
+    ],
+    "tapbacks_given": [],
+    "tapbacks_received": [
+     {
+      "action": "Questioned",
+      "count": 1
+     }
+    ],
+    "top_emojis": [],
+    "top_words": [
+     {
+      "count": 4,
+      "word": "flight"
+     },
+     {
+      "count": 4,
+      "word": "busy"
+     },
+     {
+      "count": 3,
+      "word": "morning"
+     },
+     {
+      "count": 3,
+      "word": "movie"
+     },
+     {
+      "count": 3,
+      "word": "late"
+     },
+     {
+      "count": 3,
+      "word": "call"
+     },
+     {
+      "count": 2,
+      "word": "love"
+     },
+     {
+      "count": 2,
+      "word": "pizza"
+     },
+     {
+      "count": 2,
+      "word": "home"
+     },
+     {
+      "count": 2,
+      "word": "party"
+     },
+     {
+      "count": 2,
+      "word": "running"
+     },
+     {
+      "count": 2,
+      "word": "yesterday"
+     },
+     {
+      "count": 2,
+      "word": "thank"
+     },
+     {
+      "count": 2,
+      "word": "work"
+     },
+     {
+      "count": 2,
+      "word": "cat"
+     }
+    ]
+   },
+   {
+    "display_name": "Bob Baker",
+    "gap_initiator_count": 1,
+    "handle": "+15551110002",
+    "late_night_ratio": 0.0,
+    "median_reply_seconds": 50.822,
+    "message_count": 4,
+    "participant_id": "225f5dcd-aac2-54c1-8a36-e7fb8528f0ba",
+    "personality": [],
+    "reply_histogram": [
+     {
+      "count": 2,
+      "label": "<1m"
+     },
+     {
+      "count": 0,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 0,
+      "label": "2-12h"
+     },
+     {
+      "count": 1,
+      "label": "12-24h"
+     },
+     {
+      "count": 0,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-01",
+      "score": -0.4939
+     },
+     {
+      "bucket": "2024-01-08",
+      "score": 0.07429999999999998
+     }
+    ],
+    "tapbacks_given": [],
+    "tapbacks_received": [],
+    "top_emojis": [],
+    "top_words": [
+     {
+      "count": 2,
+      "word": "tired"
+     },
+     {
+      "count": 2,
+      "word": "train"
+     },
+     {
+      "count": 2,
+      "word": "come"
+     },
+     {
+      "count": 1,
+      "word": "going"
+     },
+     {
+      "count": 1,
+      "word": "lunch"
+     },
+     {
+      "count": 1,
+      "word": "dinner"
+     },
+     {
+      "count": 1,
+      "word": "sorry"
+     },
+     {
+      "count": 1,
+      "word": "dog"
+     },
+     {
+      "count": 1,
+      "word": "friend"
+     },
+     {
+      "count": 1,
+      "word": "game"
+     },
+     {
+      "count": 1,
+      "word": "maybe"
+     },
+     {
+      "count": 1,
+      "word": "awesome"
+     },
+     {
+      "count": 1,
+      "word": "call"
+     },
+     {
+      "count": 1,
+      "word": "late"
+     },
+     {
+      "count": 1,
+      "word": "cat"
+     }
+    ]
+   },
+   {
+    "display_name": "Alice Anders",
+    "gap_initiator_count": 3,
+    "handle": "+15551110001",
+    "late_night_ratio": 0.0,
+    "median_reply_seconds": 45.356,
+    "message_count": 21,
+    "participant_id": "558f503b-a478-5cd1-9722-fa14af418fdd",
+    "personality": [
+     {
+      "percentage": 0.0,
+      "trait": "Aggressive"
+     },
+     {
+      "percentage": 5.0,
+      "trait": "Chaotic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Dramatic"
+     },
+     {
+      "percentage": 10.0,
+      "trait": "Sarcastic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Chill"
+     },
+     {
+      "percentage": 50.0,
+      "trait": "Wholesome"
+     }
+    ],
+    "reply_histogram": [
+     {
+      "count": 12,
+      "label": "<1m"
+     },
+     {
+      "count": 3,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 0,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 2,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-01",
+      "score": 0.4588
+     },
+     {
+      "bucket": "2024-01-08",
+      "score": 0.4494666666666667
+     },
+     {
+      "bucket": "2024-01-15",
+      "score": 0.46565
+     },
+     {
+      "bucket": "2024-02-05",
+      "score": 0.38155
+     },
+     {
+      "bucket": "2024-02-12",
+      "score": -0.1483
+     },
+     {
+      "bucket": "2024-03-04",
+      "score": 0.0015750000000000208
+     },
+     {
+      "bucket": "2024-03-11",
+      "score": 0.10819999999999999
+     },
+     {
+      "bucket": "2024-04-01",
+      "score": 0.33525
+     }
+    ],
+    "tapbacks_given": [
+     {
+      "action": "Disliked",
+      "count": 1
+     }
+    ],
+    "tapbacks_received": [
+     {
+      "action": "Questioned",
+      "count": 1
+     }
+    ],
+    "top_emojis": [
+     {
+      "count": 1,
+      "emoji": "\ud83d\udd25"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\ude4f"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\ude2d"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83e\udd14"
+     }
+    ],
+    "top_words": [
+     {
+      "count": 5,
+      "word": "see"
+     },
+     {
+      "count": 4,
+      "word": "free"
+     },
+     {
+      "count": 4,
+      "word": "thanks"
+     },
+     {
+      "count": 4,
+      "word": "meeting"
+     },
+     {
+      "count": 4,
+      "word": "train"
+     },
+     {
+      "count": 4,
+      "word": "food"
+     },
+     {
+      "count": 4,
+      "word": "cat"
+     },
+     {
+      "count": 4,
+      "word": "tickets"
+     },
+     {
+      "count": 4,
+      "word": "lunch"
+     },
+     {
+      "count": 3,
+      "word": "show"
+     },
+     {
+      "count": 3,
+      "word": "sorry"
+     },
+     {
+      "count": 3,
+      "word": "text"
+     },
+     {
+      "count": 3,
+      "word": "today"
+     },
+     {
+      "count": 3,
+      "word": "watch"
+     },
+     {
+      "count": 3,
+      "word": "later"
+     }
+    ]
+   },
+   {
+    "display_name": "You",
+    "gap_initiator_count": 8,
+    "handle": "",
+    "late_night_ratio": 0.0,
+    "median_reply_seconds": 34.726,
+    "message_count": 47,
+    "participant_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "personality": [
+     {
+      "percentage": 0.0,
+      "trait": "Aggressive"
+     },
+     {
+      "percentage": 2.1,
+      "trait": "Chaotic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Dramatic"
+     },
+     {
+      "percentage": 23.4,
+      "trait": "Sarcastic"
+     },
+     {
+      "percentage": 0.0,
+      "trait": "Chill"
+     },
+     {
+      "percentage": 19.1,
+      "trait": "Wholesome"
+     }
+    ],
+    "reply_histogram": [
+     {
+      "count": 15,
+      "label": "<1m"
+     },
+     {
+      "count": 5,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 1,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 2,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-01",
+      "score": 0.38038571428571427
+     },
+     {
+      "bucket": "2024-01-08",
+      "score": -0.30840000000000006
+     },
+     {
+      "bucket": "2024-01-15",
+      "score": 0.4215
+     },
+     {
+      "bucket": "2024-01-29",
+      "score": 0.39675
+     },
+     {
+      "bucket": "2024-02-05",
+      "score": 0.19945
+     },
+     {
+      "bucket": "2024-02-12",
+      "score": 0.395175
+     },
+     {
+      "bucket": "2024-03-04",
+      "score": 0.72604
+     },
+     {
+      "bucket": "2024-03-11",
+      "score": 0.49487777777777775
+     },
+     {
+      "bucket": "2024-04-01",
+      "score": 0.6555500000000001
+     }
+    ],
+    "tapbacks_given": [
+     {
+      "action": "Questioned",
+      "count": 2
+     },
+     {
+      "action": "Laughed",
+      "count": 1
+     }
+    ],
+    "tapbacks_received": [
+     {
+      "action": "Laughed",
+      "count": 1
+     },
+     {
+      "action": "Disliked",
+      "count": 1
+     }
+    ],
+    "top_emojis": [
+     {
+      "count": 1,
+      "emoji": "\ud83e\udd14"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\ude2d"
+     },
+     {
+      "count": 1,
+      "emoji": "\u2764"
+     },
+     {
+      "count": 1,
+      "emoji": "\ud83d\ude02"
+     }
+    ],
+    "top_words": [
+     {
+      "count": 12,
+      "word": "weather"
+     },
+     {
+      "count": 8,
+      "word": "soon"
+     },
+     {
+      "count": 8,
+      "word": "weekend"
+     },
+     {
+      "count": 7,
+      "word": "free"
+     },
+     {
+      "count": 7,
+      "word": "come"
+     },
+     {
+      "count": 7,
+      "word": "pizza"
+     },
+     {
+      "count": 6,
+      "word": "party"
+     },
+     {
+      "count": 6,
+      "word": "later"
+     },
+     {
+      "count": 6,
+      "word": "night"
+     },
+     {
+      "count": 6,
+      "word": "friend"
+     },
+     {
+      "count": 6,
+      "word": "yesterday"
+     },
+     {
+      "count": 6,
+      "word": "see"
+     },
+     {
+      "count": 6,
+      "word": "tickets"
+     },
+     {
+      "count": 6,
+      "word": "movie"
+     },
+     {
+      "count": 6,
+      "word": "traffic"
+     }
+    ]
+   },
+   {
+    "display_name": "Carol Chen",
+    "gap_initiator_count": 0,
+    "handle": "carol@example.com",
+    "late_night_ratio": 0.0,
+    "median_reply_seconds": 87.432,
+    "message_count": 7,
+    "participant_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+    "personality": [],
+    "reply_histogram": [
+     {
+      "count": 2,
+      "label": "<1m"
+     },
+     {
+      "count": 4,
+      "label": "1-5m"
+     },
+     {
+      "count": 0,
+      "label": "5-30m"
+     },
+     {
+      "count": 0,
+      "label": "30m-2h"
+     },
+     {
+      "count": 0,
+      "label": "2-12h"
+     },
+     {
+      "count": 0,
+      "label": "12-24h"
+     },
+     {
+      "count": 0,
+      "label": ">24h"
+     }
+    ],
+    "sentiment_series": [
+     {
+      "bucket": "2024-01-01",
+      "score": 0.0
+     },
+     {
+      "bucket": "2024-01-08",
+      "score": -0.1027
+     },
+     {
+      "bucket": "2024-01-29",
+      "score": 0.4215
+     },
+     {
+      "bucket": "2024-02-05",
+      "score": 0.20575
+     },
+     {
+      "bucket": "2024-02-12",
+      "score": 0.37374999999999997
+     }
+    ],
+    "tapbacks_given": [],
+    "tapbacks_received": [],
+    "top_emojis": [],
+    "top_words": [
+     {
+      "count": 2,
+      "word": "thank"
+     },
+     {
+      "count": 2,
+      "word": "game"
+     },
+     {
+      "count": 2,
+      "word": "tired"
+     },
+     {
+      "count": 2,
+      "word": "cat"
+     },
+     {
+      "count": 2,
+      "word": "weekend"
+     },
+     {
+      "count": 2,
+      "word": "today"
+     },
+     {
+      "count": 2,
+      "word": "haha"
+     },
+     {
+      "count": 1,
+      "word": "train"
+     },
+     {
+      "count": 1,
+      "word": "text"
+     },
+     {
+      "count": 1,
+      "word": "morning"
+     },
+     {
+      "count": 1,
+      "word": "tonight"
+     },
+     {
+      "count": 1,
+      "word": "plan"
+     },
+     {
+      "count": 1,
+      "word": "maybe"
+     },
+     {
+      "count": 1,
+      "word": "coffee"
+     },
+     {
+      "count": 1,
+      "word": "work"
+     }
+    ]
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-group-participant-stats",
+  "path": "/api/conversations/{conv:#6}/participant-stats"
+ },
+ "status": 200
+}

@@ -1,6 +1,6 @@
 // Synthetic macOS chat.db generator (stream-writes through SQLite, so memory stays flat even at 1 GB).
 // Uses node:sqlite (Node >= 22.5). Fully deterministic for a given (size, seed, append history).
-import { DatabaseSync, type StatementSync } from "node:sqlite";
+import { DatabaseSync, type StatementSync } from "./sqlite";
 import { existsSync, rmSync, statSync } from "node:fs";
 import { makeCast, type Person } from "./cast";
 import { fakeGuid, hashSeed, makeRng, type Rng } from "./rng";
@@ -27,7 +27,7 @@ export const SIZES: Record<Size, SizeConfig> = {
 
 export const APPLE_EPOCH_UNIX_MS = 978307200000;
 /** unix ms -> Apple-epoch nanoseconds (macOS >= High Sierra stores this in message.date) */
-export const toAppleNs = (unixMs: number): bigint => (BigInt(unixMs) - BigInt(APPLE_EPOCH_UNIX_MS)) * 1_000_000n;
+export const toAppleNs = (unixMs: number): bigint => (BigInt(Math.round(unixMs)) - BigInt(APPLE_EPOCH_UNIX_MS)) * 1_000_000n;
 export const fromAppleNs = (ns: bigint | number): number => Number(BigInt(ns) / 1_000_000n) + APPLE_EPOCH_UNIX_MS;
 
 const SCHEMA = `

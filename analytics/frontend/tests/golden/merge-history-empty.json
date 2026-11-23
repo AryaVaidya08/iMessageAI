@@ -1,0 +1,11 @@
+{
+ "body": {
+  "items": []
+ },
+ "case": {
+  "method": "GET",
+  "name": "merge-history-empty",
+  "path": "/api/merge-history"
+ },
+ "status": 200
+}

@@ -1,0 +1,26 @@
+{
+ "body": {
+  "edges": [
+   {
+    "count": 4,
+    "original_display_name": "You",
+    "original_id": "7732097f-b7c2-574f-9b9b-69194e6dc432",
+    "replier_display_name": "Carol Chen",
+    "replier_id": "fb293335-2fa0-5a69-b335-9179962680ef"
+   },
+   {
+    "count": 3,
+    "original_display_name": "Carol Chen",
+    "original_id": "fb293335-2fa0-5a69-b335-9179962680ef",
+    "replier_display_name": "You",
+    "replier_id": "7732097f-b7c2-574f-9b9b-69194e6dc432"
+   }
+  ]
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-email-reply-graph",
+  "path": "/api/conversations/{conv:#3}/reply-graph"
+ },
+ "status": 200
+}

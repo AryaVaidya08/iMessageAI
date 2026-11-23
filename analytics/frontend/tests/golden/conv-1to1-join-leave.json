@@ -1,0 +1,11 @@
+{
+ "body": {
+  "items": []
+ },
+ "case": {
+  "method": "GET",
+  "name": "conv-1to1-join-leave",
+  "path": "/api/conversations/{conv:#1}/join-leave"
+ },
+ "status": 200
+}

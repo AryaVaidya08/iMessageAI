@@ -1,0 +1,13 @@
+{
+ "body": {
+  "display_name": "Carol Chen",
+  "handle": "carol@example.com",
+  "id": "fb293335-2fa0-5a69-b335-9179962680ef"
+ },
+ "case": {
+  "method": "GET",
+  "name": "person-carol",
+  "path": "/api/people/{person:carol@example.com}"
+ },
+ "status": 200
+}
