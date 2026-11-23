@@ -18,5 +18,10 @@ export default defineConfig(({ mode }) => ({
   build: { target: "es2022" },
   server: { port: 5173 },
   preview: { port: 4173 },
-  test: { environment: "node", include: ["src/**/*.test.ts"] },
+  test: {
+    environment: "node",
+    include: ["src/**/*.test.ts", "tests/**/*.spec.ts"],
+    exclude: ["tests/memory.spec.ts", "node_modules/**"], // memory.spec.ts is Playwright (playwright.config.ts)
+    testTimeout: 60_000,
+  },
 }));
