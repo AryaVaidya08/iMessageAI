@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS messages (
     has_sticker INTEGER NOT NULL DEFAULT 0,
     reply_to TEXT,
     rowid_src INTEGER,
-    guid TEXT UNIQUE,
+    guid TEXT, -- equals id; no separate UNIQUE index (id is the primary key) to keep the IndexedDB footprint small
     date_edited TEXT,
     date_retracted TEXT,
     service TEXT,
@@ -89,7 +89,6 @@ CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id
 CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
 CREATE INDEX IF NOT EXISTS idx_messages_reply_to ON messages(reply_to);
 CREATE INDEX IF NOT EXISTS idx_messages_convo_ts_id ON messages(conversation_id, timestamp, id);
-CREATE INDEX IF NOT EXISTS idx_messages_rowid_src ON messages(rowid_src);
 CREATE INDEX IF NOT EXISTS idx_tapbacks_message ON tapbacks(message_id);
 CREATE INDEX IF NOT EXISTS idx_announcements_conversation ON announcements(conversation_id);
 `;

@@ -47,7 +47,7 @@ describe("schema", () => {
       INSERT INTO participant_alias VALUES('+15557654321','+15551234567');
     `);
     expect(() => db.exec(`INSERT INTO messages(id,conversation_id,sender_id,timestamp,text,guid)
-      VALUES('m2','c1','me','t','x','g1')`)).toThrow(/UNIQUE/);
+      VALUES('m1','c1','me','t','x','g1')`)).toThrow(/UNIQUE/); // id (= guid) is the primary key
     expect(db.prepare("SELECT id FROM v_participants ORDER BY id").all()).toEqual([{ id: "+15551234567" }, { id: "me" }]);
     db.exec("INSERT INTO messages(id,conversation_id,sender_id,timestamp,text,guid) VALUES('m3','c1','+15557654321','t','y','g3')");
     expect(db.prepare("SELECT sender_id FROM v_messages WHERE id='m3'").get()).toEqual({ sender_id: "+15551234567" });

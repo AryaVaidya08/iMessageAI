@@ -246,13 +246,9 @@ class AppWriter implements AppDbWriter {
 
   async getChatState(guid: string): Promise<ChatStoredState> {
     const last = await this.getSyncState(`chat_last_rowid:${guid}`);
-    const r = await this.app.all<{ n: number; mx: number | null }>(
-      "SELECT COUNT(*) AS n, MAX(rowid_src) AS mx FROM messages WHERE conversation_id = ?",
-      [guid],
-    );
-    const n = Number(r[0]?.n ?? 0);
-    const mx = Number(r[0]?.mx ?? 0);
-    return { count: n, maxRowid: Math.max(last ? Number(last) : 0, mx) };
+    // the per-chat watermark is written in the same transaction as each batch (no rowid_src index needed)
+    const r = await this.app.all<{ n: number }>("SELECT COUNT(*) AS n FROM messages WHERE conversation_id = ?", [guid]);
+    return { count: Number(r[0]?.n ?? 0), maxRowid: last ? Number(last) : 0 };
   }
 
   async upsertConversation(c: ChatInfo): Promise<void> {
@@ -339,7 +335,7 @@ class AppWriter implements AppDbWriter {
   private async deleteMessages(guids: string[]): Promise<void> {
     for (const part of chunked(guids, 500)) {
       await this.app.run(`DELETE FROM tapbacks WHERE message_id IN (${ph(part.length)})`, part);
-      await this.app.run(`DELETE FROM messages WHERE guid IN (${ph(part.length)})`, part);
+      await this.app.run(`DELETE FROM messages WHERE id IN (${ph(part.length)})`, part);
     }
   }
 
@@ -347,7 +343,7 @@ class AppWriter implements AppDbWriter {
     const out = new Map<string, { dateEdited: string | null; dateRetracted: string | null }>();
     for (const part of chunked(guids, 500)) {
       const rows = await this.app.all<{ guid: string; date_edited: string | null; date_retracted: string | null }>(
-        `SELECT guid, date_edited, date_retracted FROM messages WHERE guid IN (${ph(part.length)})`,
+        `SELECT id AS guid, date_edited, date_retracted FROM messages WHERE id IN (${ph(part.length)})`,
         part,
       );
       for (const r of rows) out.set(r.guid, { dateEdited: r.date_edited, dateRetracted: r.date_retracted });
@@ -360,7 +356,7 @@ class AppWriter implements AppDbWriter {
     return transaction(this.app, async () => {
       let n = 0;
       for (const m of b.messages) {
-        await this.app.run("UPDATE messages SET text = ?, date_edited = ?, date_retracted = ? WHERE guid = ?", [
+        await this.app.run("UPDATE messages SET text = ?, date_edited = ?, date_retracted = ? WHERE id = ?", [
           m.text ?? "", m.date_edited, m.date_retracted, m.guid,
         ]);
         n++;

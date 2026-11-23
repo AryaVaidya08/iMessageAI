@@ -112,6 +112,8 @@ export async function openAppDb(opts: { durability?: "default" | "strict" | "rel
     const handle = await sqlite3.open_v2(DB_FILE);
     const app = new AppDb(sqlite3, handle, vfs);
     try {
+      // 16 KB pages (only effective when the file is created): 4x fewer IndexedDB records than the 4 KB default.
+      await app.exec("PRAGMA page_size = 16384;");
       await app.exec("PRAGMA foreign_keys = ON; PRAGMA synchronous = NORMAL; PRAGMA cache_size = -16384;");
       await migrate({
         exec: (s) => app.exec(s),
