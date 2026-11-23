@@ -8,6 +8,7 @@ export function normalizeHandle(raw: string, opts: NormalizeOptions = {}): strin
   const s = (raw ?? "").trim();
   if (!s) return "";
   if (s.includes("@")) return s.toLowerCase();
+  if (!/^[+\d\s().\-]+$/.test(s)) return s.toLowerCase(); // not phone-shaped (business ids etc.)
   const cc = opts.defaultCountryCode ?? "1";
   const hasPlus = s.startsWith("+");
   let digits = s.replace(/\D/g, "");

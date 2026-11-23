@@ -31,7 +31,7 @@ export function decodeAttributedBody(blob: unknown): string | null {
   if (i < 0) return null;
   const start = i + NSSTRING.length;
   // After the class record: 0x01 0x94 0x84 0x01 0x2B (varies); locate "01 2B".
-  const limit = Math.min(buf.length - 2, start + 24);
+  const limit = Math.min(buf.length - 2, start + 64);
   let p = -1;
   for (let k = start; k < limit; k++) {
     if (buf[k] === 0x01 && buf[k + 1] === 0x2b) {
