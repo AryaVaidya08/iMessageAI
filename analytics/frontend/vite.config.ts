@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => ({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts", "tests/**/*.spec.ts"],
-    exclude: ["tests/memory.spec.ts", "node_modules/**"], // memory.spec.ts is Playwright (playwright.config.ts)
+    exclude: ["tests/memory.spec.ts", "tests/e2e/**", "node_modules/**"], // memory.spec.ts is Playwright (playwright.config.ts)
     testTimeout: 60_000,
   },
 }));

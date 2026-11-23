@@ -187,7 +187,9 @@ export async function createRealDeps(files: IngestInputFiles, inject: DepsInject
     },
   };
 
-  const app: AppDbLike = inject.app ?? (await openAppDb({ durability: "relaxed" }));
+  // default durability (NOT "relaxed"): with two connections (ingest + query worker) a commit must be visible
+  // to the other connection before the lock is released, or its page cache goes stale and the file corrupts.
+  const app: AppDbLike = inject.app ?? (await openAppDb());
   const writer = new AppWriter(app);
 
   const contacts: ContactsImporter = {

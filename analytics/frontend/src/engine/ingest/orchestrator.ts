@@ -171,6 +171,8 @@ export async function runIngest(args: RunArgs): Promise<void> {
         // yield so a queued cancel message can be handled between batches
         await new Promise((r) => setTimeout(r, 0));
       }
+      // messages the extractor skips (no text, no attachment) still count as handled for progress
+      if (done < expected) overall.messagesDone += expected - done;
       inserted += ins;
       overall.chatsDone++;
       if (ins > 0) changed.add(chat.guid);

@@ -89,7 +89,7 @@ export async function startIngest(input: IngestInput): Promise<void> {
   };
   setState({ running: true, percent: 0, overall: null, error: null });
   try {
-    worker = new Worker(new URL("./workers/ingest.worker.ts", import.meta.url), { type: "module" });
+    worker = new Worker(new URL("./workers/ingest.worker.ts", import.meta.url), { type: "module", name: "ingest" });
     worker.onmessage = (m: MessageEvent<IngestEvent>) => handle(m.data);
     worker.onerror = (ev) => handle({ type: "error", fatal: true, message: ev.message || "ingest worker failed to load" });
     worker.postMessage({ type: "start", files } satisfies IngestCommand);

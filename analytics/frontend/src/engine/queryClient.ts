@@ -13,7 +13,7 @@ export function resetQueryWorker(): void {
 /** Lazily spawns the query worker and sends query(route, params). */
 export function query<T>(route: string, params: Record<string, unknown> = {}): Promise<T> {
   if (!call) {
-    const worker = new Worker(new URL("./workers/query.worker.ts", import.meta.url), { type: "module" });
+    const worker = new Worker(new URL("./workers/query.worker.ts", import.meta.url), { type: "module", name: "query" });
     current = worker;
     const transport = worker as unknown as RpcTransport & { rejectAll?: (m: string) => void };
     call = createRpcClient(transport);

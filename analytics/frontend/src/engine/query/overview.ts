@@ -18,10 +18,36 @@ const num = (v: unknown) => Number(v ?? 0);
  * Unit 5 calls this after each ingest batch; the merge flow calls it after participant merges
  * (reply deltas depend on participant aliasing).
  */
-export async function refreshOverviewSummary(
-  db: QueryDb,
-  changedConversationIds?: string[] | null,
-): Promise<void> {
+export function refreshOverviewSummary(db: QueryDb, changedConversationIds?: string[] | null): Promise<void> {
+  return serialized(() => refreshInTransaction(db, changedConversationIds));
+}
+
+/**
+ * Refreshes run one at a time per worker, and each is ONE transaction (BEGIN IMMEDIATE takes the write lock, so
+ * the ingest worker's refresh and the query worker's lazy fill also serialize across connections). Without this
+ * two overview requests could interleave their delete/insert steps and violate the primary keys.
+ */
+let chain: Promise<unknown> = Promise.resolve();
+function serialized<T>(fn: () => Promise<T>): Promise<T> {
+  const next = chain.then(fn, fn);
+  chain = next.catch(() => {});
+  return next;
+}
+
+async function refreshInTransaction(db: QueryDb, changedConversationIds?: string[] | null): Promise<void> {
+  const exec = (db as unknown as { exec?: (sql: string) => Promise<void> }).exec;
+  const tx = !!exec;
+  if (tx) await exec!.call(db, "BEGIN IMMEDIATE");
+  try {
+    await refreshOverviewSummaryRows(db, changedConversationIds);
+    if (tx) await exec!.call(db, "COMMIT");
+  } catch (e) {
+    if (tx) await exec!.call(db, "ROLLBACK").catch(() => {});
+    throw e;
+  }
+}
+
+async function refreshOverviewSummaryRows(db: QueryDb, changedConversationIds?: string[] | null): Promise<void> {
   let ids = changedConversationIds;
   if (!ids) {
     ids = (await db.all("SELECT id FROM conversations")).map((r) => String(r.id));
@@ -84,13 +110,26 @@ export async function refreshOverviewSummary(
  * that already have a summary are only recomputed when ingest/merge code calls
  * refreshOverviewSummary (ingest: changed conversation ids; participant merge: null = all).
  */
-async function ensureSummary(db: QueryDb): Promise<void> {
-  const rows = await db.all(
-    `SELECT c.id FROM conversations c
+const MISSING_SQL = `SELECT c.id FROM conversations c
      WHERE NOT EXISTS (SELECT 1 FROM summary_overview_conv s WHERE s.conversation_id = c.id)
-       AND EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id)`,
-  );
-  if (rows.length) await refreshOverviewSummary(db, rows.map((r) => String(r.id)));
+       AND EXISTS (SELECT 1 FROM messages m WHERE m.conversation_id = c.id)`;
+
+async function ensureSummary(db: QueryDb): Promise<void> {
+  // cheap unlocked check first: the common case is "nothing missing"
+  if (!(await db.all(MISSING_SQL)).length) return;
+  await serialized(async () => {
+    // re-check inside the serialized section: another request (or the ingest worker) may have filled it already
+    const exec = (db as unknown as { exec?: (sql: string) => Promise<void> }).exec;
+    if (exec) await exec.call(db, "BEGIN IMMEDIATE");
+    try {
+      const rows = await db.all(MISSING_SQL);
+      if (rows.length) await refreshOverviewSummaryRows(db, rows.map((r) => String(r.id)));
+      if (exec) await exec.call(db, "COMMIT");
+    } catch (e) {
+      if (exec) await exec.call(db, "ROLLBACK").catch(() => {});
+      throw e;
+    }
+  });
 }
 
 // ---- stats.py ports ---------------------------------------------------------------------

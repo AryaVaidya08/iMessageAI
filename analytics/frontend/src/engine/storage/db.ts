@@ -17,6 +17,21 @@ const DB_FILE = "app.db";
 
 type SQLiteAPI = ReturnType<typeof SQLite.Factory>;
 
+// Diagnostics: build with VITE_TRACE=1 to log every DB call per worker (start/end) to the console.
+const TRACE = import.meta.env.VITE_TRACE === "1";
+let traceSeq = 0;
+function traced<T>(label: string, sql: string, fn: () => Promise<T>): Promise<T> {
+  if (!TRACE) return fn();
+  const id = ++traceSeq;
+  const who = (globalThis as { name?: string }).name || "main";
+  const t0 = performance.now();
+  console.log(`[trace ${who}] #${id} start ${label} ${sql.replace(/\s+/g, " ").slice(0, 90)}`);
+  return fn().then(
+    (r) => (console.log(`[trace ${who}] #${id} end ${Math.round(performance.now() - t0)}ms ${label} ${sql.replace(/\s+/g, " ").slice(0, 70)}`), r),
+    (e) => (console.log(`[trace ${who}] #${id} FAIL ${e}`), Promise.reject(e)),
+  );
+}
+
 class Mutex {
   private tail: Promise<unknown> = Promise.resolve();
   run<T>(fn: () => Promise<T>): Promise<T> {
@@ -35,9 +50,9 @@ export class AppDb implements Queryable {
   ) {}
 
   exec(sql: string): Promise<void> {
-    return this.mutex.run(async () => {
+    return traced("exec", sql, () => this.mutex.run(async () => {
       await this.sqlite3.exec(this.db, sql);
-    });
+    }));
   }
 
   async run(sql: string, params: SqlValue[] = []): Promise<void> {
@@ -46,7 +61,7 @@ export class AppDb implements Queryable {
 
   /** Executes one prepared statement for many parameter rows (caller owns the transaction). */
   runMany(sql: string, rows: SqlValue[][]): Promise<void> {
-    return this.mutex.run(async () => {
+    return traced("runMany", sql, () => this.mutex.run(async () => {
       for await (const stmt of this.sqlite3.statements(this.db, sql)) {
         for (const params of rows) {
           this.sqlite3.reset(stmt);
@@ -55,11 +70,11 @@ export class AppDb implements Queryable {
         }
         break; // single statement only
       }
-    });
+    }));
   }
 
   all<T = Record<string, SqlValue>>(sql: string, params: SqlValue[] = []): Promise<T[]> {
-    return this.mutex.run(async () => {
+    return traced("all", sql, () => this.mutex.run(async () => {
       const out: T[] = [];
       for await (const stmt of this.sqlite3.statements(this.db, sql)) {
         if (params.length) this.sqlite3.bind_collection(stmt, params as never);
@@ -72,7 +87,7 @@ export class AppDb implements Queryable {
         }
       }
       return out;
-    });
+    }));
   }
 
   async close(): Promise<void> {

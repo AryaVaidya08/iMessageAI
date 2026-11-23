@@ -92,6 +92,12 @@ export function DebugConsole({ subscribe, forceOpen = false }: { subscribe: Inge
     if (s.running && !wasRunning.current) setCollapsed(false);
     wasRunning.current = s.running;
   }, [s.running]);
+  // Tuck the dock away a few seconds after a successful import so it stops covering the page.
+  useEffect(() => {
+    if (!s.finished || s.errorCount > 0) return;
+    const t = setTimeout(() => setCollapsed(true), 4000);
+    return () => clearTimeout(t);
+  }, [s.finished, s.errorCount]);
   const open = forceOpen || !collapsed;
   const [copied, setCopied] = useState(false);
 

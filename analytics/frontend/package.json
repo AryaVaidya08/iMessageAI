@@ -12,7 +12,8 @@
     "test:memory": "MEMORY_TEST=1 playwright test -c playwright.config.ts",
     "make-fixtures": "tsx scripts/make-fixtures.ts",
     "make-goldens": "${PYTHON:-python3} scripts/make-goldens.py",
-    "typecheck:tests": "tsc --noEmit -p tsconfig.tests.json"
+    "typecheck:tests": "tsc --noEmit -p tsconfig.tests.json",
+    "test:e2e": "playwright test -c playwright.e2e.config.ts"
   },
   "dependencies": {
     "emoji-regex": "^11.0.0",
