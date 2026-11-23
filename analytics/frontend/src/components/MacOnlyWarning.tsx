@@ -20,7 +20,7 @@ const page: CSSProperties = {
   padding: 24,
   textAlign: "center",
   background: "var(--color-bg, #F5F5F7)",
-  color: "#D70015",
+  color: "#FFCC00",
   fontFamily: "var(--font-ui, -apple-system, sans-serif)",
 };
 
@@ -29,10 +29,9 @@ export function MacOnlyPage() {
   return (
     <div role="alert" style={page}>
       <FiSlash size={72} aria-hidden="true" />
-      <h1 style={{ margin: 0, fontSize: 28 }}>This only works on a Mac</h1>
+      <h1 style={{ margin: 0, fontSize: 28 }}>iMessageAI only works on a Mac!</h1>
       <p style={{ margin: 0, maxWidth: 420, fontSize: 17, lineHeight: 1.5 }}>
-        This app reads the iMessage database stored on a Mac, so it can't be used on this device. Please open it on a
-        MacBook or other Mac.
+        This app reads the iMessage database stored on a Mac, so it can't be used on this device. Please open this website on a MacBook so you can view your data!
       </p>
     </div>
   );
