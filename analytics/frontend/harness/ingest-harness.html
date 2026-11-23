@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>ingest harness</title></head>
+<body style="font:12px monospace">
+<button id="go">start (fake deps)</button> <button id="cancel">cancel</button>
+<pre id="out"></pre>
+<script type="module">
+  const out = document.getElementById("out");
+  const w = new Worker(new URL("../src/engine/workers/ingest.worker.ts", import.meta.url), { type: "module" });
+  window.__events = [];
+  w.onmessage = (e) => {
+    window.__events.push(e.data);
+    const d = e.data;
+    if (d.type !== "chat-progress" && d.type !== "overall") out.textContent += JSON.stringify(d) + "\n";
+  };
+  document.getElementById("go").onclick = () =>
+    w.postMessage({ type: "start", files: { chatDb: new File([], "chat.db") }, options: { useFakeDeps: true, batchSize: 2000 } });
+  const start = () => w.postMessage({ type: "start", files: { chatDb: new File([], "chat.db") }, options: { useFakeDeps: true, batchSize: 2000 } });
+  if (location.search.includes("auto")) {
+    let runs = 0;
+    const prev = w.onmessage;
+    w.onmessage = (e) => { prev(e); if (e.data.type === "done" && ++runs < 2) start(); else if (e.data.type === "done") document.title = "FINISHED"; };
+    start();
+  }
+  document.getElementById("cancel").onclick = () => w.postMessage({ type: "cancel" });
+</script></body></html>
