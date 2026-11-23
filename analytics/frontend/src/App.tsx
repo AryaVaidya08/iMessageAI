@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 
 import { DebugConsole } from "./components/DebugConsole";
+import { MacOnlyWarning } from "./components/MacOnlyWarning";
 import { ImportBanner } from "./components/ImportBanner";
 import { subscribeIngest } from "./engine/appState";
 import { cancelAllReads } from "./engine/engineClient";
@@ -40,6 +41,7 @@ export default function App() {
   useEffect(() => cancelAllReads, [pathname]);
   return (
     <>
+      <MacOnlyWarning />
       <TopNav />
       <ImportBanner />
       <main>
