@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 
+import { ImportBanner } from "./components/ImportBanner";
 import { TopNav } from "./components/TopNav";
 import { ConversationDetailPage } from "./pages/ConversationDetailPage";
 import { ConversationsListPage } from "./pages/ConversationsListPage";
@@ -14,6 +15,7 @@ export default function App() {
   return (
     <>
       <TopNav />
+      <ImportBanner />
       <main>
         <Routes>
           <Route path="/" element={<OverviewPage />} />

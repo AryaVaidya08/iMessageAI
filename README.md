@@ -20,3 +20,6 @@
 ## Notes
 - all .gitkeep files are temporary placeholders to retain the structure of the codebase
 - Remove sharing locations thing due to a lot of breaking in my phone
+## Legacy code
+
+`analytics/backend/` (FastAPI) and `backend/` (imessage-exporter HTML parser) are LEGACY reference implementations. The app is moving to a fully static in-browser engine (`analytics/frontend/src/engine/`); the Python code is kept only to generate golden outputs. `PERSONAL_NUMBER` / `.env.local` and the extract scripts apply to the legacy parser only and are not needed by the browser app.
