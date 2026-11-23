@@ -185,7 +185,7 @@ describe("ChatDbExtractor", () => {
     const batches = await collect(x.extractChat(chat, { batchSize: 5 }));
     expect(batches.map((b) => b.scanned)).toEqual([5, 5, 2]);
     expect(batches.flatMap((b) => b.participants).map((p) => p.id).sort()).toEqual(["+14155550001", "me"]);
-    expect(batches.at(-1)!.lastRowid).toBe(12);
+    expect(batches[batches.length - 1].lastRowid).toBe(12);
   });
 
   it("sinceRowid yields only newer messages and skips idle chats", async () => {
