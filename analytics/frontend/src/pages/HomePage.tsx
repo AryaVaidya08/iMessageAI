@@ -306,7 +306,7 @@ export function HomePage() {
                   Enter <code>~/Library/Messages</code> and press Return.
                 </li>
                 <li>
-                  Select <code>chat.db</code> (and <code>chat.db-wal, chat.db-shm </code> if they exist) and drop it above.
+                  Select <code>chat.db</code> (and <code>chat.db-wal, chat.db-shm</code> if they exist) and drop it above.
                 </li>
               </ol>
               <p>
