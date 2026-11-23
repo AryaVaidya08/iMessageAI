@@ -4,6 +4,8 @@ export type SqlValue = string | number | null | Uint8Array;
 export interface Queryable {
   run(sql: string, params?: SqlValue[]): Promise<void>;
   all<T = Record<string, SqlValue>>(sql: string, params?: SqlValue[]): Promise<T[]>;
+  /** Optional fast path: one prepared statement, many rows. */
+  runMany?(sql: string, rows: SqlValue[][]): Promise<void>;
 }
 
 export async function one<T = Record<string, SqlValue>>(db: Queryable, sql: string, params?: SqlValue[]): Promise<T | undefined> {
@@ -40,7 +42,10 @@ export async function runBatched(
     if (!batch.length) return;
     const b = batch;
     batch = [];
-    await transaction(db, async () => { for (const r of b) await db.run(sql, r); });
+    await transaction(db, async () => {
+      if (db.runMany) await db.runMany(sql, b);
+      else for (const r of b) await db.run(sql, r);
+    });
     done += b.length;
     onBatch?.(done);
   };

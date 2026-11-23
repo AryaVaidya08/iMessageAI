@@ -33,6 +33,18 @@ export class AppDb implements Queryable {
     await this.all(sql, params);
   }
 
+  /** Executes one prepared statement for many parameter rows (caller owns the transaction). */
+  async runMany(sql: string, rows: SqlValue[][]): Promise<void> {
+    for await (const stmt of this.sqlite3.statements(this.db, sql)) {
+      for (const params of rows) {
+        this.sqlite3.reset(stmt);
+        this.sqlite3.bind_collection(stmt, params as never);
+        while ((await this.sqlite3.step(stmt)) === SQLite.SQLITE_ROW) { /* drain */ }
+      }
+      break; // single statement only
+    }
+  }
+
   async all<T = Record<string, SqlValue>>(sql: string, params: SqlValue[] = []): Promise<T[]> {
     const out: T[] = [];
     for await (const stmt of this.sqlite3.statements(this.db, sql)) {
@@ -76,10 +88,11 @@ function acquireLock(wait: boolean): Promise<() => void> {
 /** Opens (creating if needed) and migrates the app DB. */
 export async function openAppDb(opts: { wait?: boolean } = {}): Promise<AppDb> {
   const release = await acquireLock(opts.wait ?? true);
+  let vfs: AccessHandlePoolVFS | undefined;
   try {
     const module = await SQLiteESMFactory({ locateFile: () => wasmUrl });
     const sqlite3 = SQLite.Factory(module as never);
-    const vfs = new AccessHandlePoolVFS(OPFS_DIR);
+    vfs = new AccessHandlePoolVFS(OPFS_DIR);
     await vfs.isReady;
     sqlite3.vfs_register(vfs as never, true);
     const handle = await sqlite3.open_v2(DB_FILE);
@@ -99,6 +112,7 @@ export async function openAppDb(opts: { wait?: boolean } = {}): Promise<AppDb> {
     }
     return app;
   } catch (e) {
+    try { await vfs?.close(); } catch { /* ignore */ }
     release();
     throw e;
   }
@@ -125,7 +139,12 @@ async function removeIfPresent(root: FileSystemDirectoryHandle, name: string, re
 
 /** Deletes all stored data. The DB must be closed in every worker first. */
 export async function clearAllData(): Promise<void> {
-  const root = await navigator.storage.getDirectory();
-  await removeIfPresent(root, OPFS_DIR_NAME, true);
-  await removeIfPresent(root, MARKER, false);
+  const release = await acquireLock(true); // waits for any open DB to close
+  try {
+    const root = await navigator.storage.getDirectory();
+    await removeIfPresent(root, OPFS_DIR_NAME, true);
+    await removeIfPresent(root, MARKER, false);
+  } finally {
+    release();
+  }
 }
