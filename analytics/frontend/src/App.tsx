@@ -8,6 +8,7 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import { OverviewPage } from "./pages/OverviewPage";
 import { PeopleListPage } from "./pages/PeopleListPage";
 import { PersonDetailPage } from "./pages/PersonDetailPage";
+import { SharePage } from "./pages/SharePage";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/people" element={<PeopleListPage />} />
           <Route path="/people/:id" element={<PersonDetailPage />} />
           <Route path="/merge" element={<MergePage />} />
+          <Route path="/share" element={<SharePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

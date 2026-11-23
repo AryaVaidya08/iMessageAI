@@ -1,0 +1,142 @@
+.block {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.blockHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.blockKicker {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+.blockTitle {
+  font-size: 20px;
+  margin: 2px 0 0;
+}
+
+.statRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 4px 0 -4px;
+}
+
+.leaderboardSection + .leaderboardSection {
+  margin-top: 4px;
+}
+
+.leaderboardSectionTitle {
+  font-size: 15px;
+  margin: 0 0 10px;
+}
+
+.leaderboardDivider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 12px 0;
+}
+
+.leaderboardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.statsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.conversationList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.conversationRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--color-bg);
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.conversationName {
+  color: var(--color-text-primary);
+}
+
+.conversationMeta {
+  color: var(--color-text-secondary);
+}
+
+.announcementList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.announcementItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.announcementDotJoin,
+.announcementDotLeave {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.announcementDotJoin {
+  background: #34c759;
+}
+
+.announcementDotLeave {
+  background: #ff453a;
+}
+
+.announcementTime {
+  margin-left: auto;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.empty {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}

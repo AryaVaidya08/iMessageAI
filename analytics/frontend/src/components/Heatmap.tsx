@@ -56,7 +56,7 @@ export function Heatmap({ grid, title }: { grid: number[][]; title?: string }) {
   const [showNumbers, setShowNumbers] = useState(true);
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} data-share-block="true">
       <div className={styles.header}>
         {title ? <h3 className={styles.title}>{title}</h3> : <span />}
         <button

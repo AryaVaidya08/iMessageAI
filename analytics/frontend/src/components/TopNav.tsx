@@ -22,6 +22,9 @@ export function TopNav() {
           <NavLink to="/merge" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
             Merge
           </NavLink>
+          <NavLink to="/share" className={({ isActive }) => (isActive ? styles.linkActive : styles.link)}>
+            Share
+          </NavLink>
         </div>
         <div className={styles.controls}>
           <ThemeToggle />

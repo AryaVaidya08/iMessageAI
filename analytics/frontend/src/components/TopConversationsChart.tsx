@@ -6,7 +6,7 @@ import styles from "./TopConversationsChart.module.css";
 export function TopConversationsChart({ items }: { items: TopConversationOut[] }) {
   const max = Math.max(...items.map((i) => i.message_count), 1);
   return (
-    <div className={styles.card}>
+    <div className={styles.card} data-share-block="true">
       <h3 className={styles.title}>Top conversations</h3>
       <ul className={styles.list}>
         {items.map((item) => (

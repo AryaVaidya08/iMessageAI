@@ -478,10 +478,17 @@ export const api = {
   conversationLeaderboard: (id: string) =>
     getJSON<ConversationLeaderboard>(`/api/conversations/${id}/leaderboard`),
 
-  people: (params: { search?: string; sort?: "count" | "recent"; page?: number; page_size?: number }) => {
+  people: (params: {
+    search?: string;
+    sort?: "count" | "recent" | "conversations";
+    order?: "asc" | "desc";
+    page?: number;
+    page_size?: number;
+  }) => {
     const qs = new URLSearchParams();
     if (params.search) qs.set("search", params.search);
     if (params.sort) qs.set("sort", params.sort);
+    if (params.order) qs.set("order", params.order);
     qs.set("page", String(params.page ?? 1));
     qs.set("page_size", String(params.page_size ?? 25));
     return getJSON<PeopleListResponse>(`/api/people?${qs.toString()}`);

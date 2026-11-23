@@ -10,15 +10,17 @@ export function VolumeChart({
   points,
   granularity,
   onGranularityChange,
+  animate = true,
 }: {
   points: VolumePoint[];
   granularity: Granularity;
   onGranularityChange: (g: Granularity) => void;
+  animate?: boolean;
 }) {
   const reducedMotion = usePrefersReducedMotion();
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} data-share-block="true">
       <div className={styles.header}>
         <h3 className={styles.title}>Message volume</h3>
         <div className={styles.segmented}>
@@ -49,7 +51,7 @@ export function VolumeChart({
             dataKey="count"
             fill="var(--color-accent)"
             radius={[6, 6, 0, 0]}
-            isAnimationActive={!reducedMotion}
+            isAnimationActive={animate && !reducedMotion}
           />
         </BarChart>
       </ResponsiveContainer>
