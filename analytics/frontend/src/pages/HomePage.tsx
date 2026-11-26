@@ -72,6 +72,28 @@ function DropZone(props: {
   );
 }
 
+// Gathers chat.db (plus -wal/-shm) and the AddressBook folder into one visible Desktop folder.
+// Old copies of chat.db* are removed first so a stale -wal is never paired with a newer chat.db.
+const EXPORT_COMMAND =
+  'mkdir -p ~/Desktop/iMessageExport && rm -f ~/Desktop/iMessageExport/chat.db{,-wal,-shm} && cp ~/Library/Messages/chat.db* ~/Desktop/iMessageExport/ && cp -R ~/Library/"Application Support"/AddressBook ~/Desktop/iMessageExport/ && open ~/Desktop/iMessageExport';
+
+function CopyCommand({ command }: { command: string }) {
+  const [status, setStatus] = useState("Copy command");
+  const copy = () =>
+    navigator.clipboard.writeText(command).then(
+      () => setStatus("Copied!"),
+      () => setStatus("Copy failed, select the text instead"),
+    );
+  return (
+    <>
+      <pre className={styles.command}>{command}</pre>
+      <button type="button" className={styles.secondary} onClick={copy}>
+        {status}
+      </button>
+    </>
+  );
+}
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <details className={styles.details}>
@@ -329,6 +351,33 @@ export function HomePage() {
                   or choose the whole Sources folder.
                 </li>
               </ol>
+            </Section>
+            <Section title="Alternative: gather everything with one Terminal command">
+              <ol>
+                <li>Quit the Messages app.</li>
+                <li>
+                  Press <kbd>Cmd</kbd>+<kbd>Space</kbd>, type <code>Terminal</code> and press Return.
+                </li>
+                <li>
+                  Copy the command below, paste it into Terminal and press Return.
+                  <CopyCommand command={EXPORT_COMMAND} />
+                </li>
+                <li>
+                  An <code>iMessageExport</code> folder opens from your Desktop. Drop <code>chat.db</code> (and{" "}
+                  <code>chat.db-wal</code>, <code>chat.db-shm</code>) into box 1 above.
+                </li>
+                <li>
+                  For contacts, click "Choose a folder" above and pick the <code>AddressBook</code> folder inside{" "}
+                  <code>iMessageExport</code>.
+                </li>
+                <li>
+                  When the import is done, delete <code>iMessageExport</code>, since it holds a copy of your messages.
+                </li>
+              </ol>
+              <p>
+                If Terminal says <code>Operation not permitted</code>, grant it Full Disk Access (System Settings,
+                Privacy and Security, Full Disk Access), then quit and reopen Terminal and run the command again.
+              </p>
             </Section>
           </section>
         </>
